@@ -1,6 +1,7 @@
 baseurl = "/"
 relativeurls = true
-languageCode = "en-us"
+hasCJKLanguage = true
+languageCode = "ja-jp"
 title = "A Hugo website"
 theme = "hugo-lithium-theme"
 googleAnalytics = ""
@@ -11,7 +12,7 @@ ignoreFiles = ["\\.Rmd$", "_files$", "_cache$"]
     post = "/:year/:month/:day/:slug/"
 
 [[menu.main]]
-    name = "About"
+    name = "Kenji Miyazaki"
     url = "/about/"
 [[menu.main]]
     name = "GitHub"
