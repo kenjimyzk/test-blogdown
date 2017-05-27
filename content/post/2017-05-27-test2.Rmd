@@ -1,0 +1,18 @@
+---
+title: test2
+author: kenji miyazaki
+date: '2017-05-27'
+slug: test2
+categories: []
+tags: []
+---
+
+日本語
+```{r}
+plot(cars)
+```
+
+$$
+y_t=\alpha+\beta x_t + \epsilon_t
+$$
+
