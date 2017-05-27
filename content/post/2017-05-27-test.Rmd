@@ -1,0 +1,15 @@
+---
+title: test
+author: Kenji Miyazaki
+date: '2017-05-27'
+slug: test
+categories: []
+tags: []
+---
+
+This is a test.
+```{r}
+rnorm(10)
+```
+
+
