@@ -1,0 +1,25 @@
+---
+title: "rnorm"
+author: "Kenji Miyazaki"
+date: '2017-06-01'
+slug: rnorm
+tags: []
+categories: R
+---
+
+ここで例を示す.
+```{r}
+(x<-rnorm(10))
+```
+```{r}
+(y<-rnorm(10))
+```
+作図すると以下になる.
+```{r}
+plot(x,y)
+```
+
+
+
+
+

@@ -1,0 +1,12 @@
+---
+title: ols
+author: "宮﨑憲治"
+date: '2017-05-27'
+slug: ols
+categories: []
+tags: []
+---
+```{r}
+library(mosaic)
+```
+
