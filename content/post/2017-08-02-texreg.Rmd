@@ -14,7 +14,6 @@ library(AER)
 data("CASchools", package = "AER")
 ```
 
-
 データ加工したうえで幾つか選択する.
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
@@ -127,3 +126,4 @@ if(.Platform$OS.type == "windows") {
   }
 ```
 
+ファイルは [ここ](https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab5.tex) にある.
