@@ -7,26 +7,22 @@ categories: [R]
 tags: []
 ---
 
-https://github.com/leifeld/texreg/
-```{r}
-library(texreg)
-```
 
 ライブラリ AER データ を用いる.
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(AER)
 data("CASchools", package = "AER")
 ```
 
 
 データ加工したうえで幾つか選択する.
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
-head(CASchools)
+library(knitr)
 df <- CASchools %>% 
   mutate(stratio=students/teachers,score=(math+read)/2) %>%
   select(score,stratio,english,lunch,calworks)
-head(df)
+df %>% head() %>% kable()
 ```
 
 日本語での統計表は次のようにする.
@@ -40,15 +36,14 @@ tab<-df %>% gather(key=variables, values) %>%
                最小値=min(values),
                最大値=max(values)) %>%
   rename(変数=variables)
-library(knitr)
-kable(tab)
+tab %>% kable()
 ```
 
 単回帰モデルは以下のとおりである.
 ```{r}
 fm1 <- lm(score ~ stratio, data = df)
 library(broom)
-tidy(fm1)
+fm1 %>% tidy() %>% kable()
 ```
 
 ```{r}
@@ -58,55 +53,51 @@ fm4 <- lm(score ~ stratio + english + calworks, data = df)
 fm5 <- lm(score ~ stratio + english + lunch + calworks, data = df)
 ```
 
-画面は次のようになる.
+https://github.com/leifeld/texreg/
 ```{r}
+library(texreg)
+```
+
+画面は次のようになる.
+```{r results='asis'}
 ll<-list(fm1,fm2,fm3,fm4,fm5)
-screenreg(ll)
+htmlreg(ll)
 ```
 
 ロバスト分散を指定すると次のようになる.
-```{r}
+```{r results='asis'}
 selist <- ll %>% map(~coeftest(.,vcovHC(.,type="HC1"))[,2])
 pvlist <- ll %>% map(~coeftest(.,vcovHC(.,type="HC1"))[,4])
-screenreg(ll, override.se=selist,override.pvalues=pvlist)
+htmlreg(ll, override.se=selist,override.pvalues=pvlist)
 ```
 
 0.1%有意水準を使わないように指定し, 注釈をつける.
-```{r}
+
+```{r results='asis'}
 cn = "係数下の括弧内はロバスト標準誤差を表す. 各係数の統計的な有意性は両側検定にもとづいてテストされる. 個々の係数は, 5%水準 (*), 1%水準 (**) でそれぞれ有意."
-screenreg(ll, stars = c(0.05, 0.01), custom.note = cn, override.se=selist,override.pvalues=pvlist)
+htmlreg(ll, stars = c(0.05, 0.01), custom.note = cn, override.se=selist,override.pvalues=pvlist)
 ```
 
 係数の順序を変更
-```{r}
-screenreg(ll,  reorder.coef = c(2, 3, 4, 5, 1),
+```{r results='asis'}
+htmlreg(ll, reorder.coef = c(2, 3, 4, 5, 1),
           stars = c(0.05, 0.01), custom.note = cn,
           override.se=selist,override.pvalues=pvlist)
 ```
 
 決定係数を表示しないように指定し, 統計量の順序を変更する.
-```{r}
-screenreg(ll,  reorder.coef = c(2, 3, 4, 5, 1),
+```{r results='asis'}
+htmlreg(ll, reorder.coef = c(2, 3, 4, 5, 1),
           include.rsquared=FALSE, reorder.gof = c(3, 1, 2),
            stars = c(0.05, 0.01), custom.note= cn,
            override.se=selist,override.pvalues=pvlist)
 ```
 
 名前を変更する.
-```{r}
+```{r results='asis'}
 cnm = c("(1)","(2)","(3)","(4)","(5)")
 ccn = c("切片","教員一人あたり学生数","英語学習者割合","昼食補助者割合","所得支援家計")
 cgn=c("調整済み決定係数","観測数","SER")
-screenreg(ll, custom.model.names =cnm,
-       custom.coef.names =ccn,reorder.coef = c(2, 3, 4, 5, 1),
-       include.rsquared=FALSE, reorder.gof = c(3, 1, 2),
-       custom.gof.names= cgn, 
-       stars = c(0.05, 0.01),  custom.note =cn, 
-       override.se=selist,override.pvalues=pvlist)
-```
-
-html で表記する.
-```{r results='asis'}
 htmlreg(ll, custom.model.names =cnm,
        custom.coef.names =ccn,reorder.coef = c(2, 3, 4, 5, 1),
        include.rsquared=FALSE, reorder.gof = c(3, 1, 2),
