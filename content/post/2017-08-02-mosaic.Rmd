@@ -37,12 +37,12 @@ mean(births ~ wday, data = Births78)
 
 ```{r}
 cars.mod1 <- lm(dist ~ speed, data = cars)
-summary(cars.mod1) %>% tidy() %>% kable()
+cars.mod1 %>% tidy() %>% kable()
 ```
 
 ```{r}
 cars.mod2 <- lm(dist ~ poly(speed,2), data = cars)
-summary(cars.mod2) %>% tidy() %>% kable()
+cars.mod2 %>% tidy() %>% kable()
 ```
 ```{r, results = 'asis'}
 library(stargazer)
