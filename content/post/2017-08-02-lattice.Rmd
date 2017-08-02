@@ -1,0 +1,28 @@
+---
+title: mosaic
+author: Kenji Miyazaki
+date: '2017-08-02'
+slug: lattice
+categories:
+  - R
+tags:
+  - R Markdown
+---
+パッケージ `mosaic` がアップグレードされた.
+
+```{r, message=FALSE, warning=FALSE}
+library(mosaic)
+```
+
+```{r}
+model <- lm(length ~ width + sex, data = KidsFeet)
+l <- makeFun(model)
+l(width = 8.25, sex = "B")
+```
+
+```{r}
+gf_point(length ~ width, data = KidsFeet, color = ~ sex) %>% 
+  gf_fun(l(w, sex = "B") ~ w, color = ~"B") %>%
+  gf_fun(l(w, sex = "G") ~ w, color = ~"G")
+```
+

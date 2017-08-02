@@ -1,0 +1,24 @@
+---
+title: mosaic
+author: Kenji Miyazaki
+date: '2017-08-02'
+slug: lattice
+categories:
+  - R
+tags:
+  - R Markdown
+---
+
+
+
+<p>パッケージ <code>mosaic</code> がアップグレードされた.</p>
+<pre class="r"><code>library(mosaic)</code></pre>
+<pre class="r"><code>model &lt;- lm(length ~ width + sex, data = KidsFeet)
+l &lt;- makeFun(model)
+l(width = 8.25, sex = &quot;B&quot;)</code></pre>
+<pre><code>##        1 
+## 23.59689</code></pre>
+<pre class="r"><code>gf_point(length ~ width, data = KidsFeet, color = ~ sex) %&gt;% 
+  gf_fun(l(w, sex = &quot;B&quot;) ~ w, color = ~&quot;B&quot;) %&gt;%
+  gf_fun(l(w, sex = &quot;G&quot;) ~ w, color = ~&quot;G&quot;)</code></pre>
+<p><img src="/post/2017-08-02-lattice_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
