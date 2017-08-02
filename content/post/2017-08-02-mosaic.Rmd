@@ -1,0 +1,58 @@
+---
+title: mosaic
+author: Kenji Miyazaki
+date: '2017-08-02'
+slug: mosaic
+categories:
+  - R
+tags:
+  - R Markdown
+---
+## 初期設定
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(broom)
+library(knitr)
+```
+
+```{r}
+Births78 %>% head(3) %>% kable()
+```
+
+
+
+```{r}
+bwplot(births ~ wday, data=Births78)
+```
+
+
+```{r}
+bwplot(wday ~ births, data=Births78, pch = "|")
+```
+
+```{r}
+mean(births ~ wday, data = Births78)
+```
+
+```{r}
+cars.mod1 <- lm(dist ~ speed, data = cars)
+summary(cars.mod1) %>% tidy() %>% kable()
+```
+
+```{r}
+cars.mod2 <- lm(dist ~ poly(speed,2), data = cars)
+summary(cars.mod2) %>% tidy() %>% kable()
+```
+```{r, results = 'asis'}
+library(stargazer)
+stargazer(cars.mod1,cars.mod2,type="html")
+```
+`cars.mod1` の係数名を変更する.
+```{r, results = 'asis'}
+library(stargazer)
+names(cars.mod2$coefficients) <- c("(Intercept)", "speed",  "speed2")
+stargazer(cars.mod1,cars.mod2,type="html")
+```
+
+
