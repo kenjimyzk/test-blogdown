@@ -885,4 +885,26 @@ Num. obs.
 </td>
 </tr>
 </table>
+<pre class="r"><code>fm7 &lt;- df %&gt;% filter(year==1982|year==1988) %&gt;% 
+  lm(frate ~ beertax + drinkagec + punish + vmiles + unemp + log(income) + state + year,.)
+coeftest(fm7, vcovHC(fm7 ,type=&quot;HC1&quot;)) %&gt;% tidy() %&gt;% head(9)</code></pre>
+<pre><code>##               term    estimate  std.error  statistic      p.value
+## 1      (Intercept) -5.24571226 7.00269819 -0.7490987 0.4584099638
+## 2          beertax -0.92560284 0.36055834 -2.5671375 0.0143148699
+## 3 drinkagec[18,19)  0.03744951 0.10773747  0.3475997 0.7300589040
+## 4 drinkagec[19,20) -0.06488482 0.10375259 -0.6253802 0.5354595137
+## 5 drinkagec[20,21) -0.11265975 0.13170612 -0.8553874 0.3976981262
+## 6        punishyes  0.08904197 0.17255222  0.5160292 0.6088238606
+## 7           vmiles  0.12435007 0.05131170  2.4234252 0.0202459114
+## 8            unemp -0.09078230 0.02196733 -4.1326049 0.0001901589
+## 9      log(income)  0.99551324 0.71271907  1.3967821 0.1705839089</code></pre>
+<pre class="r"><code>fm2a &lt;- lm(frate ~ beertax + state, df)
+fm3a &lt;- update(fm2a, . ~ . + year)
+fm4a &lt;- update(fm3a, . ~ . + drinkagec + punish + vmiles + unemp + log(income))
+fm5a &lt;- update(fm4a, . ~ . - unemp - log(income))
+fm6a &lt;- update(fm4a, . ~ . - drinkagec + drinkage)
+fmlist &lt;- list(fm2a, fm3a, fm4a, fm5a, fm6a, fm7)
+fmlist %&gt;% map(summary) %&gt;% map_dbl(&quot;adj.r.squared&quot;)</code></pre>
+<pre><code>## [1] 0.8891286 0.8914250 0.9260149 0.8928436 0.9261851 0.8986838</code></pre>
+<p>```</p>
 </div>

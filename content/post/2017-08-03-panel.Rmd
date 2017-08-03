@@ -83,4 +83,19 @@ htmlreg(ll, override.se=selist,override.pvalues=pvlist,omit.coef = "(Intercept)"
         reorder.coef = c(1:4,9,5:8),digits = 3)
 ```
 
+```{r}
+fm7 <- df %>% filter(year==1982|year==1988) %>% 
+  lm(frate ~ beertax + drinkagec + punish + vmiles + unemp + log(income) + state + year,.)
+coeftest(fm7, vcovHC(fm7 ,type="HC1")) %>% tidy() %>% head(9)
+```
 
+```{r}
+fm2a <- lm(frate ~ beertax + state, df)
+fm3a <- update(fm2a, . ~ . + year)
+fm4a <- update(fm3a, . ~ . + drinkagec + punish + vmiles + unemp + log(income))
+fm5a <- update(fm4a, . ~ . - unemp - log(income))
+fm6a <- update(fm4a, . ~ . - drinkagec + drinkage)
+fmlist <- list(fm2a, fm3a, fm4a, fm5a, fm6a, fm7)
+fmlist %>% map(summary) %>% map_dbl("adj.r.squared")
+```
+```
