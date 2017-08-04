@@ -220,8 +220,8 @@ fm_diff2 &lt;- ivreg(ydiff ~ pricediff + incdiff | incdiff + taxdiff,data=ddf)
 fm_diff3 &lt;- ivreg(ydiff ~ pricediff + incdiff | incdiff + taxsdiff + taxdiff,data=ddf)</code></pre>
 <p>作表すると以下になる.</p>
 <pre class="r"><code>ll=list(fm_diff1,fm_diff2,fm_diff3)
-selist &lt;- ll %&gt;% map(~coeftest(.,vcovHC=hc)[,2])
-pvlist &lt;- ll %&gt;% map(~coeftest(.,vcovHC=hc)[,4])
+selist &lt;- ll %&gt;% map(~coeftest(.,hc1)[,2])
+pvlist &lt;- ll %&gt;% map(~coeftest(.,hc1)[,4])
 htmlreg(ll, override.se=selist,override.pvalues=pvlist,
         reorder.coef = c(2,3,1))</code></pre>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -264,10 +264,10 @@ pricediff
 (0.21)
 </td>
 <td style="padding-right: 12px; border: none;">
-(0.19)
+(0.23)
 </td>
 <td style="padding-right: 12px; border: none;">
-(0.17)
+(0.20)
 </td>
 </tr>
 <tr>
@@ -288,10 +288,10 @@ incdiff
 <td style="padding-right: 12px; border: none;">
 </td>
 <td style="padding-right: 12px; border: none;">
-(0.31)
+(0.34)
 </td>
 <td style="padding-right: 12px; border: none;">
-(0.32)
+(0.30)
 </td>
 <td style="padding-right: 12px; border: none;">
 (0.31)
@@ -318,7 +318,7 @@ incdiff
 (0.07)
 </td>
 <td style="padding-right: 12px; border: none;">
-(0.06)
+(0.07)
 </td>
 <td style="padding-right: 12px; border: none;">
 (0.06)

@@ -137,8 +137,8 @@ fm_diff3 <- ivreg(ydiff ~ pricediff + incdiff | incdiff + taxsdiff + taxdiff,dat
 作表すると以下になる.
 ```{r results='asis'}
 ll=list(fm_diff1,fm_diff2,fm_diff3)
-selist <- ll %>% map(~coeftest(.,vcovHC=hc)[,2])
-pvlist <- ll %>% map(~coeftest(.,vcovHC=hc)[,4])
+selist <- ll %>% map(~coeftest(.,hc1)[,2])
+pvlist <- ll %>% map(~coeftest(.,hc1)[,4])
 htmlreg(ll, override.se=selist,override.pvalues=pvlist,
         reorder.coef = c(2,3,1))
 ```
