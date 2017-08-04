@@ -51,11 +51,19 @@ coeftest(fm1988, vcov = vcovHC(fm1988,type = "HC1")) %>% tidy() %>% kable()
 
 ### pp. 355, Eq. (10.8)
 ```{r}
+df1982 <- df %>% filter(year=="1982") %>% select(frate,beertax,state)
+df1988 <- df %>% filter(year=="1988") %>% select(frate,beertax,state)
+full_join(df1982,df1988,by="state") %>%
+  mutate(dfrate = frate.y-frate.x, dbeertax = beertax.y-beertax.x) %>%
+  lm(dfrate ~ dbeertax, data = .) %>% tidy() %>% kable()
+```
+
+```{r}
 fm_diff <- df %>% filter(year=="1982"|year=="1988") %>%
-  plm(frate ~ beertax, data = ., index = c("state", "year"),
-model = "fd")
+  plm(frate ~ beertax, data = ., index = c("state", "year"),model = "fd")
 coeftest(fm_diff) %>% tidy() %>% kable()
 ```
+
 
 ## p. 368, Table 10.1, numbers refer to cols.
 ```{r}

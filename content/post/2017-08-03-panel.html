@@ -385,9 +385,40 @@ coeftest(fm1988, vcov = vcovHC(fm1988,type = &quot;HC1&quot;)) %&gt;% tidy() %&g
 </div>
 <div id="pp.355-eq.-10.8" class="section level3">
 <h3>pp. 355, Eq. (10.8)</h3>
+<pre class="r"><code>df1982 &lt;- df %&gt;% filter(year==&quot;1982&quot;) %&gt;% select(frate,beertax,state)
+df1988 &lt;- df %&gt;% filter(year==&quot;1988&quot;) %&gt;% select(frate,beertax,state)
+full_join(df1982,df1988,by=&quot;state&quot;) %&gt;%
+  mutate(dfrate = frate.y-frate.x, dbeertax = beertax.y-beertax.x) %&gt;%
+  lm(dfrate ~ dbeertax, data = .) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-0.0720371</td>
+<td align="right">0.0606440</td>
+<td align="right">-1.187868</td>
+<td align="right">0.2409827</td>
+</tr>
+<tr class="even">
+<td align="left">dbeertax</td>
+<td align="right">-1.0409727</td>
+<td align="right">0.4172279</td>
+<td align="right">-2.494974</td>
+<td align="right">0.0162485</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>fm_diff &lt;- df %&gt;% filter(year==&quot;1982&quot;|year==&quot;1988&quot;) %&gt;%
-  plm(frate ~ beertax, data = ., index = c(&quot;state&quot;, &quot;year&quot;),
-model = &quot;fd&quot;)
+  plm(frate ~ beertax, data = ., index = c(&quot;state&quot;, &quot;year&quot;),model = &quot;fd&quot;)
 coeftest(fm_diff) %&gt;% tidy() %&gt;% kable()</code></pre>
 <table>
 <thead>
