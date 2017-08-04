@@ -1,0 +1,79 @@
+---
+title: maschools
+author: kenjimyzk
+date: '2017-08-04'
+slug: maschools
+categories:
+  - R
+tags:
+  - R Markdown
+---
+
+SW本8章の表8.3を再現する. まず以下のライブラリを導入する
+```{r, message=FALSE, warning=FALSE}
+library(knitr)
+library(mosaic)
+library(AER)
+library(texreg)
+library(tidyverse)
+```
+
+またロバスト分散を何度も計算するため次の関数を作っておく.
+```{r}
+## convenience function: HC1 covariances
+hc1 <- function(x) vcovHC(x, type = "HC1")
+```
+
+データを少し加工する.
+```{r}
+data("MASchools", package = "AER")
+df <- MASchools %>% mutate(higheng = I(english > median(english))) %>%
+  select(score4,lunch,stratio,higheng,english,income)
+summary(df)
+```
+
+回帰分析を実行する.
+```{r}
+fm1 <- lm(score4 ~ stratio, data = df)
+fm2 <- lm(score4 ~ stratio + english + lunch + log(income), data = df)
+fm3 <- lm(score4 ~ stratio + english + lunch + income + I(income^2) + I(income^3),
+  data = df)
+fm4 <- lm(score4 ~ stratio + I(stratio^2) + I(stratio^3) + english + lunch +
+  income + I(income^2) + I(income^3), data = df)
+fm5 <- lm(score4 ~ stratio + higheng + I(higheng * stratio) + lunch +
+  income + I(income^2) + I(income^3), data = df)
+fm6 <- lm(score4 ~ stratio + lunch + income + I(income^2) + I(income^3),
+  data = df)
+```
+
+
+ロバスト分散を考慮に入れて作表する.
+```{r results='asis'}
+ll = list(fm1,fm2,fm3,fm4,fm5,fm6)
+selist <- ll %>% map(~coeftest(.,hc1)[,2])
+pvlist <- ll %>% map(~coeftest(.,hc1)[,4])
+htmlreg(ll, override.se=selist,override.pvalues=pvlist,
+        include.rsquared = FALSE,digits=3,
+        custom.model.names = c("(1)","(2)","(3)","(4)","(5)","(6)"))
+```
+
+検定を実行する.
+```{r}
+fm3r <- update(fm3, . ~ . - I(income^2) - I(income^3))
+waldtest(fm3, fm3r, vcov = hc1)
+fm4r_str1 <- update(fm4, . ~ . - stratio - I(stratio^2) - I(stratio^3))
+waldtest(fm4, fm4r_str1, vcov = hc1)
+fm4r_str2 <- update(fm4, . ~ . - I(stratio^2) - I(stratio^3))
+waldtest(fm4, fm4r_str2, vcov = hc1)
+fm4r_inc <- update(fm4, . ~ . - I(income^2) - I(income^3))
+waldtest(fm4, fm4r_inc, vcov = hc1)
+fm5r_str <- update(fm5, . ~ . - stratio - I(higheng * stratio))
+waldtest(fm5, fm5r_str, vcov = hc1)
+fm5r_inc <- update(fm5, . ~ . - I(income^2) - I(income^3))
+waldtest(fm5, fm5r_inc, vcov = hc1)
+fm5r_high <- update(fm5, . ~ . - higheng - I(higheng * stratio))
+waldtest(fm5, fm5r_high, vcov = hc1)
+fm6r_inc <- update(fm6, . ~ . - I(income^2) - I(income^3))
+waldtest(fm6, fm6r_inc, vcov = hc1)
+```
+
