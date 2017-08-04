@@ -1,0 +1,68 @@
+---
+title: journal
+author: Kenji Miyazaki
+date: '2017-08-04'
+slug: journal
+categories:
+  - R
+tags:
+  - R Markdown
+---
+
+SW本8章の表8.2再現を試みる. 以下のライブラリを導入する
+```{r, message=FALSE, warning=FALSE}
+library(knitr)
+library(mosaic)
+library(AER)
+library(texreg)
+library(tidyverse)
+```
+
+またロバスト分散を何度も計算するため次の関数を作っておく.
+```{r}
+## convenience function: HC1 covariances
+hc1 <- function(x) vcovHC(x, type = "HC1")
+```
+
+データ整理
+```{r}
+## data and transformed variables
+data("Journals", package = "AER")
+journals <- Journals %>% mutate(citeprice = price/citations,
+                                age = 2000 - foundingyear,
+                                chars = charpp*pages/10^7) %>%
+  select(subs,price,citeprice,age,chars)
+```
+
+```{r}
+plot(subs ~ citeprice, data = journals, pch = 19)
+```
+
+```{r}
+plot(subs ~ citeprice, data = log(journals), pch = 19)
+fm1 <- lm(subs ~ citeprice, data = log(journals))
+abline(fm1)
+```
+
+
+
+```{r}
+fm2 <- update(fm1, .~ . + age + chars)
+fm3 <- update(fm2, .~ . + I(citeprice^2) + I(citeprice^3) + I(age * citeprice))
+fm4 <- update(fm2, .~ . + I(age * citeprice))
+fm4 <- lm(subs ~ citeprice + age + I(age * citeprice) + chars, data = log(journals))
+```
+
+
+```{r results='asis'}
+ll = list(fm1,fm2,fm3,fm4)
+selist <- ll %>% map(~coeftest(.,hc1)[,2])
+pvlist <- ll %>% map(~coeftest(.,hc1)[,4])
+hc1 <- function(x) vcovHC(x, type = "HC1")
+htmlreg(ll, override.se=selist,override.pvalues=pvlist,
+        custom.model.names = c("(1)","(2)","(3)","(4)"),
+        reorder.coef = c(2,5,6,3,7,4,1),
+        include.rsquared = FALSE,digits=3)
+```
+
+
