@@ -9,7 +9,7 @@ tags:
   - R Markdown
 ---
 
-SW本8章の表8.3を再現する. まず以下のライブラリを導入する
+SW本9章の表8.2を再現する. まず以下のライブラリを導入する
 ```{r, message=FALSE, warning=FALSE}
 library(knitr)
 library(mosaic)
@@ -35,15 +35,20 @@ summary(df)
 回帰分析を実行する.
 ```{r}
 fm1 <- lm(score4 ~ stratio, data = df)
-fm2 <- lm(score4 ~ stratio + english + lunch + log(income), data = df)
-fm3 <- lm(score4 ~ stratio + english + lunch + income + I(income^2) + I(income^3),
-  data = df)
-fm4 <- lm(score4 ~ stratio + I(stratio^2) + I(stratio^3) + english + lunch +
-  income + I(income^2) + I(income^3), data = df)
-fm5 <- lm(score4 ~ stratio + higheng + I(higheng * stratio) + lunch +
-  income + I(income^2) + I(income^3), data = df)
-fm6 <- lm(score4 ~ stratio + lunch + income + I(income^2) + I(income^3),
-  data = df)
+fm2 <- update(fm1, . ~ . + english + lunch + log(income))
+fm3 <- update(fm2, . ~ . -log(income) + income +I(income^2) + I(income^3))
+fm4 <- update(fm3, . ~ . + I(stratio^2) + I(stratio^3))
+fm5 <- update(fm3, . ~ . - english + higheng + I(higheng * stratio))
+fm6 <- update(fm3, . ~ . - english)
+# fm2 <- lm(score4 ~ stratio + english + lunch + log(income), data = df)
+# fm3 <- lm(score4 ~ stratio + english + lunch + income + I(income^2) + I(income^3),
+#   data = df)
+# fm4 <- lm(score4 ~ stratio + I(stratio^2) + I(stratio^3) + english + lunch +
+#   income + I(income^2) + I(income^3), data = df)
+# fm5 <- lm(score4 ~ stratio + higheng + I(higheng * stratio) + lunch +
+#   income + I(income^2) + I(income^3), data = df)
+# fm6 <- lm(score4 ~ stratio + lunch + income + I(income^2) + I(income^3),
+#   data = df)
 ```
 
 
@@ -59,6 +64,7 @@ htmlreg(ll, override.se=selist,override.pvalues=pvlist,
 
 検定を実行する.
 ```{r}
+summary(fm4)
 fm3r <- update(fm3, . ~ . - I(income^2) - I(income^3))
 waldtest(fm3, fm3r, vcov = hc1)
 fm4r_str1 <- update(fm4, . ~ . - stratio - I(stratio^2) - I(stratio^3))
