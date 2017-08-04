@@ -1,0 +1,178 @@
+---
+title: iv
+author: kenjimyzk
+date: '2017-08-04'
+slug: iv
+categories:
+  - R
+tags:
+  - regression
+---
+
+
+以下のライブラリを導入する
+```{r, message=FALSE, warning=FALSE}
+library(knitr)
+library(mosaic)
+library(AER)
+library(texreg)
+library(tidyverse)
+```
+
+データ生成は以下のとおりである
+```{r}
+data("CigarettesSW", package = "AER")
+df <- CigarettesSW %>% 
+  mutate(tdiff=(taxs - tax)/cpi,
+         rprice=price/cpi,
+         rincome = income/population/cpi)
+df1995 <- filter(df,year=="1995")
+head(df1995)
+```
+
+またロバスト分散を何度も計算するため次の関数を作っておく.
+```{r}
+## convenience function: HC1 covariances
+hc1 <- function(x) vcovHC(x, type = "HC1")
+```
+
+作図
+```{r}
+## plot
+xyplot(log(packs)~log(rprice),data=df1995)
+```
+
+単回帰
+```{r}
+fm_ols <- lm(log(packs) ~ log(rprice),data = df1995)
+coeftest(fm_ols, vcov = hc1)
+```
+
+作図すると以下になる.
+```{r}
+fn_ols <- makeFun(fm_ols)
+plotFun(log(fn_ols(exp(rprice)))~log(rprice),add=TRUE)
+```
+
+式 (12.11) を再現する. 第一段階の回帰式 (12.9) は以下である.
+```{r}
+fm_s1 <- lm(log(rprice) ~ tdiff, data = df1995)
+coeftest(fm_s1, vcov = hc1)
+```
+
+この回帰式の予測値を説明変数にして回帰すると以下になる. 
+```{r}
+df1995 <- mutate(df1995, frprice=fitted(fm_s1))
+fm_s2 <- lm(log(packs) ~ frprice, data = df1995)
+coeftest(fm_s2, vcov = hc1)
+```
+
+回帰式の結果を図示すると以下になる.
+```{r}
+fn_iv <- makeFun(fm_s2)
+plotFun(log(fn_iv(rprice))~rprice,add=TRUE, col="red")
+```
+
+ただ係数の標準誤差が微妙に一致していない.
+一致させるためには次のコマンドを実施する.
+```{r}
+fm_ivreg <- ivreg(log(packs) ~ log(rprice) | tdiff, data = df1995)
+summary(fm_ivreg, vcov = hc1)
+```
+
+`fm_s1` の予測値は以下である:
+```{r}
+fitted(fm_s2)
+```
+これは以下のようにして計算される
+```{r}
+coef(fm_s2)[1] + coef(fm_s2)[2] * fitted(fm_s1)
+```
+正しい予測値の計算は以下である.
+```{r}
+coef(fm_s2)[1] + coef(fm_s2)[2] * log(df1995$rprice)
+```
+
+以下の計算でもよい:
+```{r}
+log(fn_iv(log(df1995$rprice)))
+```
+
+たしかに予測値と一致する
+```{r}
+fitted(fm_ivreg)
+```
+
+
+## Equation 12.15
+```{r}
+fm_ivreg2 <- ivreg(log(packs) ~ log(rprice) + log(rincome) | log(rincome) + tdiff,
+  data = df1995)
+coeftest(fm_ivreg2, vcov = hc1)
+```
+
+## Equation 12.16
+```{r}
+fm_ivreg3 <- ivreg(log(packs) ~ log(rprice) + log(rincome) | log(rincome) + tdiff + I(tax/cpi),
+  data = df1995)
+coeftest(fm_ivreg3, vcov = hc1)
+```
+
+## Table 12.1
+さて表12.1を再現しよう.
+```{r}
+df1985 <- filter(df, year=="1985")
+ddf <- full_join(df1985,df1995,by="state") %>%
+  mutate(ydiff = log(packs.y)-log(packs.x),
+         pricediff = log(rprice.y)-log(rprice.x),
+         incdiff =  log(rincome.y)-log(rincome.x),
+         taxsdiff = tdiff.y -tdiff.x,
+         taxdiff = tax.y/cpi.y - tax.x/cpi.x) %>%
+  select(ydiff,pricediff,incdiff,taxsdiff,taxdiff)
+fm_diff1 <- ivreg(ydiff ~ pricediff + incdiff | incdiff + taxsdiff,data=ddf)
+fm_diff2 <- ivreg(ydiff ~ pricediff + incdiff | incdiff + taxdiff,data=ddf)
+fm_diff3 <- ivreg(ydiff ~ pricediff + incdiff | incdiff + taxsdiff + taxdiff,data=ddf)
+```
+
+作表すると以下になる.
+```{r results='asis'}
+ll=list(fm_diff1,fm_diff2,fm_diff3)
+selist <- ll %>% map(~coeftest(.,vcovHC=hc)[,2])
+pvlist <- ll %>% map(~coeftest(.,vcovHC=hc)[,4])
+htmlreg(ll, override.se=selist,override.pvalues=pvlist,
+        reorder.coef = c(2,3,1))
+```
+
+## checking instrument relevance
+関連性の
+```{r}
+lm(pricediff ~ taxsdiff + incdiff,data=ddf) %>% 
+  linearHypothesis("taxsdiff = 0", vcov = hc1)
+lm(pricediff ~ taxdiff + incdiff,data=ddf) %>%
+  linearHypothesis("taxdiff = 0", vcov = hc1)
+lm(pricediff ~ incdiff + taxsdiff + taxdiff,data=ddf) %>% 
+  linearHypothesis(c("taxsdiff = 0", "taxdiff = 0"),vcov = hc1)
+```
+
+J検定 (サーガン検定) は次のようにする:
+```{r}
+fm_diff3 %>% summary(diag=T) %>% .$diagnostics %>% kable()
+```
+
+ただここでのサーガン検定の結果と本文では異なっている. 
+`ivreg` でのサーガン検定はLM検定にもとづく計算方法である.
+ワルド検定にもとづく計算なら以下のように実施する.
+```{r}
+## testing overidentifying restrictions (J test)
+fm_or <- lm(residuals(fm_diff3) ~ incdiff + taxsdiff + taxdiff,data=ddf)
+(fm_or_test <- linearHypothesis(fm_or, c("taxsdiff = 0", "taxdiff = 0"), test = "Chisq"))
+```
+
+統計量は一致するが, 自由度の扱いが異なっているため P値が異なっている.
+自由度を補正してP値を求めるには以下のようにすればよい.
+```{r}
+## warning: df (and hence p-value) invalid above.
+## correct df: # instruments - # endogenous variables
+pchisq(fm_or_test[2,5], df.residual(fm_diff3) - df.residual(fm_or), lower.tail = FALSE)
+```
+
