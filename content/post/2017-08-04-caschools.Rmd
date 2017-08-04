@@ -1,0 +1,80 @@
+---
+title: caschools
+author: kenjimiyzaki
+date: '2017-08-04'
+slug: caschools
+categories: []
+tags:
+  - R Markdown
+---
+
+SW本8章の表8.3を再現する. まず以下のライブラリを導入する
+```{r, message=FALSE, warning=FALSE}
+library(knitr)
+library(mosaic)
+library(AER)
+library(texreg)
+library(tidyverse)
+```
+
+またロバスト分散を何度も計算するため次の関数を作っておく.
+```{r}
+## convenience function: HC1 covariances
+hc1 <- function(x) vcovHC(x, type = "HC1")
+```
+
+データを少し加工する.
+```{r}
+data("CASchools", package = "AER")
+df <- CASchools %>% mutate(score=(math + read)/2,
+                           STR = students/teachers,
+                           HiEL = I(english>=10)) %>%
+  select(score,lunch,STR,HiEL,english,income)
+summary(df)
+```
+
+回帰分析を実行する.
+```{r}
+## p. 152
+fm1 <- lm(score ~ STR + english + lunch, data = df)
+fm2 <- update(fm1, . ~ . + lunch + log(income))
+fm3 <- update(fm1, . ~ STR + HiEL + I(HiEL*STR), data = df)
+fm4 <- update(fm3, . ~ . + lunch + log(income))
+fm5 <- update(fm4, . ~ . - I(HiEL*STR) + I(STR^2) + I(STR^3))
+fm6 <- update(fm5, . ~ . +  + I(HiEL*STR) + I(HiEL*STR^2) +I(HiEL*STR^3))
+fm7 <- update(fm5, . ~ . - HiEL + english)
+```
+
+ロバスト分散を考慮に入れて作表する.
+```{r results='asis'}
+ll = list(fm1,fm2,fm3,fm4,fm5,fm6, fm7)
+selist <- ll %>% map(~coeftest(.,hc1)[,2])
+pvlist <- ll %>% map(~coeftest(.,hc1)[,4])
+hc1 <- function(x) vcovHC(x, type = "HC1")
+screenreg(ll, override.se=selist,override.pvalues=pvlist,
+        include.rsquared = FALSE,digits=3,
+        custom.model.names = c("(1)","(2)","(3)","(4)","(5)","(6)","(7)"),
+        reorder.coef = c(2,8, 9, 3, 6, 7, 10, 11, 4, 5, 1))
+```
+
+```{r}
+fm3r <- update(fm3, . ~ . - STR - I(HiEL * STR))
+waldtest(fm3r, fm3, vcov = hc1)
+fm4r <- update(fm4, . ~ . - STR - I(HiEL * STR))
+waldtest(fm4r, fm4, vcov = hc1)
+
+fm5b <- update(fm5, . ~ . -I(STR^2) - I(STR^3))
+fm5a <- update(fm5b, . ~ . -STR)
+waldtest(fm5a, fm5, vcov = hc1)
+waldtest(fm5b, fm5, vcov = hc1)
+
+fm6r <- update(fm6, . ~ .  -I(STR^2) - I(STR^3))
+waldtest(fm5a, fm6, vcov = hc1)
+waldtest(fm6r, fm6, vcov = hc1)
+waldtest(fm5, fm6, vcov = hc1)
+
+fm7r <- update(fm2, . ~ . -STR)
+waldtest(fm7r, fm7, vcov = hc1)
+waldtest(fm2, fm7, vcov = hc1)
+```
+
