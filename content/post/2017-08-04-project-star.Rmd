@@ -1,0 +1,81 @@
+---
+title: Project-Star
+author: kenjimyzk
+date: '2017-08-04'
+slug: project-star
+categories:
+  - R
+tags:
+  - R Markdown
+---
+
+SW本13章の再現を試みる. 以下のライブラリを導入する
+```{r, message=FALSE, warning=FALSE}
+library(knitr)
+library(mosaic)
+library(AER)
+library(texreg)
+library(tidyverse)
+library(stargazer)
+```
+
+またロバスト分散を何度も計算するため次の関数を作っておく.
+```{r}
+## convenience function: HC1 covariances
+hc1 <- function(x) vcovHC(x, type = "HC1")
+```
+
+表113.1の再現を試みる. データを入力し分析する.
+```{r}
+## data
+data("STAR", package = "AER")
+fmk <- STAR %>% rename(read=readk,math=mathk,star=stark) %>%
+  lm(I(read + math) ~ star, data = .)
+fm1 <- STAR %>% rename(read=read1,math=math1,star=star1) %>%
+  lm(I(read + math) ~ star, data = .)
+fm2 <- STAR %>% rename(read=read2,math=math2,star=star2) %>%
+  lm(I(read + math) ~ star, data = .)
+fm3 <- STAR %>% rename(read=read3,math=math3,star=star3) %>%
+  lm(I(read + math) ~ star, data = .)
+```
+
+ロバスト分散のもとの係数比較は以下である.
+```{r results='asis'}
+ll = list(fmk,fm1,fm2,fm3)
+selist <- ll %>% map(~coeftest(.,hc1)[,2])
+pvlist <- ll %>% map(~coeftest(.,hc1)[,4])
+htmlreg(ll, override.se=selist,override.pvalues=pvlist,
+        custom.model.names = c("K","1","2","3"),
+        custom.coef.names = c("Intercept", "Small class", "Regular size with aide"),
+        reorder.coef = c(2,3,1),
+        include.rsquared = FALSE, include.adjrs = FALSE, include.rmse = FALSE)
+```
+
+次に表13.2の再現を試みる
+```{r}
+star <- STAR %>% mutate(score = I(readk+mathk),
+                boy = I(gender == "male"), 
+                black = I(ethnicity =="afam"),
+                other = I(!((ethnicity == "afam")|(ethnicity=="cauc")))) %>%
+  select(score, stark, experiencek, schoolidk, boy, lunchk, black, other)
+fmk1 <- lm(score ~ stark, data = star)
+fmk2 <- update(fmk1,.~.+ experiencek)
+fmk3 <- update(fmk2,.~.+ schoolidk)
+fmk4 <- update(fmk3,.~.+ boy + lunchk + black + other)
+```
+表にまとめると以下になる.
+```{r, results='asis'}
+lll = list(fmk1,fmk2,fmk3,fmk4)
+selist <- lll %>% map(~coeftest(.,hc1)[,2])
+pvlist <- lll %>% map(~coeftest(.,hc1)[,4])
+htmlreg(lll, override.se=selist,override.pvalues=pvlist,
+        custom.model.names = c("(1)","(2)","(3)","(4)"),
+        omit.coef = "schoolidk",
+        custom.coef.names = c("Intercept", "Small class", "Regular size with aide", 
+                              "Teacher's years of experience", "Boy",
+                              "Free lunch eligible", "Black", 
+                              "Race other than black or white"),
+        reorder.coef=c(2:8,1),
+        include.rsquared = FALSE, include.rmse = FALSE)
+```
+
