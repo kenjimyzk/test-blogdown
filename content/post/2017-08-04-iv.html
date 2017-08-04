@@ -386,10 +386,7 @@ RMSE
 </td>
 </tr>
 </table>
-</div>
-<div id="checking-instrument-relevance" class="section level2">
-<h2>checking instrument relevance</h2>
-<p>関連性の</p>
+<p>操作変数として妥当かどうか確認する. まずそれぞれ内生変数と十分相関をもつかを確認する.</p>
 <pre class="r"><code>lm(pricediff ~ taxsdiff + incdiff,data=ddf) %&gt;% 
   linearHypothesis(&quot;taxsdiff = 0&quot;, vcov = hc1)</code></pre>
 <pre><code>## Linear hypothesis test

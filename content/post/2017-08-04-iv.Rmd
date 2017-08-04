@@ -143,8 +143,7 @@ htmlreg(ll, override.se=selist,override.pvalues=pvlist,
         reorder.coef = c(2,3,1))
 ```
 
-## checking instrument relevance
-関連性の
+操作変数として妥当かどうか確認する. まずそれぞれ内生変数と十分相関をもつかを確認する.
 ```{r}
 lm(pricediff ~ taxsdiff + incdiff,data=ddf) %>% 
   linearHypothesis("taxsdiff = 0", vcov = hc1)
