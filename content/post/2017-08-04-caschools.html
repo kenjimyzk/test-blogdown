@@ -168,32 +168,618 @@ fm7 &lt;- update(fm5, . ~ . - HiEL + english)</code></pre>
 selist &lt;- ll %&gt;% map(~coeftest(.,hc1)[,2])
 pvlist &lt;- ll %&gt;% map(~coeftest(.,hc1)[,4])
 hc1 &lt;- function(x) vcovHC(x, type = &quot;HC1&quot;)
-screenreg(ll, override.se=selist,override.pvalues=pvlist,
+htmlreg(ll, override.se=selist,override.pvalues=pvlist,
         include.rsquared = FALSE,digits=3,
         custom.model.names = c(&quot;(1)&quot;,&quot;(2)&quot;,&quot;(3)&quot;,&quot;(4)&quot;,&quot;(5)&quot;,&quot;(6)&quot;,&quot;(7)&quot;),
         reorder.coef = c(2,8, 9, 3, 6, 7, 10, 11, 4, 5, 1))</code></pre>
-<p>============================================================================================================= (1) (2) (3) (4) (5) (6) (7)<br />
-————————————————————————————————————- STR -0.998 *** -0.734 ** -0.968 -0.531 64.339 ** 83.702 ** 65.285 *<br />
-(0.270) (0.257) (0.589) (0.342) (24.861) (28.497) (25.259)<br />
-I(STR^2) -3.424 ** -4.381 ** -3.466 ** (1.250) (1.441) (1.271)<br />
-I(STR^3) 0.059 ** 0.075 ** 0.060 ** (0.021) (0.024) (0.021)<br />
-english -0.122 *** -0.176 *** -0.166 <strong><em> (0.033) (0.034) (0.034)<br />
-HiELTRUE 5.639 5.498 -5.474 </em></strong> 816.076 *<br />
-(19.515) (9.795) (1.034) (327.674)<br />
-I(HiEL * STR) -1.277 -0.578 -123.282 *<br />
-(0.967) (0.496) (50.213)<br />
-I(HiEL * STR^2) 6.121 *<br />
-(2.542)<br />
-I(HiEL * STR^3) -0.101 *<br />
-(0.043)<br />
-lunch -0.547 *** -0.398 *** -0.411 *** -0.420 *** -0.418 *** -0.402 <strong><em> (0.024) (0.033) (0.029) (0.029) (0.029) (0.033)<br />
-log(income) 11.569 </em></strong> 12.124 *** 11.748 *** 11.800 *** 11.509 <strong><em> (1.819) (1.798) (1.771) (1.778) (1.806)<br />
-(Intercept) 700.150 </em></strong> 658.552 *** 682.246 *** 653.666 *** 252.050 122.353 244.809<br />
-(5.568) (8.642) (11.868) (9.869) (163.634) (185.519) (165.722)<br />
-————————————————————————————————————- Adj. R^2 0.773 0.794 0.305 0.795 0.798 0.799 0.798<br />
-Num. obs. 420 420 420 420 420 420 420<br />
-RMSE 9.080 8.643 15.880 8.629 8.559 8.547 8.568<br />
-============================================================================================================= *** p &lt; 0.001, ** p &lt; 0.01, * p &lt; 0.05</p>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<table cellspacing="0" align="center" style="border: none;">
+<caption align="bottom" style="margin-top:0.3em;">
+Statistical models
+</caption>
+<tr>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b></b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(1)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(2)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(3)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(4)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(5)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(6)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(7)</b>
+</th>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+STR
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.998<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.734<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.968
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.531
+</td>
+<td style="padding-right: 12px; border: none;">
+64.339<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+83.702<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+65.285<sup style="vertical-align: 0px;">*</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.270)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.257)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.589)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.342)
+</td>
+<td style="padding-right: 12px; border: none;">
+(24.861)
+</td>
+<td style="padding-right: 12px; border: none;">
+(28.497)
+</td>
+<td style="padding-right: 12px; border: none;">
+(25.259)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+I(STR^2)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-3.424<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-4.381<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-3.466<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.250)
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.441)
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.271)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+I(STR^3)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+0.059<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.075<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.060<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.021)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.024)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.021)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+english
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.122<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.176<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.166<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.033)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.034)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.034)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+HiELTRUE
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+5.639
+</td>
+<td style="padding-right: 12px; border: none;">
+5.498
+</td>
+<td style="padding-right: 12px; border: none;">
+-5.474<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+816.076<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(19.515)
+</td>
+<td style="padding-right: 12px; border: none;">
+(9.795)
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.034)
+</td>
+<td style="padding-right: 12px; border: none;">
+(327.674)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+I(HiEL * STR)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.277
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.578
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-123.282<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.967)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.496)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(50.213)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+I(HiEL * STR^2)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+6.121<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(2.542)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+I(HiEL * STR^3)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.101<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.043)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+lunch
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.547<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.398<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.411<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.420<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.418<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.402<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.024)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.033)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.029)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.029)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.029)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.033)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+log(income)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+11.569<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+12.124<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+11.748<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+11.800<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+11.509<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.819)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.798)
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.771)
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.778)
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.806)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+(Intercept)
+</td>
+<td style="padding-right: 12px; border: none;">
+700.150<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+658.552<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+682.246<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+653.666<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+252.050
+</td>
+<td style="padding-right: 12px; border: none;">
+122.353
+</td>
+<td style="padding-right: 12px; border: none;">
+244.809
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(5.568)
+</td>
+<td style="padding-right: 12px; border: none;">
+(8.642)
+</td>
+<td style="padding-right: 12px; border: none;">
+(11.868)
+</td>
+<td style="padding-right: 12px; border: none;">
+(9.869)
+</td>
+<td style="padding-right: 12px; border: none;">
+(163.634)
+</td>
+<td style="padding-right: 12px; border: none;">
+(185.519)
+</td>
+<td style="padding-right: 12px; border: none;">
+(165.722)
+</td>
+</tr>
+<tr>
+<td style="border-top: 1px solid black;">
+Adj. R<sup style="vertical-align: 0px;">2</sup>
+</td>
+<td style="border-top: 1px solid black;">
+0.773
+</td>
+<td style="border-top: 1px solid black;">
+0.794
+</td>
+<td style="border-top: 1px solid black;">
+0.305
+</td>
+<td style="border-top: 1px solid black;">
+0.795
+</td>
+<td style="border-top: 1px solid black;">
+0.798
+</td>
+<td style="border-top: 1px solid black;">
+0.799
+</td>
+<td style="border-top: 1px solid black;">
+0.798
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+Num. obs.
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid black;">
+RMSE
+</td>
+<td style="border-bottom: 2px solid black;">
+9.080
+</td>
+<td style="border-bottom: 2px solid black;">
+8.643
+</td>
+<td style="border-bottom: 2px solid black;">
+15.880
+</td>
+<td style="border-bottom: 2px solid black;">
+8.629
+</td>
+<td style="border-bottom: 2px solid black;">
+8.559
+</td>
+<td style="border-bottom: 2px solid black;">
+8.547
+</td>
+<td style="border-bottom: 2px solid black;">
+8.568
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;" colspan="9">
+<span style="font-size:0.8em"><sup style="vertical-align: 0px;"><em><strong></sup>p &lt; 0.001, <sup style="vertical-align: 0px;"></strong></sup>p &lt; 0.01, <sup style="vertical-align: 0px;"></em></sup>p &lt; 0.05</span>
+</td>
+</tr>
+</table>
 <pre class="r"><code>fm3r &lt;- update(fm3, . ~ . - STR - I(HiEL * STR))
 waldtest(fm3r, fm3, vcov = hc1)</code></pre>
 <pre><code>## Wald test

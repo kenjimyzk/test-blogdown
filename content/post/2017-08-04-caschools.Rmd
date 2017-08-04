@@ -51,7 +51,7 @@ ll = list(fm1,fm2,fm3,fm4,fm5,fm6, fm7)
 selist <- ll %>% map(~coeftest(.,hc1)[,2])
 pvlist <- ll %>% map(~coeftest(.,hc1)[,4])
 hc1 <- function(x) vcovHC(x, type = "HC1")
-screenreg(ll, override.se=selist,override.pvalues=pvlist,
+htmlreg(ll, override.se=selist,override.pvalues=pvlist,
         include.rsquared = FALSE,digits=3,
         custom.model.names = c("(1)","(2)","(3)","(4)","(5)","(6)","(7)"),
         reorder.coef = c(2,8, 9, 3, 6, 7, 10, 11, 4, 5, 1))
