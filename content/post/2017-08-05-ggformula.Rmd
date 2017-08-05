@@ -36,6 +36,7 @@ gf_bar( ~ substance, data = HELPrct, fill = ~sex, position ="fill")
 ## ヒストグラム
 ```{r}
 gf_histogram( ~ age, data = HELPrct)
+gf_histogram(..density.. ~ age, data = HELPrct)
 gf_histogram( ~ age|sex, data = HELPrct)
 gf_histogram( ~ age|sex ~ ., data = HELPrct)
 gf_histogram( ~ age, fill = ~sex, data = HELPrct)
@@ -65,19 +66,5 @@ gf_point(mpg ~ hp, size = ~wt, data = mtcars)
 gf_point(mpg ~ hp, color = ~ cyl, size = ~wt, data = mtcars)
 gf_point(mpg ~ hp | am, group = ~ cyl, color = ~ cyl, data = mtcars)
 gf_point(mpg ~ hp | am ~ ., group = ~ cyl, color = ~ cyl,  data = mtcars)
-```
-
-```{r, message=FALSE, warning=FALSE}
-HELPrct %>% gf_point(cesd ~ age, color = ~ sex) %>% gf_lm()
-HELPrct %>% gf_point(cesd ~ age | sex) %>% gf_lm()
-```
-
-```{r, message=FALSE, warning=FALSE}
-extrafont::loadfonts(quiet=TRUE)
-theme_set(theme_gray(base_family="IPAexGothic"))
-HELPrct %>% gf_point(cesd ~ age, color = ~ sex) %>% gf_lm() %>% 
-  gf_theme(legend.position = "top") %>%
-  gf_labs(title = "作図",
-          x = "年齢", y = "CES-D measure of depressive symptoms")
 ```
 
