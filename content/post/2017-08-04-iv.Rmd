@@ -9,14 +9,15 @@ tags:
   - regression
 ---
 
-
-以下のライブラリを導入する
+SW12章の表12.1を再現する.
+まず以下のライブラリを導入する
 ```{r, message=FALSE, warning=FALSE}
 library(knitr)
 library(mosaic)
 library(AER)
 library(texreg)
 library(tidyverse)
+library(broom)
 ```
 
 データ生成は以下のとおりである
@@ -164,7 +165,8 @@ fm_diff3 %>% summary(diag=T) %>% .$diagnostics %>% kable()
 ```{r}
 ## testing overidentifying restrictions (J test)
 fm_or <- lm(residuals(fm_diff3) ~ incdiff + taxsdiff + taxdiff,data=ddf)
-(fm_or_test <- linearHypothesis(fm_or, c("taxsdiff = 0", "taxdiff = 0"), test = "Chisq"))
+fm_or_test <- linearHypothesis(fm_or, c("taxsdiff = 0", "taxdiff = 0"), test = "Chisq")
+fm_or_test %>% tidy() %>% kable()
 ```
 
 統計量は一致するが, 自由度の扱いが異なっているため P値が異なっている.
