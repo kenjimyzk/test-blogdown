@@ -1,0 +1,83 @@
+---
+title: ggformula
+author: Kenji Miyazaki
+date: '2017-08-05'
+slug: ggformula
+categories:
+  - R
+tags:
+  - plot
+---
+
+ggformula というパッケージがある. 
+https://cran.r-project.org/web/packages/ggformula/index.html
+
+ひとことでいうと, ggplot2 を lattice のように扱えるようにしたパッケージである.
+詳しくは以下を参照.
+
+https://cran.r-project.org/web/packages/ggformula/vignettes/ggformula.html
+
+自分の備忘録のために記録しておく.
+パッケージ [mosaic](https://cran.r-project.org/web/packages/mosaic/index.html) を導入すれば自動的に導入される.
+```{r, message=FALSE, warning=FALSE}
+library(mosaic)
+```
+
+
+## 棒グラフ
+```{r}
+gf_bar( ~ substance, data = HELPrct)
+gf_bar( ~ substance, data = HELPrct, fill = ~sex)
+gf_bar( ~ substance, data = HELPrct, fill = ~sex, position = "dodge")
+gf_bar( ~ substance, data = HELPrct, fill = ~sex, position ="fill")
+```
+
+
+## ヒストグラム
+```{r}
+gf_histogram( ~ age, data = HELPrct)
+gf_histogram( ~ age|sex, data = HELPrct)
+gf_histogram( ~ age|sex ~ ., data = HELPrct)
+gf_histogram( ~ age, fill = ~sex, data = HELPrct)
+```
+
+
+## 密度プロット
+```{r}
+gf_density(~ Sepal.Length,data=iris)
+gf_density(~ Sepal.Length,  fill = ~Species,data=iris)
+gf_density(~ Sepal.Length,  fill = ~Species, position = "stack",data=iris)
+```
+
+
+## ボックス図
+```{r}
+gf_boxplot(age ~ substance, data = HELPrct)
+gf_boxplot(age ~ substance, data = HELPrct, color = ~sex)
+gf_boxplot(age ~ substance|sex, data = HELPrct)
+gf_boxplot(age ~ substance|sex ~ ., data = HELPrct)
+```
+
+## 散布図
+```{r}
+gf_point(mpg ~ hp, data = mtcars)
+gf_point(mpg ~ hp, size = ~wt, data = mtcars)
+gf_point(mpg ~ hp, color = ~ cyl, size = ~wt, data = mtcars)
+gf_point(mpg ~ hp | am, group = ~ cyl, color = ~ cyl, data = mtcars)
+gf_point(mpg ~ hp | am ~ ., group = ~ cyl, color = ~ cyl,  data = mtcars)
+```
+
+```{r}
+HELPrct %>% gf_point(cesd ~ age, color = ~ sex) %>% gf_lm()
+HELPrct %>% gf_point(cesd ~ age | sex) %>% gf_lm()
+```
+
+```{r, message=FALSE, warning=FALSE}
+extrafont::loadfonts(quiet=TRUE)
+theme_set(theme_gray(base_family="IPAexGothic"))
+HELPrct %>% gf_point(cesd ~ age, color = ~ sex) %>% gf_lm() %>% 
+  gf_theme(legend.position = "top") %>%
+  gf_labs(title = "作図",
+          x = "年齢", y = "CES-D measure of depressive symptoms")
+```
+
