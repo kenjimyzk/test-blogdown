@@ -67,7 +67,7 @@ gf_point(mpg ~ hp | am, group = ~ cyl, color = ~ cyl, data = mtcars)
 gf_point(mpg ~ hp | am ~ ., group = ~ cyl, color = ~ cyl,  data = mtcars)
 ```
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 HELPrct %>% gf_point(cesd ~ age, color = ~ sex) %>% gf_lm()
 HELPrct %>% gf_point(cesd ~ age | sex) %>% gf_lm()
 ```
