@@ -20,7 +20,7 @@ library(knitr)
 rflip(20)
 ```
 
-そうした行為を10000回繰り返す
+そうした行為を1000回繰り返す
 ```{r}
 simulation <- do(10000)*rflip(20)
 simulation %>% head() %>% kable()

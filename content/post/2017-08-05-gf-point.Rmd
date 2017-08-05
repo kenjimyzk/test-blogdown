@@ -37,8 +37,7 @@ KidsFeet %>% gf_point(length ~ width, color = ~ sex) %>% gf_lm()
 
 これは次のように実行することと同じである.
 ```{r eval =FALSE}
-fm <- lm(length ~ width * sex, data = KidsFeet) 
-fn <- makeFun(fm)
+fn <- lm(length ~ width * sex, data = KidsFeet) %>% makeFun()
 KidsFeet %>% gf_point(length ~ width, color = ~ sex) %>%
   gf_fun(fn(w, sex = "B") ~ w, color = ~"B") %>%
   gf_fun(fn(w, sex = "G") ~ w, color = ~"G")
