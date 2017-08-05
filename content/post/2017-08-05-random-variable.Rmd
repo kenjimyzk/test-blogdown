@@ -1,0 +1,48 @@
+---
+title: random variable
+author: Kenji Miyazaki
+date: '2017-08-05'
+slug: random-variable
+categories:
+  - R
+tags:
+  - R Markdown
+---
+
+```{r, message=FALSE, warning=FALSE}
+set.seed(2017)
+library(mosaic)
+library(knitr)
+```
+
+コインを20回投げる.
+```{r}
+rflip(20)
+```
+
+そうした行為を10000回繰り返す
+```{r}
+simulation <- do(10000)*rflip(20)
+simulation %>% head() %>% kable()
+```
+
+図にすると以下になる.
+```{r}
+simulation %>% gf_histogram(~ prop)
+```
+
+次に200回にして図示する
+```{r}
+simulation <- do(10000)*rflip(200)
+simulation %>% gf_histogram(~ prop)
+```
+
+同じようにみえるが, 横軸の幅が縮まっていることに注意されたい.
+
+これを基準化してみていくと次のように標準正規分布に近似できる.
+```{r}
+simulation %>% mutate(z=(prop-0.5)/sqrt(0.5*0.5/200)) %>%
+  gf_histogram(..density..~ z) %>% gf_dist("norm",col=2)
+```
+
+このような性質を **中心極限定理** という.
