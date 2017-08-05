@@ -1,0 +1,55 @@
+---
+title: gf_point
+author: Kenji Miyazaki
+date: '2017-08-05'
+slug: gf-point
+categories:
+  - R
+tags:
+  - regression
+---
+
+```{r, message=FALSE, warning=FALSE}
+library(mosaic)
+```
+
+散布図に回帰直線を加えた式は次のようにすればよい.
+```{r}
+cars %>% gf_point(dist ~ speed) %>% gf_lm()
+```
+
+これは以下と同様である.
+```{r, eval=FALSE}
+fn <- lm(dist ~ speed, data = cars) %>% makeFun()
+cars %>% gf_point(dist ~ speed) %>% gf_fun(fn, color = 4)
+```
+
+自乗項をつける場合には次のようにすればよい.
+```{r}
+fn <- lm(dist ~ speed + I(speed^2), data = cars) %>% makeFun()
+cars %>% gf_point(dist ~ speed) %>% gf_fun(fn, color = 4)
+```
+
+次のように男女別に色分けした散布図に回帰直線を付け加えることもできる.
+```{r}
+KidsFeet %>% gf_point(length ~ width, color = ~ sex) %>% gf_lm()
+```
+
+これは次のように実行することと同じである.
+```{r eval =FALSE}
+fm <- lm(length ~ width * sex, data = KidsFeet) 
+fn <- makeFun(fm)
+KidsFeet %>% gf_point(length ~ width, color = ~ sex) %>%
+  gf_fun(fn(w, sex = "B") ~ w, color = ~"B") %>%
+  gf_fun(fn(w, sex = "G") ~ w, color = ~"G")
+```
+
+交差項を付け加えない場合には次のようにすればよい.
+```{r}
+fn <- lm(length ~ width + sex, data = KidsFeet) %>% makeFun()
+KidsFeet %>% gf_point(length ~ width, color = ~ sex) %>%
+  gf_fun(fn(w, sex = "B") ~ w, color = ~"B") %>%
+  gf_fun(fn(w, sex = "G") ~ w, color = ~"G")
+```
+
+
