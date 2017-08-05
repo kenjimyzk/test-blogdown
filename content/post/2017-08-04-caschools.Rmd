@@ -15,6 +15,7 @@ library(mosaic)
 library(AER)
 library(texreg)
 library(tidyverse)
+library(mosaic)
 ```
 
 またロバスト分散を何度も計算するため次の関数を作っておく.
@@ -78,3 +79,24 @@ waldtest(fm7r, fm7, vcov = hc1)
 waldtest(fm2, fm7, vcov = hc1)
 ```
 
+```{r fig.keep='last'}
+xyplot(score ~ STR, data=df)
+fn2 <- makeFun(fm2)
+mean(~english, data =df)
+mean(~lunch, data =df)
+mean(~income, data =df)
+plotFun(fn2(STR, english=15.76816,lunch=44.70524,income=15.31659)~STR,add=TRUE)
+fn7 <- makeFun(fm7)
+plotFun(fn7(STR, english=15.76816,lunch=44.70524,income=15.31659)~STR,add=TRUE,col=2)
+```
+
+
+```{r fig.keep='last'}
+xyplot(score ~ STR, group=HiEL, data=df)
+fn6 <- makeFun(fm6)
+plotFun(fn6(STR, HiEL=TRUE,lunch=44.70524,income=15.31659)~STR,add=TRUE)
+plotFun(fn6(STR, HiEL=FALSE,lunch=44.70524,income=15.31659)~STR,add=TRUE,col=2)
+```
+
+
+ 
