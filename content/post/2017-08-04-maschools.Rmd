@@ -9,7 +9,7 @@ tags:
   - R Markdown
 ---
 
-SW本9章の表8.2を再現する. まず以下のライブラリを導入する
+SW本9章の表9.2を再現する. まず以下のライブラリを導入する
 ```{r, message=FALSE, warning=FALSE}
 library(knitr)
 library(mosaic)
@@ -50,7 +50,6 @@ fm6 <- update(fm3, . ~ . - english)
 # fm6 <- lm(score4 ~ stratio + lunch + income + I(income^2) + I(income^3),
 #   data = df)
 ```
-
 
 ロバスト分散を考慮に入れて作表する.
 ```{r results='asis'}
