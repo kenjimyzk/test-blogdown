@@ -1,16 +1,34 @@
----
-title: gf_point
-author: Kenji Miyazaki
-date: '2017-08-05'
-slug: gf-point
-categories:
-  - R
-tags:
-  - regression
----
 
 
 
+<table>
+<tbody>
+<tr class="odd">
+<td>itle: gf_point</td>
+</tr>
+<tr class="even">
+<td>uthor: Kenji Miyazaki</td>
+</tr>
+<tr class="odd">
+<td>ate: ‘2017-08-05’</td>
+</tr>
+<tr class="even">
+<td>lug: gf-point</td>
+</tr>
+<tr class="odd">
+<td>ategories:</td>
+</tr>
+<tr class="even">
+<td>- R</td>
+</tr>
+<tr class="odd">
+<td>ags:</td>
+</tr>
+<tr class="even">
+<td>- regression</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>library(mosaic)</code></pre>
 <p>散布図に回帰直線を加えた式は次のようにすればよい.</p>
 <pre class="r"><code>cars %&gt;% gf_point(dist ~ speed) %&gt;% gf_lm()</code></pre>
