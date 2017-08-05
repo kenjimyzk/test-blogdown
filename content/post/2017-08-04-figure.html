@@ -1,0 +1,70 @@
+---
+title: figure
+author: kenji miyazaki
+date: '2017-08-04'
+slug: figure
+categories:
+  - R
+tags:
+  - R Markdown
+---
+
+
+
+<div id="library" class="section level2">
+<h2>library</h2>
+<pre class="r"><code>library(tidyverse)
+library(knitr)
+library(broom)
+library(AER)
+library(mosaic)</code></pre>
+<p>データを少し加工する.</p>
+<pre class="r"><code>data(&quot;CASchools&quot;, package = &quot;AER&quot;)
+CASchools &lt;- CASchools %&gt;% mutate(score=(math + read)/2,
+                           STR = students/teachers,
+                           HiEL = I(english&gt;=10))</code></pre>
+<p>図8.2</p>
+<pre class="r"><code>lm(score ~ income, data = CASchools) %&gt;% plotModel()</code></pre>
+<p><img src="/post/2017-08-04-figure_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>図8.3</p>
+<pre class="r"><code>fm2 &lt;- lm(score ~ income + I(income^2), data = CASchools)
+fn2 &lt;- makeFun(fm2)
+plotFun(fn2, add=T, col=2)</code></pre>
+<pre><code>## converting numerical color value into a color using lattice settings</code></pre>
+<p><img src="/post/2017-08-04-figure_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>plotModel(fm2)</code></pre>
+<p><img src="/post/2017-08-04-figure_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>図8.5</p>
+<pre class="r"><code>xyplot(score ~ income, data =CASchools)</code></pre>
+<p><img src="/post/2017-08-04-figure_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>fm_linear_log &lt;- lm(score ~ log(income), data = CASchools)
+fn_linear_log&lt;- makeFun(fm_linear_log)
+plotFun(fn_linear_log, add=T)</code></pre>
+<p><img src="/post/2017-08-04-figure_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
+<pre class="r"><code>plotModel(fm_linear_log)</code></pre>
+<p><img src="/post/2017-08-04-figure_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>図8.6</p>
+<pre class="r"><code>xyplot(log(score) ~ income, data =CASchools)</code></pre>
+<p><img src="/post/2017-08-04-figure_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>fm_log_linear &lt;- lm(log(score) ~ income, data = CASchools)
+fn_log_linear &lt;- makeFun(fm_log_linear)
+plotFun(log(fn_log_linear(income))~income, add=T)</code></pre>
+<p><img src="/post/2017-08-04-figure_files/figure-html/unnamed-chunk-8-2.png" width="672" /></p>
+<pre class="r"><code>fm_log_log &lt;- lm(log(score) ~ log(income), data = CASchools)
+fn_log_log &lt;- makeFun(fm_log_log)
+plotFun(log(fn_log_log(income))~income, add=T, col=2)</code></pre>
+<pre><code>## converting numerical color value into a color using lattice settings</code></pre>
+<p><img src="/post/2017-08-04-figure_files/figure-html/unnamed-chunk-8-3.png" width="672" /></p>
+<p>図8.7</p>
+<pre class="r"><code>xyplot(score ~ income, data =CASchools)</code></pre>
+<p><img src="/post/2017-08-04-figure_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>fm3 &lt;- lm(score ~ income + I(income^2) + I(income^3), data=CASchools)
+fn3 &lt;- makeFun(fm3)
+plotFun(fn3, add=T)</code></pre>
+<p><img src="/post/2017-08-04-figure_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
+<pre class="r"><code>fm_linear_log &lt;- lm(score ~ log(income), data = CASchools)
+fn_linear_log &lt;- makeFun(fm_linear_log)
+plotFun(fn_linear_log, add=T, col=2)</code></pre>
+<pre><code>## converting numerical color value into a color using lattice settings</code></pre>
+<p><img src="/post/2017-08-04-figure_files/figure-html/unnamed-chunk-9-3.png" width="672" /></p>
+</div>

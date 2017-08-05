@@ -1,0 +1,88 @@
+---
+title: figure
+author: kenji miyazaki
+date: '2017-08-04'
+slug: figure
+categories:
+  - R
+tags:
+  - R Markdown
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## library
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(knitr)
+library(broom)
+library(AER)
+library(mosaic)
+```
+
+データを少し加工する.
+```{r}
+data("CASchools", package = "AER")
+CASchools <- CASchools %>% mutate(score=(math + read)/2,
+                           STR = students/teachers,
+                           HiEL = I(english>=10))
+```
+
+図8.2
+```{r}
+lm(score ~ income, data = CASchools) %>% plotModel()
+```
+
+図8.3
+```{r}
+fm2 <- lm(score ~ income + I(income^2), data = CASchools)
+fn2 <- makeFun(fm2)
+plotFun(fn2, add=T, col=2)
+```
+
+```{r}
+plotModel(fm2)
+```
+
+
+図8.5
+```{r}
+xyplot(score ~ income, data =CASchools)
+fm_linear_log <- lm(score ~ log(income), data = CASchools)
+fn_linear_log<- makeFun(fm_linear_log)
+plotFun(fn_linear_log, add=T)
+```
+```{r}
+plotModel(fm_linear_log)
+```
+
+
+
+図8.6
+```{r}
+xyplot(log(score) ~ income, data =CASchools)
+fm_log_linear <- lm(log(score) ~ income, data = CASchools)
+fn_log_linear <- makeFun(fm_log_linear)
+plotFun(log(fn_log_linear(income))~income, add=T)
+
+fm_log_log <- lm(log(score) ~ log(income), data = CASchools)
+fn_log_log <- makeFun(fm_log_log)
+plotFun(log(fn_log_log(income))~income, add=T, col=2)
+```
+
+
+図8.7
+```{r}
+xyplot(score ~ income, data =CASchools)
+fm3 <- lm(score ~ income + I(income^2) + I(income^3), data=CASchools)
+fn3 <- makeFun(fm3)
+plotFun(fn3, add=T)
+
+fm_linear_log <- lm(score ~ log(income), data = CASchools)
+fn_linear_log <- makeFun(fm_linear_log)
+plotFun(fn_linear_log, add=T, col=2)
+```
+
