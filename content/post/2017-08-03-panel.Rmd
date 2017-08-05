@@ -22,6 +22,7 @@ library(broom)
 library(AER)
 library(plm)
 library(texreg)
+library(mosaic)
 ```
 
 ## data
@@ -39,24 +40,43 @@ head(df) %>% kable()
 ## for comparability with Stata we use HC1 below
 ### p. 351, Eq. (10.2)
 ```{r}
-fm1982 <- df %>% filter(year=="1982") %>% lm(frate ~beertax, data = .)
+df1982 <- df %>% filter(year=="1982") 
+fm1982 <- lm(frate ~beertax, data = df1982)
 coeftest(fm1982, vcov = vcovHC(fm1982, type = "HC1")) %>% tidy() %>% kable()
 ```
 
+```{r}
+plotModel(fm1982)
+```
+
+
 ### p. 351, Eq. (10.2)
 ```{r}
-fm1988 <- df %>% filter(year=="1988") %>% lm(frate ~beertax, data = .)
+df1988 <- df %>% filter(year=="1988") 
+fm1988 <- lm(frate ~beertax, data = df1988)
 coeftest(fm1988, vcov = vcovHC(fm1988,type = "HC1")) %>% tidy() %>% kable()
 ```
+
+```{r}
+plotModel(fm1988)
+fn1988 <-makeFun(fm1988)
+```
+
 
 ### pp. 355, Eq. (10.8)
 ```{r}
 df1982 <- df %>% filter(year=="1982") %>% select(frate,beertax,state)
 df1988 <- df %>% filter(year=="1988") %>% select(frate,beertax,state)
-full_join(df1982,df1988,by="state") %>%
-  mutate(dfrate = frate.y-frate.x, dbeertax = beertax.y-beertax.x) %>%
-  lm(dfrate ~ dbeertax, data = .) %>% tidy() %>% kable()
+df8288 <- full_join(df1982,df1988,by="state") %>%
+  mutate(dfrate = frate.y-frate.x, dbeertax = beertax.y-beertax.x)
+fm8288 <- lm(dfrate ~ dbeertax, data = df8288)
+fm8288 %>% tidy() %>% kable()
 ```
+
+```{r}
+plotModel(fm8288)
+```
+
 
 ```{r}
 fm_diff <- df %>% filter(year=="1982"|year=="1988") %>%
