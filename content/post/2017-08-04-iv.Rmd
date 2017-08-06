@@ -145,14 +145,17 @@ htmlreg(ll, override.se=selist,override.pvalues=pvlist,
 ```
 
 操作変数として妥当かどうか確認する. まずそれぞれ内生変数と十分相関をもつかを確認する.
+
 ```{r}
 lm(pricediff ~ taxsdiff + incdiff,data=ddf) %>% 
-  linearHypothesis("taxsdiff = 0", vcov = hc1)
+  waldtest(. ~ . -taxsdiff, vcov = hc1)
 lm(pricediff ~ taxdiff + incdiff,data=ddf) %>%
-  linearHypothesis("taxdiff = 0", vcov = hc1)
+  waldtest(. ~ . -taxdiff, vcov = hc1)
 lm(pricediff ~ incdiff + taxsdiff + taxdiff,data=ddf) %>% 
-  linearHypothesis(c("taxsdiff = 0", "taxdiff = 0"),vcov = hc1)
+  waldtest(. ~ . -taxsdiff -taxdiff, vcov = hc1)
 ```
+
+
 
 J検定 (サーガン検定) は次のようにする:
 ```{r}

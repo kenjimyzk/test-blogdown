@@ -63,22 +63,21 @@ htmlreg(ll, override.se=selist,override.pvalues=pvlist,
 
 検定を実行する.
 ```{r}
-summary(fm4)
-fm3r <- update(fm3, . ~ . - I(income^2) - I(income^3))
-waldtest(fm3, fm3r, vcov = hc1)
-fm4r_str1 <- update(fm4, . ~ . - stratio - I(stratio^2) - I(stratio^3))
-waldtest(fm4, fm4r_str1, vcov = hc1)
-fm4r_str2 <- update(fm4, . ~ . - I(stratio^2) - I(stratio^3))
-waldtest(fm4, fm4r_str2, vcov = hc1)
-fm4r_inc <- update(fm4, . ~ . - I(income^2) - I(income^3))
-waldtest(fm4, fm4r_inc, vcov = hc1)
-fm5r_str <- update(fm5, . ~ . - stratio - I(higheng * stratio))
-waldtest(fm5, fm5r_str, vcov = hc1)
-fm5r_inc <- update(fm5, . ~ . - I(income^2) - I(income^3))
-waldtest(fm5, fm5r_inc, vcov = hc1)
-fm5r_high <- update(fm5, . ~ . - higheng - I(higheng * stratio))
-waldtest(fm5, fm5r_high, vcov = hc1)
-fm6r_inc <- update(fm6, . ~ . - I(income^2) - I(income^3))
-waldtest(fm6, fm6r_inc, vcov = hc1)
+update(fm3, . ~ . - I(income^2) - I(income^3)) %>%
+  waldtest(fm3, vcov = hc1)
+update(fm4, . ~ . - stratio - I(stratio^2) - I(stratio^3)) %>%
+  waldtest(fm4, vcov = hc1)
+update(fm4, . ~ . - I(stratio^2) - I(stratio^3)) %>%
+  waldtest(fm4, vcov = hc1)
+update(fm4, . ~ . - I(income^2) - I(income^3)) %>%
+  waldtest(fm4, vcov = hc1)
+update(fm5, . ~ . - stratio - I(higheng * stratio)) %>%
+  waldtest(fm5, vcov = hc1)
+update(fm5, . ~ . - I(income^2) - I(income^3)) %>% 
+  waldtest(fm5, vcov = hc1)
+update(fm5, . ~ . - higheng - I(higheng * stratio)) %>%
+  waldtest(fm5, vcov = hc1)
+update(fm6, . ~ . - I(income^2) - I(income^3)) %>%
+  waldtest(fm6, vcov = hc1)
 ```
 

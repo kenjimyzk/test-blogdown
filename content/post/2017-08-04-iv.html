@@ -389,55 +389,36 @@ RMSE
 </table>
 <p>操作変数として妥当かどうか確認する. まずそれぞれ内生変数と十分相関をもつかを確認する.</p>
 <pre class="r"><code>lm(pricediff ~ taxsdiff + incdiff,data=ddf) %&gt;% 
-  linearHypothesis(&quot;taxsdiff = 0&quot;, vcov = hc1)</code></pre>
-<pre><code>## Linear hypothesis test
+  waldtest(. ~ . -taxsdiff, vcov = hc1)</code></pre>
+<pre><code>## Wald test
 ## 
-## Hypothesis:
-## taxsdiff = 0
-## 
-## Model 1: restricted model
-## Model 2: pricediff ~ taxsdiff + incdiff
-## 
-## Note: Coefficient covariance matrix supplied.
-## 
+## Model 1: pricediff ~ taxsdiff + incdiff
+## Model 2: pricediff ~ incdiff
 ##   Res.Df Df      F    Pr(&gt;F)    
-## 1     46                        
-## 2     45  1 33.674 6.119e-07 ***
+## 1     45                        
+## 2     46 -1 33.674 6.119e-07 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>lm(pricediff ~ taxdiff + incdiff,data=ddf) %&gt;%
-  linearHypothesis(&quot;taxdiff = 0&quot;, vcov = hc1)</code></pre>
-<pre><code>## Linear hypothesis test
+  waldtest(. ~ . -taxdiff, vcov = hc1)</code></pre>
+<pre><code>## Wald test
 ## 
-## Hypothesis:
-## taxdiff = 0
-## 
-## Model 1: restricted model
-## Model 2: pricediff ~ taxdiff + incdiff
-## 
-## Note: Coefficient covariance matrix supplied.
-## 
+## Model 1: pricediff ~ taxdiff + incdiff
+## Model 2: pricediff ~ incdiff
 ##   Res.Df Df      F    Pr(&gt;F)    
-## 1     46                        
-## 2     45  1 107.18 1.735e-13 ***
+## 1     45                        
+## 2     46 -1 107.18 1.735e-13 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>lm(pricediff ~ incdiff + taxsdiff + taxdiff,data=ddf) %&gt;% 
-  linearHypothesis(c(&quot;taxsdiff = 0&quot;, &quot;taxdiff = 0&quot;),vcov = hc1)</code></pre>
-<pre><code>## Linear hypothesis test
+  waldtest(. ~ . -taxsdiff -taxdiff, vcov = hc1)</code></pre>
+<pre><code>## Wald test
 ## 
-## Hypothesis:
-## taxsdiff = 0
-## taxdiff = 0
-## 
-## Model 1: restricted model
-## Model 2: pricediff ~ incdiff + taxsdiff + taxdiff
-## 
-## Note: Coefficient covariance matrix supplied.
-## 
+## Model 1: pricediff ~ incdiff + taxsdiff + taxdiff
+## Model 2: pricediff ~ incdiff
 ##   Res.Df Df      F    Pr(&gt;F)    
-## 1     46                        
-## 2     44  2 88.616 3.709e-16 ***
+## 1     44                        
+## 2     46 -2 88.616 3.709e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>J検定 (サーガン検定) は次のようにする:</p>

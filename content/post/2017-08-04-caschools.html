@@ -667,8 +667,8 @@ RMSE
 </td>
 </tr>
 </table>
-<pre class="r"><code>fm3r &lt;- update(fm3, . ~ . - STR - I(HiEL * STR))
-waldtest(fm3r, fm3, vcov = hc1)</code></pre>
+<pre class="r"><code>update(fm3, . ~ . - STR - I(HiEL * STR)) %&gt;% 
+  waldtest(fm3, vcov = hc1)</code></pre>
 <pre><code>## Wald test
 ## 
 ## Model 1: score ~ HiEL
@@ -678,8 +678,8 @@ waldtest(fm3r, fm3, vcov = hc1)</code></pre>
 ## 2    416  2 5.6381 0.003837 **
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>fm4r &lt;- update(fm4, . ~ . - STR - I(HiEL * STR))
-waldtest(fm4r, fm4, vcov = hc1)</code></pre>
+<pre class="r"><code>update(fm4, . ~ . - STR - I(HiEL * STR)) %&gt;% 
+  waldtest(fm4, vcov = hc1)</code></pre>
 <pre><code>## Wald test
 ## 
 ## Model 1: score ~ HiEL + lunch + log(income)
@@ -689,9 +689,8 @@ waldtest(fm4r, fm4, vcov = hc1)</code></pre>
 ## 2    414  2 5.9221 0.002912 **
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>fm5b &lt;- update(fm5, . ~ . -I(STR^2) - I(STR^3))
-fm5a &lt;- update(fm5b, . ~ . -STR)
-waldtest(fm5a, fm5, vcov = hc1)</code></pre>
+<pre class="r"><code>update(fm5, . ~ . -STR  -I(STR^2) - I(STR^3)) %&gt;% 
+  waldtest(fm5, vcov = hc1)</code></pre>
 <pre><code>## Wald test
 ## 
 ## Model 1: score ~ HiEL + lunch + log(income)
@@ -701,7 +700,8 @@ waldtest(fm5a, fm5, vcov = hc1)</code></pre>
 ## 2    413  3 6.313 0.0003403 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>waldtest(fm5b, fm5, vcov = hc1)</code></pre>
+<pre class="r"><code>update(fm5, . ~ . -I(STR^2) - I(STR^3)) %&gt;% 
+  waldtest(fm5, vcov = hc1)</code></pre>
 <pre><code>## Wald test
 ## 
 ## Model 1: score ~ STR + HiEL + lunch + log(income)
@@ -711,8 +711,8 @@ waldtest(fm5a, fm5, vcov = hc1)</code></pre>
 ## 2    413  2 6.1663 0.002297 **
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>fm6r &lt;- update(fm6, . ~ .  -I(STR^2) - I(STR^3))
-waldtest(fm5a, fm6, vcov = hc1)</code></pre>
+<pre class="r"><code>update(fm5, . ~ . -STR  -I(STR^2) - I(STR^3)) %&gt;% 
+  waldtest(fm6, vcov = hc1)</code></pre>
 <pre><code>## Wald test
 ## 
 ## Model 1: score ~ HiEL + lunch + log(income)
@@ -723,7 +723,8 @@ waldtest(fm5a, fm6, vcov = hc1)</code></pre>
 ## 2    410  6 4.9617 6.416e-05 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>waldtest(fm6r, fm6, vcov = hc1)</code></pre>
+<pre class="r"><code>update(fm6, . ~ .  -I(STR^2) - I(STR^3)) %&gt;%
+  waldtest(fm6, vcov = hc1)</code></pre>
 <pre><code>## Wald test
 ## 
 ## Model 1: score ~ STR + HiEL + lunch + log(income) + I(HiEL * STR) + I(HiEL * 
@@ -746,8 +747,8 @@ waldtest(fm5a, fm6, vcov = hc1)</code></pre>
 ## 2    410  3 2.6903 0.04597 *
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>fm7r &lt;- update(fm2, . ~ . -STR)
-waldtest(fm7r, fm7, vcov = hc1)</code></pre>
+<pre class="r"><code>update(fm2, . ~ . -STR) %&gt;%
+  waldtest(fm7, vcov = hc1)</code></pre>
 <pre><code>## Wald test
 ## 
 ## Model 1: score ~ english + lunch + log(income)

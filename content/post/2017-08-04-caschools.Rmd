@@ -58,24 +58,27 @@ htmlreg(ll, override.se=selist,override.pvalues=pvlist,
         reorder.coef = c(2,8, 9, 3, 6, 7, 10, 11, 4, 5, 1))
 ```
 
+
+
 ```{r}
-fm3r <- update(fm3, . ~ . - STR - I(HiEL * STR))
-waldtest(fm3r, fm3, vcov = hc1)
-fm4r <- update(fm4, . ~ . - STR - I(HiEL * STR))
-waldtest(fm4r, fm4, vcov = hc1)
+update(fm3, . ~ . - STR - I(HiEL * STR)) %>% 
+  waldtest(fm3, vcov = hc1)
+update(fm4, . ~ . - STR - I(HiEL * STR)) %>% 
+  waldtest(fm4, vcov = hc1)
 
-fm5b <- update(fm5, . ~ . -I(STR^2) - I(STR^3))
-fm5a <- update(fm5b, . ~ . -STR)
-waldtest(fm5a, fm5, vcov = hc1)
-waldtest(fm5b, fm5, vcov = hc1)
+update(fm5, . ~ . -STR  -I(STR^2) - I(STR^3)) %>% 
+  waldtest(fm5, vcov = hc1)
+update(fm5, . ~ . -I(STR^2) - I(STR^3)) %>% 
+  waldtest(fm5, vcov = hc1)
 
-fm6r <- update(fm6, . ~ .  -I(STR^2) - I(STR^3))
-waldtest(fm5a, fm6, vcov = hc1)
-waldtest(fm6r, fm6, vcov = hc1)
+update(fm5, . ~ . -STR  -I(STR^2) - I(STR^3)) %>% 
+  waldtest(fm6, vcov = hc1)
+update(fm6, . ~ .  -I(STR^2) - I(STR^3)) %>%
+  waldtest(fm6, vcov = hc1)
 waldtest(fm5, fm6, vcov = hc1)
 
-fm7r <- update(fm2, . ~ . -STR)
-waldtest(fm7r, fm7, vcov = hc1)
+update(fm2, . ~ . -STR) %>%
+  waldtest(fm7, vcov = hc1)
 waldtest(fm2, fm7, vcov = hc1)
 ```
 

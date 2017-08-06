@@ -636,121 +636,94 @@ RMSE
 </tr>
 </table>
 <p>検定を実行する.</p>
-<pre class="r"><code>summary(fm4)</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = score4 ~ stratio + english + lunch + income + I(income^2) + 
-##     I(income^3) + I(stratio^2) + I(stratio^3), data = df)
+<pre class="r"><code>update(fm3, . ~ . - I(income^2) - I(income^3)) %&gt;%
+  waldtest(fm3, vcov = hc1)</code></pre>
+<pre><code>## Wald test
 ## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -23.6546  -5.5258  -0.7591   5.1203  22.2999 
-## 
-## Coefficients:
-##                Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  665.496053  84.142987   7.909 1.43e-13 ***
-## stratio       12.425976  14.309387   0.868   0.3862    
-## english       -0.434166   0.279373  -1.554   0.1217    
-## lunch         -0.587217   0.079172  -7.417 2.88e-12 ***
-## income        -3.381537   2.327229  -1.453   0.1477    
-## I(income^2)    0.174102   0.089019   1.956   0.0518 .  
-## I(income^3)   -0.002288   0.001082  -2.115   0.0356 *  
-## I(stratio^2)  -0.680303   0.781356  -0.871   0.3849    
-## I(stratio^3)   0.011474   0.014020   0.818   0.4141    
+## Model 1: score4 ~ stratio + english + lunch + income
+## Model 2: score4 ~ stratio + english + lunch + income + I(income^2) + I(income^3)
+##   Res.Df Df      F    Pr(&gt;F)    
+## 1    215                        
+## 2    213  2 7.7448 0.0005664 ***
 ## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>update(fm4, . ~ . - stratio - I(stratio^2) - I(stratio^3)) %&gt;%
+  waldtest(fm4, vcov = hc1)</code></pre>
+<pre><code>## Wald test
 ## 
-## Residual standard error: 8.626 on 211 degrees of freedom
-## Multiple R-squared:  0.6867, Adjusted R-squared:  0.6748 
-## F-statistic:  57.8 on 8 and 211 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre class="r"><code>fm3r &lt;- update(fm3, . ~ . - I(income^2) - I(income^3))
-waldtest(fm3, fm3r, vcov = hc1)</code></pre>
+## Model 1: score4 ~ english + lunch + income + I(income^2) + I(income^3)
+## Model 2: score4 ~ stratio + english + lunch + income + I(income^2) + I(income^3) + 
+##     I(stratio^2) + I(stratio^3)
+##   Res.Df Df      F  Pr(&gt;F)  
+## 1    214                    
+## 2    211  3 2.8565 0.03809 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>update(fm4, . ~ . - I(stratio^2) - I(stratio^3)) %&gt;%
+  waldtest(fm4, vcov = hc1)</code></pre>
 <pre><code>## Wald test
 ## 
 ## Model 1: score4 ~ stratio + english + lunch + income + I(income^2) + I(income^3)
-## Model 2: score4 ~ stratio + english + lunch + income
+## Model 2: score4 ~ stratio + english + lunch + income + I(income^2) + I(income^3) + 
+##     I(stratio^2) + I(stratio^3)
+##   Res.Df Df      F Pr(&gt;F)
+## 1    213                 
+## 2    211  2 0.4463 0.6406</code></pre>
+<pre class="r"><code>update(fm4, . ~ . - I(income^2) - I(income^3)) %&gt;%
+  waldtest(fm4, vcov = hc1)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: score4 ~ stratio + english + lunch + income + I(stratio^2) + 
+##     I(stratio^3)
+## Model 2: score4 ~ stratio + english + lunch + income + I(income^2) + I(income^3) + 
+##     I(stratio^2) + I(stratio^3)
 ##   Res.Df Df      F    Pr(&gt;F)    
 ## 1    213                        
-## 2    215 -2 7.7448 0.0005664 ***
+## 2    211  2 7.7487 0.0005657 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>fm4r_str1 &lt;- update(fm4, . ~ . - stratio - I(stratio^2) - I(stratio^3))
-waldtest(fm4, fm4r_str1, vcov = hc1)</code></pre>
+<pre class="r"><code>update(fm5, . ~ . - stratio - I(higheng * stratio)) %&gt;%
+  waldtest(fm5, vcov = hc1)</code></pre>
 <pre><code>## Wald test
 ## 
-## Model 1: score4 ~ stratio + english + lunch + income + I(income^2) + I(income^3) + 
-##     I(stratio^2) + I(stratio^3)
-## Model 2: score4 ~ english + lunch + income + I(income^2) + I(income^3)
-##   Res.Df Df      F  Pr(&gt;F)  
-## 1    211                    
-## 2    214 -3 2.8565 0.03809 *
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>fm4r_str2 &lt;- update(fm4, . ~ . - I(stratio^2) - I(stratio^3))
-waldtest(fm4, fm4r_str2, vcov = hc1)</code></pre>
-<pre><code>## Wald test
-## 
-## Model 1: score4 ~ stratio + english + lunch + income + I(income^2) + I(income^3) + 
-##     I(stratio^2) + I(stratio^3)
-## Model 2: score4 ~ stratio + english + lunch + income + I(income^2) + I(income^3)
-##   Res.Df Df      F Pr(&gt;F)
-## 1    211                 
-## 2    213 -2 0.4463 0.6406</code></pre>
-<pre class="r"><code>fm4r_inc &lt;- update(fm4, . ~ . - I(income^2) - I(income^3))
-waldtest(fm4, fm4r_inc, vcov = hc1)</code></pre>
-<pre><code>## Wald test
-## 
-## Model 1: score4 ~ stratio + english + lunch + income + I(income^2) + I(income^3) + 
-##     I(stratio^2) + I(stratio^3)
-## Model 2: score4 ~ stratio + english + lunch + income + I(stratio^2) + 
-##     I(stratio^3)
-##   Res.Df Df      F    Pr(&gt;F)    
-## 1    211                        
-## 2    213 -2 7.7487 0.0005657 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>fm5r_str &lt;- update(fm5, . ~ . - stratio - I(higheng * stratio))
-waldtest(fm5, fm5r_str, vcov = hc1)</code></pre>
-<pre><code>## Wald test
-## 
-## Model 1: score4 ~ stratio + lunch + income + I(income^2) + I(income^3) + 
+## Model 1: score4 ~ lunch + income + I(income^2) + I(income^3) + higheng
+## Model 2: score4 ~ stratio + lunch + income + I(income^2) + I(income^3) + 
 ##     higheng + I(higheng * stratio)
-## Model 2: score4 ~ lunch + income + I(income^2) + I(income^3) + higheng
 ##   Res.Df Df      F Pr(&gt;F)  
-## 1    212                   
-## 2    214 -2 4.0062 0.0196 *
+## 1    214                   
+## 2    212  2 4.0062 0.0196 *
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>fm5r_inc &lt;- update(fm5, . ~ . - I(income^2) - I(income^3))
-waldtest(fm5, fm5r_inc, vcov = hc1)</code></pre>
+<pre class="r"><code>update(fm5, . ~ . - I(income^2) - I(income^3)) %&gt;% 
+  waldtest(fm5, vcov = hc1)</code></pre>
 <pre><code>## Wald test
 ## 
-## Model 1: score4 ~ stratio + lunch + income + I(income^2) + I(income^3) + 
+## Model 1: score4 ~ stratio + lunch + income + higheng + I(higheng * stratio)
+## Model 2: score4 ~ stratio + lunch + income + I(income^2) + I(income^3) + 
 ##     higheng + I(higheng * stratio)
-## Model 2: score4 ~ stratio + lunch + income + higheng + I(higheng * stratio)
 ##   Res.Df Df      F   Pr(&gt;F)   
-## 1    212                      
-## 2    214 -2 5.8468 0.003375 **
+## 1    214                      
+## 2    212  2 5.8468 0.003375 **
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>fm5r_high &lt;- update(fm5, . ~ . - higheng - I(higheng * stratio))
-waldtest(fm5, fm5r_high, vcov = hc1)</code></pre>
-<pre><code>## Wald test
-## 
-## Model 1: score4 ~ stratio + lunch + income + I(income^2) + I(income^3) + 
-##     higheng + I(higheng * stratio)
-## Model 2: score4 ~ stratio + lunch + income + I(income^2) + I(income^3)
-##   Res.Df Df      F Pr(&gt;F)
-## 1    212                 
-## 2    214 -2 1.5835 0.2077</code></pre>
-<pre class="r"><code>fm6r_inc &lt;- update(fm6, . ~ . - I(income^2) - I(income^3))
-waldtest(fm6, fm6r_inc, vcov = hc1)</code></pre>
+<pre class="r"><code>update(fm5, . ~ . - higheng - I(higheng * stratio)) %&gt;%
+  waldtest(fm5, vcov = hc1)</code></pre>
 <pre><code>## Wald test
 ## 
 ## Model 1: score4 ~ stratio + lunch + income + I(income^2) + I(income^3)
-## Model 2: score4 ~ stratio + lunch + income
+## Model 2: score4 ~ stratio + lunch + income + I(income^2) + I(income^3) + 
+##     higheng + I(higheng * stratio)
+##   Res.Df Df      F Pr(&gt;F)
+## 1    214                 
+## 2    212  2 1.5835 0.2077</code></pre>
+<pre class="r"><code>update(fm6, . ~ . - I(income^2) - I(income^3)) %&gt;%
+  waldtest(fm6, vcov = hc1)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: score4 ~ stratio + lunch + income
+## Model 2: score4 ~ stratio + lunch + income + I(income^2) + I(income^3)
 ##   Res.Df Df      F   Pr(&gt;F)   
-## 1    214                      
-## 2    216 -2 6.5479 0.001737 **
+## 1    216                      
+## 2    214  2 6.5479 0.001737 **
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
