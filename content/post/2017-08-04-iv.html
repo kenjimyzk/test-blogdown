@@ -389,7 +389,7 @@ RMSE
 </table>
 <p>操作変数として妥当かどうか確認する. まずそれぞれ内生変数と十分相関をもつかを確認する.</p>
 <pre class="r"><code>lm(pricediff ~ taxsdiff + incdiff,data=ddf) %&gt;% 
-  waldtest(. ~ . -taxsdiff, vcov = hc1)</code></pre>
+  waldtest(&quot;taxsdiff&quot;, vcov = hc1)</code></pre>
 <pre><code>## Wald test
 ## 
 ## Model 1: pricediff ~ taxsdiff + incdiff
@@ -400,7 +400,7 @@ RMSE
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>lm(pricediff ~ taxdiff + incdiff,data=ddf) %&gt;%
-  waldtest(. ~ . -taxdiff, vcov = hc1)</code></pre>
+  waldtest(&quot;taxdiff&quot;, vcov = hc1)</code></pre>
 <pre><code>## Wald test
 ## 
 ## Model 1: pricediff ~ taxdiff + incdiff
@@ -411,7 +411,7 @@ RMSE
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>lm(pricediff ~ incdiff + taxsdiff + taxdiff,data=ddf) %&gt;% 
-  waldtest(. ~ . -taxsdiff -taxdiff, vcov = hc1)</code></pre>
+  waldtest(c(&quot;taxsdiff&quot;, &quot;taxdiff&quot;), vcov = hc1)</code></pre>
 <pre><code>## Wald test
 ## 
 ## Model 1: pricediff ~ incdiff + taxsdiff + taxdiff
@@ -460,41 +460,35 @@ RMSE
 <p>ただここでのサーガン検定の結果と本文では異なっている. <code>ivreg</code> でのサーガン検定はLM検定にもとづく計算方法である. ワルド検定にもとづく計算なら以下のように実施する.</p>
 <pre class="r"><code>## testing overidentifying restrictions (J test)
 fm_or &lt;- lm(residuals(fm_diff3) ~ incdiff + taxsdiff + taxdiff,data=ddf)
-fm_or_test &lt;- linearHypothesis(fm_or, c(&quot;taxsdiff = 0&quot;, &quot;taxdiff = 0&quot;), test = &quot;Chisq&quot;)
-fm_or_test %&gt;% tidy() %&gt;% kable()</code></pre>
+fm_or_test &lt;- waldtest(fm_or, c(&quot;taxsdiff&quot;, &quot;taxdiff&quot;), test = &quot;Chisq&quot;)
+fm_or_test %&gt;% kable()</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th align="right">res.df</th>
-<th align="right">rss</th>
-<th align="right">df</th>
-<th align="right">sumsq</th>
-<th align="right">statistic</th>
-<th align="right">p.value</th>
+<th align="right">Res.Df</th>
+<th align="right">Df</th>
+<th align="right">Chisq</th>
+<th align="right">Pr(&gt;Chisq)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">46</td>
-<td align="right">0.3747215</td>
-<td align="right">NA</td>
+<td align="right">44</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr>
 <tr class="even">
-<td align="right">44</td>
-<td align="right">0.3369523</td>
-<td align="right">2</td>
-<td align="right">0.0377692</td>
+<td align="right">46</td>
+<td align="right">-2</td>
 <td align="right">4.931982</td>
 <td align="right">0.0849246</td>
 </tr>
 </tbody>
 </table>
-<p>統計量は一致するが, 自由度の扱いが異なっているため P値が異なっている. 自由度を補正してP値を求めるには以下のようにすればよい.</p>
+<p>統計量は一致するが, 自由度の扱いが異なっているため P値が正しくない. 自由度を補正して正しいP値を求めるには以下のようにすればよい.</p>
 <pre class="r"><code>## warning: df (and hence p-value) invalid above.
 ## correct df: # instruments - # endogenous variables
-pchisq(fm_or_test[2,5], df.residual(fm_diff3) - df.residual(fm_or), lower.tail = FALSE)</code></pre>
+pchisq(fm_or_test[2,3], df.residual(fm_diff3) - df.residual(fm_or), lower.tail = FALSE)</code></pre>
 <pre><code>## [1] 0.02636406</code></pre>
 </div>
