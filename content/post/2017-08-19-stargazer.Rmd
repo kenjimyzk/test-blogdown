@@ -90,7 +90,7 @@ stargazer(fm1,fm2, file="tab2.tex")
 tab2_html <- stargazer(fm1,fm2, type="html",
                        covariate.labels = c("速度", "速度自乗","定数項"),
                        dep.var.caption  = "被説明変数",
-                       dep.var.labels   = "距離")
+                       dep.var.labels   = "距離") 
 ```
 
 それ以外の変換は次のようにする.
@@ -101,7 +101,7 @@ tab2_html <- tab2_html %>%
 ```
 
 ```{r,results="asis"}
-cat(tab2_html)
+cat(tab2_html,sep='\n')
 ```
 
 latex 形式での保存は以下のようにする.
