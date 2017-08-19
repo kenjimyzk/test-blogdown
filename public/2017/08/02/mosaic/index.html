@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ja-jp">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.21" />
+
+
+<title>texreg poly - A Hugo website</title>
+<meta property="og:title" content="texreg poly - A Hugo website">
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="../../../../css/fonts.css" media="all">
+<link rel="stylesheet" href="../../../../css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="../../../../" class="nav-logo">
+    <img src="../../../../images/sarah.jpg"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="https://github.com/rstudio/blogdown">GitHub</a></li>
+    
+    <li><a href="../../../../about/">Kenji Miyazaki</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">1 min read</span>
+    
+
+    <h1 class="article-title">texreg poly</h1>
+
+    
+    <span class="article-date">2017/08/02</span>
+    
+
+    <div class="article-content">
+      <div class="section level2">
+<h2>初期設定</h2>
+<pre class="r"><code>library(tidyverse)
+library(mosaic)
+library(broom)
+library(knitr)</code></pre>
+<pre class="r"><code>Births78 %&gt;% head(3) %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">date</th>
+<th align="right">births</th>
+<th align="right">dayofyear</th>
+<th align="left">wday</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1978-01-01</td>
+<td align="right">7701</td>
+<td align="right">1</td>
+<td align="left">Sun</td>
+</tr>
+<tr class="even">
+<td align="left">1978-01-02</td>
+<td align="right">7527</td>
+<td align="right">2</td>
+<td align="left">Mon</td>
+</tr>
+<tr class="odd">
+<td align="left">1978-01-03</td>
+<td align="right">8825</td>
+<td align="right">3</td>
+<td align="left">Tues</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>bwplot(births ~ wday, data=Births78)</code></pre>
+<p><img src="../../../../post/2017-08-02-mosaic_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>bwplot(wday ~ births, data=Births78, pch = &quot;|&quot;)</code></pre>
+<p><img src="../../../../post/2017-08-02-mosaic_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>mean(births ~ wday, data = Births78)</code></pre>
+<pre><code>##      Sun      Mon     Tues      Wed    Thurs      Fri      Sat 
+## 7950.943 9371.327 9708.808 9498.019 9483.635 9625.788 8309.327</code></pre>
+<pre class="r"><code>cars.mod1 &lt;- lm(dist ~ speed, data = cars)
+cars.mod1 %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-17.579095</td>
+<td align="right">6.7584402</td>
+<td align="right">-2.601058</td>
+<td align="right">0.0123188</td>
+</tr>
+<tr class="even">
+<td align="left">speed</td>
+<td align="right">3.932409</td>
+<td align="right">0.4155128</td>
+<td align="right">9.463990</td>
+<td align="right">0.0000000</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>cars.mod2 &lt;- lm(dist ~ poly(speed,2), data = cars)
+cars.mod2 %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">42.98000</td>
+<td align="right">2.14622</td>
+<td align="right">20.025902</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">poly(speed, 2)1</td>
+<td align="right">145.55226</td>
+<td align="right">15.17607</td>
+<td align="right">9.590905</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">poly(speed, 2)2</td>
+<td align="right">22.99576</td>
+<td align="right">15.17607</td>
+<td align="right">1.515265</td>
+<td align="right">0.1364024</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>library(stargazer)</code></pre>
+<pre><code>## 
+## Please cite as:</code></pre>
+<pre><code>##  Hlavac, Marek (2015). stargazer: Well-Formatted Regression and Summary Statistics Tables.</code></pre>
+<pre><code>##  R package version 5.2. http://CRAN.R-project.org/package=stargazer</code></pre>
+<pre class="r"><code>stargazer(cars.mod1,cars.mod2,type=&quot;html&quot;)</code></pre>
+<table style="text-align:center">
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+dist
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+speed
+</td>
+<td>
+3.932<sup>***</sup>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.416)
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+poly(speed, 2)1
+</td>
+<td>
+</td>
+<td>
+145.552<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+(15.176)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+poly(speed, 2)2
+</td>
+<td>
+</td>
+<td>
+22.996
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+(15.176)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+-17.579<sup>**</sup>
+</td>
+<td>
+42.980<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(6.758)
+</td>
+<td>
+(2.146)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+50
+</td>
+<td>
+50
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.651
+</td>
+<td>
+0.667
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.644
+</td>
+<td>
+0.653
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+15.380 (df = 48)
+</td>
+<td>
+15.176 (df = 47)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+89.567<sup>***</sup> (df = 1; 48)
+</td>
+<td>
+47.141<sup>***</sup> (df = 2; 47)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="2" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<p><code>cars.mod1</code> の係数名を変更する.</p>
+<pre class="r"><code>library(stargazer)
+names(cars.mod2$coefficients) &lt;- c(&quot;(Intercept)&quot;, &quot;speed&quot;,  &quot;speed2&quot;)
+stargazer(cars.mod1,cars.mod2,type=&quot;html&quot;)</code></pre>
+<table style="text-align:center">
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+dist
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+speed
+</td>
+<td>
+3.932<sup>***</sup>
+</td>
+<td>
+145.552<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.416)
+</td>
+<td>
+(15.176)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+speed2
+</td>
+<td>
+</td>
+<td>
+22.996
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+(15.176)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+-17.579<sup>**</sup>
+</td>
+<td>
+42.980<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(6.758)
+</td>
+<td>
+(2.146)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+50
+</td>
+<td>
+50
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.651
+</td>
+<td>
+0.667
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.644
+</td>
+<td>
+0.653
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+15.380 (df = 48)
+</td>
+<td>
+15.176 (df = 47)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+89.567<sup>***</sup> (df = 1; 48)
+</td>
+<td>
+47.141<sup>***</sup> (df = 2; 47)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="2" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="../../../../index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="../../../../js/math-code.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    processEscapes: true
+  }
+});
+</script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

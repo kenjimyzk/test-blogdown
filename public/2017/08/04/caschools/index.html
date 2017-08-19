@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ja-jp">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.21" />
+
+
+<title>caschools - A Hugo website</title>
+<meta property="og:title" content="caschools - A Hugo website">
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="../../../../css/fonts.css" media="all">
+<link rel="stylesheet" href="../../../../css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="../../../../" class="nav-logo">
+    <img src="../../../../images/sarah.jpg"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="https://github.com/rstudio/blogdown">GitHub</a></li>
+    
+    <li><a href="../../../../about/">Kenji Miyazaki</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">3 min read</span>
+    
+
+    <h1 class="article-title">caschools</h1>
+
+    
+    <span class="article-date">2017/08/04</span>
+    
+
+    <div class="article-content">
+      <p>SW本8章の表8.3を再現する. まず以下のライブラリを導入する</p>
+<pre class="r"><code>library(knitr)
+library(mosaic)
+library(AER)
+library(texreg)
+library(tidyverse)
+library(mosaic)</code></pre>
+<p>またロバスト分散を何度も計算するため次の関数を作っておく.</p>
+<pre class="r"><code>## convenience function: HC1 covariances
+hc1 &lt;- function(x) vcovHC(x, type = &quot;HC1&quot;)</code></pre>
+<p>データを少し加工する.</p>
+<pre class="r"><code>data(&quot;CASchools&quot;, package = &quot;AER&quot;)
+df &lt;- CASchools %&gt;% mutate(score=(math + read)/2,
+                           STR = students/teachers,
+                           HiEL = I(english&gt;=10)) %&gt;%
+  select(score,lunch,STR,HiEL,english,income)
+summary(df)</code></pre>
+<pre><code>##      score           lunch             STR           HiEL        
+##  Min.   :605.5   Min.   :  0.00   Min.   :14.00   Mode :logical  
+##  1st Qu.:640.0   1st Qu.: 23.28   1st Qu.:18.58   FALSE:228      
+##  Median :654.5   Median : 41.75   Median :19.72   TRUE :192      
+##  Mean   :654.2   Mean   : 44.71   Mean   :19.64                  
+##  3rd Qu.:666.7   3rd Qu.: 66.86   3rd Qu.:20.87                  
+##  Max.   :706.8   Max.   :100.00   Max.   :25.80                  
+##     english           income      
+##  Min.   : 0.000   Min.   : 5.335  
+##  1st Qu.: 1.941   1st Qu.:10.639  
+##  Median : 8.778   Median :13.728  
+##  Mean   :15.768   Mean   :15.317  
+##  3rd Qu.:22.970   3rd Qu.:17.629  
+##  Max.   :85.540   Max.   :55.328</code></pre>
+<p>回帰分析を実行する.</p>
+<pre class="r"><code>## p. 152
+fm1 &lt;- lm(score ~ STR + english + lunch, data = df)
+fm2 &lt;- update(fm1, . ~ . + lunch + log(income))
+fm3 &lt;- update(fm1, . ~ STR + HiEL + I(HiEL*STR), data = df)
+fm4 &lt;- update(fm3, . ~ . + lunch + log(income))
+fm5 &lt;- update(fm4, . ~ . - I(HiEL*STR) + I(STR^2) + I(STR^3))
+fm6 &lt;- update(fm5, . ~ . +  + I(HiEL*STR) + I(HiEL*STR^2) +I(HiEL*STR^3))
+fm7 &lt;- update(fm5, . ~ . - HiEL + english)</code></pre>
+<p>ロバスト分散を考慮に入れて作表する.</p>
+<pre class="r"><code>ll = list(fm1,fm2,fm3,fm4,fm5,fm6, fm7)
+selist &lt;- ll %&gt;% map(~coeftest(.,hc1)[,2])
+pvlist &lt;- ll %&gt;% map(~coeftest(.,hc1)[,4])
+hc1 &lt;- function(x) vcovHC(x, type = &quot;HC1&quot;)
+htmlreg(ll, override.se=selist,override.pvalues=pvlist,
+        include.rsquared = FALSE,digits=3,
+        custom.model.names = c(&quot;(1)&quot;,&quot;(2)&quot;,&quot;(3)&quot;,&quot;(4)&quot;,&quot;(5)&quot;,&quot;(6)&quot;,&quot;(7)&quot;),
+        reorder.coef = c(2,8, 9, 3, 6, 7, 10, 11, 4, 5, 1))</code></pre>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<table cellspacing="0" align="center" style="border: none;">
+<caption align="bottom" style="margin-top:0.3em;">
+Statistical models
+</caption>
+<tr>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b></b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(1)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(2)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(3)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(4)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(5)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(6)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(7)</b>
+</th>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+STR
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.998<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.734<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.968
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.531
+</td>
+<td style="padding-right: 12px; border: none;">
+64.339<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+83.702<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+65.285<sup style="vertical-align: 0px;">*</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.270)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.257)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.589)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.342)
+</td>
+<td style="padding-right: 12px; border: none;">
+(24.861)
+</td>
+<td style="padding-right: 12px; border: none;">
+(28.497)
+</td>
+<td style="padding-right: 12px; border: none;">
+(25.259)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+I(STR^2)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-3.424<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-4.381<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-3.466<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.250)
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.441)
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.271)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+I(STR^3)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+0.059<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.075<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.060<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.021)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.024)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.021)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+english
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.122<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.176<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.166<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.033)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.034)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.034)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+HiELTRUE
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+5.639
+</td>
+<td style="padding-right: 12px; border: none;">
+5.498
+</td>
+<td style="padding-right: 12px; border: none;">
+-5.474<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+816.076<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(19.515)
+</td>
+<td style="padding-right: 12px; border: none;">
+(9.795)
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.034)
+</td>
+<td style="padding-right: 12px; border: none;">
+(327.674)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+I(HiEL * STR)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.277
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.578
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-123.282<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.967)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.496)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(50.213)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+I(HiEL * STR^2)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+6.121<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(2.542)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+I(HiEL * STR^3)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.101<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.043)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+lunch
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.547<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.398<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.411<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.420<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.418<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.402<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.024)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.033)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.029)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.029)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.029)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.033)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+log(income)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+11.569<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+12.124<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+11.748<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+11.800<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+11.509<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.819)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.798)
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.771)
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.778)
+</td>
+<td style="padding-right: 12px; border: none;">
+(1.806)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+(Intercept)
+</td>
+<td style="padding-right: 12px; border: none;">
+700.150<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+658.552<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+682.246<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+653.666<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+252.050
+</td>
+<td style="padding-right: 12px; border: none;">
+122.353
+</td>
+<td style="padding-right: 12px; border: none;">
+244.809
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(5.568)
+</td>
+<td style="padding-right: 12px; border: none;">
+(8.642)
+</td>
+<td style="padding-right: 12px; border: none;">
+(11.868)
+</td>
+<td style="padding-right: 12px; border: none;">
+(9.869)
+</td>
+<td style="padding-right: 12px; border: none;">
+(163.634)
+</td>
+<td style="padding-right: 12px; border: none;">
+(185.519)
+</td>
+<td style="padding-right: 12px; border: none;">
+(165.722)
+</td>
+</tr>
+<tr>
+<td style="border-top: 1px solid black;">
+Adj. R<sup style="vertical-align: 0px;">2</sup>
+</td>
+<td style="border-top: 1px solid black;">
+0.773
+</td>
+<td style="border-top: 1px solid black;">
+0.794
+</td>
+<td style="border-top: 1px solid black;">
+0.305
+</td>
+<td style="border-top: 1px solid black;">
+0.795
+</td>
+<td style="border-top: 1px solid black;">
+0.798
+</td>
+<td style="border-top: 1px solid black;">
+0.799
+</td>
+<td style="border-top: 1px solid black;">
+0.798
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+Num. obs.
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid black;">
+RMSE
+</td>
+<td style="border-bottom: 2px solid black;">
+9.080
+</td>
+<td style="border-bottom: 2px solid black;">
+8.643
+</td>
+<td style="border-bottom: 2px solid black;">
+15.880
+</td>
+<td style="border-bottom: 2px solid black;">
+8.629
+</td>
+<td style="border-bottom: 2px solid black;">
+8.559
+</td>
+<td style="border-bottom: 2px solid black;">
+8.547
+</td>
+<td style="border-bottom: 2px solid black;">
+8.568
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;" colspan="9">
+<span style="font-size:0.8em"><sup style="vertical-align: 0px;"><em><strong></sup>p &lt; 0.001, <sup style="vertical-align: 0px;"></strong></sup>p &lt; 0.01, <sup style="vertical-align: 0px;"></em></sup>p &lt; 0.05</span>
+</td>
+</tr>
+</table>
+<pre class="r"><code>update(fm3, . ~ . - STR - I(HiEL * STR)) %&gt;% 
+  waldtest(fm3, vcov = hc1)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: score ~ HiEL
+## Model 2: score ~ STR + HiEL + I(HiEL * STR)
+##   Res.Df Df      F   Pr(&gt;F)   
+## 1    418                      
+## 2    416  2 5.6381 0.003837 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>update(fm4, . ~ . - STR - I(HiEL * STR)) %&gt;% 
+  waldtest(fm4, vcov = hc1)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: score ~ HiEL + lunch + log(income)
+## Model 2: score ~ STR + HiEL + I(HiEL * STR) + lunch + log(income)
+##   Res.Df Df      F   Pr(&gt;F)   
+## 1    416                      
+## 2    414  2 5.9221 0.002912 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>update(fm5, . ~ . -STR  -I(STR^2) - I(STR^3)) %&gt;% 
+  waldtest(fm5, vcov = hc1)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: score ~ HiEL + lunch + log(income)
+## Model 2: score ~ STR + HiEL + lunch + log(income) + I(STR^2) + I(STR^3)
+##   Res.Df Df     F    Pr(&gt;F)    
+## 1    416                       
+## 2    413  3 6.313 0.0003403 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>update(fm5, . ~ . -I(STR^2) - I(STR^3)) %&gt;% 
+  waldtest(fm5, vcov = hc1)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: score ~ STR + HiEL + lunch + log(income)
+## Model 2: score ~ STR + HiEL + lunch + log(income) + I(STR^2) + I(STR^3)
+##   Res.Df Df      F   Pr(&gt;F)   
+## 1    415                      
+## 2    413  2 6.1663 0.002297 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>update(fm5, . ~ . -STR  -I(STR^2) - I(STR^3)) %&gt;% 
+  waldtest(fm6, vcov = hc1)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: score ~ HiEL + lunch + log(income)
+## Model 2: score ~ STR + HiEL + lunch + log(income) + I(STR^2) + I(STR^3) + 
+##     I(HiEL * STR) + I(HiEL * STR^2) + I(HiEL * STR^3)
+##   Res.Df Df      F    Pr(&gt;F)    
+## 1    416                        
+## 2    410  6 4.9617 6.416e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>update(fm6, . ~ .  -I(STR^2) - I(STR^3)) %&gt;%
+  waldtest(fm6, vcov = hc1)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: score ~ STR + HiEL + lunch + log(income) + I(HiEL * STR) + I(HiEL * 
+##     STR^2) + I(HiEL * STR^3)
+## Model 2: score ~ STR + HiEL + lunch + log(income) + I(STR^2) + I(STR^3) + 
+##     I(HiEL * STR) + I(HiEL * STR^2) + I(HiEL * STR^3)
+##   Res.Df Df      F   Pr(&gt;F)   
+## 1    412                      
+## 2    410  2 5.8063 0.003261 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>waldtest(fm5, fm6, vcov = hc1)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: score ~ STR + HiEL + lunch + log(income) + I(STR^2) + I(STR^3)
+## Model 2: score ~ STR + HiEL + lunch + log(income) + I(STR^2) + I(STR^3) + 
+##     I(HiEL * STR) + I(HiEL * STR^2) + I(HiEL * STR^3)
+##   Res.Df Df      F  Pr(&gt;F)  
+## 1    413                    
+## 2    410  3 2.6903 0.04597 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>update(fm2, . ~ . -STR) %&gt;%
+  waldtest(fm7, vcov = hc1)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: score ~ english + lunch + log(income)
+## Model 2: score ~ STR + lunch + log(income) + I(STR^2) + I(STR^3) + english
+##   Res.Df Df      F    Pr(&gt;F)    
+## 1    416                        
+## 2    413  3 5.9071 0.0005924 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>waldtest(fm2, fm7, vcov = hc1)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: score ~ STR + english + lunch + log(income)
+## Model 2: score ~ STR + lunch + log(income) + I(STR^2) + I(STR^3) + english
+##   Res.Df Df      F   Pr(&gt;F)   
+## 1    415                      
+## 2    413  2 5.9579 0.002813 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>xyplot(score ~ STR, data=df)
+fn2 &lt;- makeFun(fm2)
+mean(~english, data =df)</code></pre>
+<pre><code>## [1] 15.76816</code></pre>
+<pre class="r"><code>mean(~lunch, data =df)</code></pre>
+<pre><code>## [1] 44.70524</code></pre>
+<pre class="r"><code>mean(~income, data =df)</code></pre>
+<pre><code>## [1] 15.31659</code></pre>
+<pre class="r"><code>plotFun(fn2(STR, english=15.76816,lunch=44.70524,income=15.31659)~STR,add=TRUE)
+fn7 &lt;- makeFun(fm7)
+plotFun(fn7(STR, english=15.76816,lunch=44.70524,income=15.31659)~STR,add=TRUE,col=2)</code></pre>
+<pre><code>## converting numerical color value into a color using lattice settings</code></pre>
+<p><img src="../../../../post/2017-08-04-caschools_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>xyplot(score ~ STR, group=HiEL, data=df)
+fn6 &lt;- makeFun(fm6)
+plotFun(fn6(STR, HiEL=TRUE,lunch=44.70524,income=15.31659)~STR,add=TRUE)
+plotFun(fn6(STR, HiEL=FALSE,lunch=44.70524,income=15.31659)~STR,add=TRUE,col=2)</code></pre>
+<pre><code>## converting numerical color value into a color using lattice settings</code></pre>
+<p><img src="../../../../post/2017-08-04-caschools_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="../../../../index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+

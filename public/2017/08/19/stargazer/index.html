@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="ja-jp">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.21" />
+
+
+<title>stargazer - A Hugo website</title>
+<meta property="og:title" content="stargazer - A Hugo website">
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="../../../../css/fonts.css" media="all">
+<link rel="stylesheet" href="../../../../css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="../../../../" class="nav-logo">
+    <img src="../../../../images/sarah.jpg"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="https://github.com/rstudio/blogdown">GitHub</a></li>
+    
+    <li><a href="../../../../about/">Kenji Miyazaki</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">3 min read</span>
+    
+
+    <h1 class="article-title">stargazer</h1>
+
+    
+    <span class="article-date">2017/08/19</span>
+    
+
+    <div class="article-content">
+      <pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## Loading tidyverse: ggplot2
+## Loading tidyverse: tibble
+## Loading tidyverse: tidyr
+## Loading tidyverse: readr
+## Loading tidyverse: purrr
+## Loading tidyverse: dplyr</code></pre>
+<pre><code>## Conflicts with tidy packages ----------------------------------------------</code></pre>
+<pre><code>## filter(): dplyr, stats
+## lag():    dplyr, stats</code></pre>
+<pre class="r"><code>library(stringr)
+library(stargazer)</code></pre>
+<pre><code>## 
+## Please cite as:</code></pre>
+<pre><code>##  Hlavac, Marek (2015). stargazer: Well-Formatted Regression and Summary Statistics Tables.</code></pre>
+<pre><code>##  R package version 5.2. http://CRAN.R-project.org/package=stargazer</code></pre>
+<div id="statics" class="section level2">
+<h2>statics</h2>
+<pre class="r"><code>stargazer(cars, type=&quot;html&quot;)</code></pre>
+<table style="text-align:center">
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Statistic
+</td>
+<td>
+N
+</td>
+<td>
+Mean
+</td>
+<td>
+St. Dev.
+</td>
+<td>
+Min
+</td>
+<td>
+Max
+</td>
+</tr>
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+speed
+</td>
+<td>
+50
+</td>
+<td>
+15.400
+</td>
+<td>
+5.288
+</td>
+<td>
+4
+</td>
+<td>
+25
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+dist
+</td>
+<td>
+50
+</td>
+<td>
+42.980
+</td>
+<td>
+25.769
+</td>
+<td>
+2
+</td>
+<td>
+120
+</td>
+</tr>
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+</table>
+<p>latex形式のファイルの保存は以下を実施</p>
+<pre class="r"><code>stargazer(cars, file=&quot;tab1.tex&quot;)</code></pre>
+<p>変数名は日本語に変換できる.</p>
+<pre class="r"><code>tab1_html&lt;-stargazer(cars, type=&quot;html&quot;,
+                     covariate.labels = c(&quot;速度&quot;,&quot;距離&quot;))</code></pre>
+<table style="text-align:center">
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Statistic
+</td>
+<td>
+N
+</td>
+<td>
+Mean
+</td>
+<td>
+St. Dev.
+</td>
+<td>
+Min
+</td>
+<td>
+Max
+</td>
+</tr>
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+速度
+</td>
+<td>
+50
+</td>
+<td>
+15.400
+</td>
+<td>
+5.288
+</td>
+<td>
+4
+</td>
+<td>
+25
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+距離
+</td>
+<td>
+50
+</td>
+<td>
+42.980
+</td>
+<td>
+25.769
+</td>
+<td>
+2
+</td>
+<td>
+120
+</td>
+</tr>
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+</table>
+<p>ほかも変更するには以下を実施する.</p>
+<pre class="r"><code>tab1_html&lt;- tab1_html %&gt;% 
+  str_replace(&quot;Mean&quot;,&quot;平均&quot;) %&gt;%
+  str_replace(&quot;St. Dev.&quot;,&quot;標準誤差&quot;) %&gt;%
+  str_replace(&quot;Min&quot;,&quot;最小&quot;) %&gt;%
+  str_replace(&quot;Max&quot;,&quot;最大&quot;)</code></pre>
+<pre class="r"><code>cat(tab1_html)</code></pre>
+<table style="text-align:center">
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Statistic
+</td>
+<td>
+N
+</td>
+<td>
+平均
+</td>
+<td>
+標準誤差
+</td>
+<td>
+最小
+</td>
+<td>
+最大
+</td>
+</tr>
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+速度
+</td>
+<td>
+50
+</td>
+<td>
+15.400
+</td>
+<td>
+5.288
+</td>
+<td>
+4
+</td>
+<td>
+25
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+距離
+</td>
+<td>
+50
+</td>
+<td>
+42.980
+</td>
+<td>
+25.769
+</td>
+<td>
+2
+</td>
+<td>
+120
+</td>
+</tr>
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+</table>
+<p>latex形式のファイル保存は以下を実施する.</p>
+<pre class="r"><code>tab1 &lt;- stargazer(cars)  %&gt;%
+  str_replace(&quot;Mean&quot;,&quot;平均&quot;) %&gt;%
+  str_replace(&quot;St. Dev.&quot;,&quot;標準誤差&quot;) %&gt;%
+  str_replace(&quot;Min&quot;,&quot;最小&quot;) %&gt;%
+  str_replace(&quot;Max&quot;,&quot;最大&quot;)
+fout &lt;- file(&quot;tab1j.tex&quot;,encoding = &quot;UTF8&quot;)
+write(tab1, file=fout)
+close(fout)</code></pre>
+</div>
+<div id="lm" class="section level2">
+<h2>lm</h2>
+<p>回帰分析結果</p>
+<pre class="r"><code>fm1&lt;-lm(dist~speed,data=cars)
+fm2&lt;-lm(dist~speed+I(speed^2),data=cars)</code></pre>
+<p>結果の表示</p>
+<pre class="r"><code>stargazer(fm1,fm2, type=&quot;html&quot;)</code></pre>
+<table style="text-align:center">
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+dist
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+speed
+</td>
+<td>
+3.932<sup>***</sup>
+</td>
+<td>
+0.913
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.416)
+</td>
+<td>
+(2.034)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+I(speed2)
+</td>
+<td>
+</td>
+<td>
+0.100
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+(0.066)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+-17.579<sup>**</sup>
+</td>
+<td>
+2.470
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(6.758)
+</td>
+<td>
+(14.817)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+50
+</td>
+<td>
+50
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.651
+</td>
+<td>
+0.667
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.644
+</td>
+<td>
+0.653
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+15.380 (df = 48)
+</td>
+<td>
+15.176 (df = 47)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+89.567<sup>***</sup> (df = 1; 48)
+</td>
+<td>
+47.141<sup>***</sup> (df = 2; 47)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="2" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<p>latex形式のファイルの保存は以下を実施</p>
+<pre class="r"><code>stargazer(fm1,fm2, file=&quot;tab2.tex&quot;)</code></pre>
+<p>変数名は日本語に変換できる.</p>
+<pre class="r"><code>tab2_html &lt;- stargazer(fm1,fm2, type=&quot;html&quot;,
+                       covariate.labels = c(&quot;速度&quot;, &quot;速度自乗&quot;),
+                       dep.var.caption  = &quot;被説明変数&quot;,
+                       dep.var.labels   = &quot;距離&quot;)</code></pre>
+<table style="text-align:center">
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+被説明変数
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+距離
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+速度
+</td>
+<td>
+3.932<sup>***</sup>
+</td>
+<td>
+0.913
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.416)
+</td>
+<td>
+(2.034)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+速度自乗
+</td>
+<td>
+</td>
+<td>
+0.100
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+(0.066)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+-17.579<sup>**</sup>
+</td>
+<td>
+2.470
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(6.758)
+</td>
+<td>
+(14.817)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+50
+</td>
+<td>
+50
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.651
+</td>
+<td>
+0.667
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.644
+</td>
+<td>
+0.653
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+15.380 (df = 48)
+</td>
+<td>
+15.176 (df = 47)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+89.567<sup>***</sup> (df = 1; 48)
+</td>
+<td>
+47.141<sup>***</sup> (df = 2; 47)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="2" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<p>それ以外の変換は次のようにする.</p>
+<pre class="r"><code>tab2_html &lt;- tab2_html %&gt;% 
+  str_replace(&quot;Constant&quot;,&quot;定数項&quot;) %&gt;%
+  str_replace(&quot;Observations&quot;,&quot;観測数&quot;) %&gt;%
+  str_replace(&quot;Adjusted&quot;,&quot;修正済み&quot;)</code></pre>
+<pre class="r"><code>cat(tab2_html)</code></pre>
+<table style="text-align:center">
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+被説明変数
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="2" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+距離
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+速度
+</td>
+<td>
+3.932<sup>***</sup>
+</td>
+<td>
+0.913
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.416)
+</td>
+<td>
+(2.034)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+速度自乗
+</td>
+<td>
+</td>
+<td>
+0.100
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+(0.066)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+定数項
+</td>
+<td>
+-17.579<sup>**</sup>
+</td>
+<td>
+2.470
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(6.758)
+</td>
+<td>
+(14.817)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+観測数
+</td>
+<td>
+50
+</td>
+<td>
+50
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.651
+</td>
+<td>
+0.667
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+修正済み R<sup>2</sup>
+</td>
+<td>
+0.644
+</td>
+<td>
+0.653
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+15.380 (df = 48)
+</td>
+<td>
+15.176 (df = 47)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+89.567<sup>***</sup> (df = 1; 48)
+</td>
+<td>
+47.141<sup>***</sup> (df = 2; 47)
+</td>
+</tr>
+<tr>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="2" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<p>latex 形式ので保存は以下のようにする.</p>
+<pre class="r"><code>tab2 &lt;- stargazer(fm1, fm2, type = &quot;html&quot;,
+                  covariate.labels = c(&quot;速度&quot;, &quot;速度自乗&quot;),
+                  dep.var.caption  = &quot;被説明変数&quot;,
+                  dep.var.labels   = &quot;距離&quot;) %&gt;%
+  str_replace(&quot;Constant&quot;, &quot;定数項&quot;) %&gt;%
+  str_replace(&quot;Observations&quot;, &quot;観測数&quot;) %&gt;%
+  str_replace(&quot;Adjusted&quot;, &quot;修正済み&quot;)</code></pre>
+<pre class="r"><code>fout &lt;- file(&quot;tab2j.tex&quot;,encoding = &quot;UTF8&quot;)
+write(tab2, file=fout)
+close(fout)</code></pre>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="../../../../index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+

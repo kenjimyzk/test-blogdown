@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ja-jp">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.21" />
+
+
+<title>journal - A Hugo website</title>
+<meta property="og:title" content="journal - A Hugo website">
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="../../../../css/fonts.css" media="all">
+<link rel="stylesheet" href="../../../../css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="../../../../" class="nav-logo">
+    <img src="../../../../images/sarah.jpg"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="https://github.com/rstudio/blogdown">GitHub</a></li>
+    
+    <li><a href="../../../../about/">Kenji Miyazaki</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">1 min read</span>
+    
+
+    <h1 class="article-title">journal</h1>
+
+    
+    <span class="article-date">2017/08/04</span>
+    
+
+    <div class="article-content">
+      <p>SW本8章の表8.2再現を試みる. 以下のライブラリを導入する</p>
+<pre class="r"><code>library(knitr)
+library(mosaic)
+library(AER)
+library(texreg)
+library(tidyverse)</code></pre>
+<p>またロバスト分散を何度も計算するため次の関数を作っておく.</p>
+<pre class="r"><code>## convenience function: HC1 covariances
+hc1 &lt;- function(x) vcovHC(x, type = &quot;HC1&quot;)</code></pre>
+<p>データ整理</p>
+<pre class="r"><code>## data and transformed variables
+data(&quot;Journals&quot;, package = &quot;AER&quot;)
+journals &lt;- Journals %&gt;% mutate(citeprice = price/citations,
+                                age = 2000 - foundingyear,
+                                chars = charpp*pages/10^7) %&gt;%
+  select(subs,price,citeprice,age,chars)</code></pre>
+<pre class="r"><code>plot(subs ~ citeprice, data = journals, pch = 19)</code></pre>
+<p><img src="../../../../post/2017-08-04-journal_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>plot(subs ~ citeprice, data = log(journals), pch = 19)
+fm1 &lt;- lm(subs ~ citeprice, data = log(journals))
+abline(fm1)</code></pre>
+<p><img src="../../../../post/2017-08-04-journal_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>fm2 &lt;- update(fm1, .~ . + age + chars)
+fm3 &lt;- update(fm2, .~ . + I(citeprice^2) + I(citeprice^3) + I(age * citeprice))
+fm4 &lt;- update(fm2, .~ . + I(age * citeprice))
+fm4 &lt;- lm(subs ~ citeprice + age + I(age * citeprice) + chars, data = log(journals))</code></pre>
+<pre class="r"><code>ll = list(fm1,fm2,fm3,fm4)
+selist &lt;- ll %&gt;% map(~coeftest(.,hc1)[,2])
+pvlist &lt;- ll %&gt;% map(~coeftest(.,hc1)[,4])
+hc1 &lt;- function(x) vcovHC(x, type = &quot;HC1&quot;)
+htmlreg(ll, override.se=selist,override.pvalues=pvlist,
+        custom.model.names = c(&quot;(1)&quot;,&quot;(2)&quot;,&quot;(3)&quot;,&quot;(4)&quot;),
+        reorder.coef = c(2,5,6,3,7,4,1),
+        include.rsquared = FALSE,digits=3)</code></pre>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<table cellspacing="0" align="center" style="border: none;">
+<caption align="bottom" style="margin-top:0.3em;">
+Statistical models
+</caption>
+<tr>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b></b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(1)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(2)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(3)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(4)</b>
+</th>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+citeprice
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.533<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.408<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.961<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.899<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.034)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.044)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.160)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.145)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+I(citeprice^2)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+0.017
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.025)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+I(citeprice^3)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+0.004
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.006)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+age
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+0.424<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.373<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.374<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.119)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.118)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.118)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+I(age * citeprice)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+0.156<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.141<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.052)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.040)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+chars
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+0.206<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.235<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.229<sup style="vertical-align: 0px;">*</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.098)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.098)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.096)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+(Intercept)
+</td>
+<td style="padding-right: 12px; border: none;">
+4.766<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+3.680<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+3.948<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+3.962<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.055)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.416)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.417)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.411)
+</td>
+</tr>
+<tr>
+<td style="border-top: 1px solid black;">
+Adj. R<sup style="vertical-align: 0px;">2</sup>
+</td>
+<td style="border-top: 1px solid black;">
+0.555
+</td>
+<td style="border-top: 1px solid black;">
+0.607
+</td>
+<td style="border-top: 1px solid black;">
+0.622
+</td>
+<td style="border-top: 1px solid black;">
+0.626
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+Num. obs.
+</td>
+<td style="padding-right: 12px; border: none;">
+180
+</td>
+<td style="padding-right: 12px; border: none;">
+180
+</td>
+<td style="padding-right: 12px; border: none;">
+180
+</td>
+<td style="padding-right: 12px; border: none;">
+180
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid black;">
+RMSE
+</td>
+<td style="border-bottom: 2px solid black;">
+0.750
+</td>
+<td style="border-bottom: 2px solid black;">
+0.705
+</td>
+<td style="border-bottom: 2px solid black;">
+0.691
+</td>
+<td style="border-bottom: 2px solid black;">
+0.688
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;" colspan="6">
+<span style="font-size:0.8em"><sup style="vertical-align: 0px;"><em><strong></sup>p &lt; 0.001, <sup style="vertical-align: 0px;"></strong></sup>p &lt; 0.01, <sup style="vertical-align: 0px;"></em></sup>p &lt; 0.05</span>
+</td>
+</tr>
+</table>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="../../../../index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+

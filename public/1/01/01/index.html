@@ -1,0 +1,53 @@
+<table>
+<tbody>
+<tr class="odd">
+<td>itle: gf_point</td>
+</tr>
+<tr class="even">
+<td>uthor: Kenji Miyazaki</td>
+</tr>
+<tr class="odd">
+<td>ate: ‘2017-08-05’</td>
+</tr>
+<tr class="even">
+<td>lug: gf-point</td>
+</tr>
+<tr class="odd">
+<td>ategories:</td>
+</tr>
+<tr class="even">
+<td>- R</td>
+</tr>
+<tr class="odd">
+<td>ags:</td>
+</tr>
+<tr class="even">
+<td>- regression</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>library(mosaic)</code></pre>
+<p>散布図に回帰直線を加えた式は次のようにすればよい.</p>
+<pre class="r"><code>cars %&gt;% gf_point(dist ~ speed) %&gt;% gf_lm()</code></pre>
+<p><img src="../../../post/2017-08-05-gf-point_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>これは以下と同様である.</p>
+<pre class="r"><code>fn &lt;- lm(dist ~ speed, data = cars) %&gt;% makeFun()
+cars %&gt;% gf_point(dist ~ speed) %&gt;% gf_fun(fn, color = 4)</code></pre>
+<p>自乗項をつける場合には次のようにすればよい.</p>
+<pre class="r"><code>fn &lt;- lm(dist ~ speed + I(speed^2), data = cars) %&gt;% makeFun()
+cars %&gt;% gf_point(dist ~ speed) %&gt;% gf_fun(fn, color = 4)</code></pre>
+<p><img src="../../../post/2017-08-05-gf-point_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>次のように男女別に色分けした散布図に回帰直線を付け加えることもできる.</p>
+<pre class="r"><code>KidsFeet %&gt;% gf_point(length ~ width, color = ~ sex) %&gt;% gf_lm()</code></pre>
+<p><img src="../../../post/2017-08-05-gf-point_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>これは次のように実行することと同じである.</p>
+<pre class="r"><code>fn &lt;- lm(length ~ width * sex, data = KidsFeet) %&gt;% makeFun()
+KidsFeet %&gt;% gf_point(length ~ width, color = ~ sex) %&gt;%
+  gf_fun(fn(w, sex = &quot;B&quot;) ~ w, color = ~&quot;B&quot;) %&gt;%
+  gf_fun(fn(w, sex = &quot;G&quot;) ~ w, color = ~&quot;G&quot;)</code></pre>
+<p>交差項を付け加えない場合には次のようにすればよい.</p>
+<pre class="r"><code>fn &lt;- lm(length ~ width + sex, data = KidsFeet) %&gt;% makeFun()
+KidsFeet %&gt;% gf_point(length ~ width, color = ~ sex) %&gt;%
+  gf_fun(fn(w, sex = &quot;B&quot;) ~ w, color = ~&quot;B&quot;) %&gt;%
+  gf_fun(fn(w, sex = &quot;G&quot;) ~ w, color = ~&quot;G&quot;)</code></pre>
+<p><img src="../../../post/2017-08-05-gf-point_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>

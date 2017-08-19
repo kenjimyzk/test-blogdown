@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="ja-jp">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.21" />
+
+
+<title>texreg - A Hugo website</title>
+<meta property="og:title" content="texreg - A Hugo website">
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="../../../../css/fonts.css" media="all">
+<link rel="stylesheet" href="../../../../css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="../../../../" class="nav-logo">
+    <img src="../../../../images/sarah.jpg"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="https://github.com/rstudio/blogdown">GitHub</a></li>
+    
+    <li><a href="../../../../about/">Kenji Miyazaki</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">4 min read</span>
+    
+
+    <h1 class="article-title">texreg</h1>
+
+    
+    <span class="article-date">2017/08/02</span>
+    
+
+    <div class="article-content">
+      <p><a href="https://www.amazon.co.jp/%E5%85%A5%E9%96%80-%E8%A8%88%E9%87%8F%E7%B5%8C%E6%B8%88%E5%AD%A6-%E3%82%B9%E3%83%88%E3%83%83%E3%82%AF-%E3%82%B8%E3%82%A7%E3%83%BC%E3%83%A0%E3%82%B9/dp/432011146X/ref=as_li_ss_il?ie=UTF8&qid=1501653072&sr=8-2&keywords=%E5%85%A5%E9%96%80%E8%A8%88%E9%87%8F%E7%B5%8C%E6%B8%88%E5%AD%A6&linkCode=li3&tag=miyaken-22&linkId=62dddd266718cd051e5a851699e1afdc" target="_blank"><img border="0" src="//ws-fe.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=432011146X&Format=_SL250_&ID=AsinImage&MarketPlace=JP&ServiceVersion=20070822&WS=1&tag=miyaken-22" ></a><img src="https://ir-jp.amazon-adsystem.com/e/ir?t=miyaken-22&l=li3&o=9&a=432011146X" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /></p>
+<p><a href="https://www.amazon.co.jp/Introduction-Econometrics-James-H-Stock/dp/1292071311/ref=as_li_ss_il?s=english-books&ie=UTF8&qid=1501653252&sr=1-1&keywords=stock+watson&linkCode=li2&tag=miyaken-22&linkId=51ea707551bf8c68de15f0e69401410f" target="_blank"><img border="0" src="//ws-fe.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=1292071311&Format=_SL160_&ID=AsinImage&MarketPlace=JP&ServiceVersion=20070822&WS=1&tag=miyaken-22" ></a><img src="https://ir-jp.amazon-adsystem.com/e/ir?t=miyaken-22&l=li2&o=9&a=1292071311" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /></p>
+<p>ライブラリ AER データ を用いる.</p>
+<pre class="r"><code>library(AER)
+data(&quot;CASchools&quot;, package = &quot;AER&quot;)</code></pre>
+<p>データ加工したうえで幾つか選択する.</p>
+<pre class="r"><code>library(tidyverse)
+library(knitr)
+df &lt;- CASchools %&gt;% 
+  mutate(stratio=students/teachers,score=(math+read)/2) %&gt;%
+  select(score,stratio,english,lunch,calworks)
+df %&gt;% head() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">score</th>
+<th align="right">stratio</th>
+<th align="right">english</th>
+<th align="right">lunch</th>
+<th align="right">calworks</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">690.80</td>
+<td align="right">17.88991</td>
+<td align="right">0.000000</td>
+<td align="right">2.0408</td>
+<td align="right">0.5102</td>
+</tr>
+<tr class="even">
+<td align="right">661.20</td>
+<td align="right">21.52466</td>
+<td align="right">4.583334</td>
+<td align="right">47.9167</td>
+<td align="right">15.4167</td>
+</tr>
+<tr class="odd">
+<td align="right">643.60</td>
+<td align="right">18.69723</td>
+<td align="right">30.000002</td>
+<td align="right">76.3226</td>
+<td align="right">55.0323</td>
+</tr>
+<tr class="even">
+<td align="right">647.70</td>
+<td align="right">17.35714</td>
+<td align="right">0.000000</td>
+<td align="right">77.0492</td>
+<td align="right">36.4754</td>
+</tr>
+<tr class="odd">
+<td align="right">640.85</td>
+<td align="right">18.67133</td>
+<td align="right">13.857677</td>
+<td align="right">78.4270</td>
+<td align="right">33.1086</td>
+</tr>
+<tr class="even">
+<td align="right">605.55</td>
+<td align="right">21.40625</td>
+<td align="right">12.408759</td>
+<td align="right">86.9565</td>
+<td align="right">12.3188</td>
+</tr>
+</tbody>
+</table>
+<p>日本語での統計表は次のようにする.</p>
+<pre class="r"><code>library(tidyr)
+tab&lt;-df %&gt;% gather(key=variables, values) %&gt;%
+  group_by(variables) %&gt;%
+  summarize(観測数=n(),
+               平均=mean(values),
+               標準偏差=sd(values),
+               最小値=min(values),
+               最大値=max(values)) %&gt;%
+  rename(変数=variables)
+tab %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">変数</th>
+<th align="center">観測数</th>
+<th align="center">平均</th>
+<th align="center">標準偏差</th>
+<th align="center">最小値</th>
+<th align="center">最大値</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">calworks</td>
+<td align="center">420</td>
+<td align="center">13.24604</td>
+<td align="center">11.454821</td>
+<td align="center">0.00</td>
+<td align="center">78.99420</td>
+</tr>
+<tr class="even">
+<td align="left">english</td>
+<td align="center">420</td>
+<td align="center">15.76816</td>
+<td align="center">18.285927</td>
+<td align="center">0.00</td>
+<td align="center">85.53972</td>
+</tr>
+<tr class="odd">
+<td align="left">lunch</td>
+<td align="center">420</td>
+<td align="center">44.70524</td>
+<td align="center">27.123381</td>
+<td align="center">0.00</td>
+<td align="center">100.00000</td>
+</tr>
+<tr class="even">
+<td align="left">score</td>
+<td align="center">420</td>
+<td align="center">654.15655</td>
+<td align="center">19.053347</td>
+<td align="center">605.55</td>
+<td align="center">706.75000</td>
+</tr>
+<tr class="odd">
+<td align="left">stratio</td>
+<td align="center">420</td>
+<td align="center">19.64043</td>
+<td align="center">1.891812</td>
+<td align="center">14.00</td>
+<td align="center">25.80000</td>
+</tr>
+</tbody>
+</table>
+<p>単回帰モデルは以下のとおりである.</p>
+<pre class="r"><code>fm1 &lt;- lm(score ~ stratio, data = df)
+library(broom)
+fm1 %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">698.932949</td>
+<td align="right">9.4674911</td>
+<td align="right">73.824516</td>
+<td align="right">0.0e+00</td>
+</tr>
+<tr class="even">
+<td align="left">stratio</td>
+<td align="right">-2.279808</td>
+<td align="right">0.4798255</td>
+<td align="right">-4.751327</td>
+<td align="right">2.8e-06</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>fm2 &lt;- lm(score ~ stratio + english, data = df)
+fm3 &lt;- lm(score ~ stratio + english + lunch, data = df)
+fm4 &lt;- lm(score ~ stratio + english + calworks, data = df)
+fm5 &lt;- lm(score ~ stratio + english + lunch + calworks, data = df)</code></pre>
+<p><a href="https://github.com/leifeld/texreg/" class="uri">https://github.com/leifeld/texreg/</a></p>
+<pre class="r"><code>library(texreg)</code></pre>
+<pre><code>## Version:  1.36.23
+## Date:     2017-03-03
+## Author:   Philip Leifeld (University of Glasgow)
+## 
+## Please cite the JSS article in your publications -- see citation(&quot;texreg&quot;).</code></pre>
+<pre><code>## 
+##  次のパッケージを付け加えます: &#39;texreg&#39;</code></pre>
+<pre><code>##  以下のオブジェクトは &#39;package:tidyr&#39; からマスクされています: 
+## 
+##      extract</code></pre>
+<p>画面は次のようになる.</p>
+<pre class="r"><code>ll&lt;-list(fm1,fm2,fm3,fm4,fm5)
+htmlreg(ll)</code></pre>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<table cellspacing="0" align="center" style="border: none;">
+<caption align="bottom" style="margin-top:0.3em;">
+Statistical models
+</caption>
+<tr>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b></b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 1</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 2</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 3</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 4</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 5</b>
+</th>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+(Intercept)
+</td>
+<td style="padding-right: 12px; border: none;">
+698.93<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+686.03<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+700.15<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+698.00<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+700.39<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(9.47)
+</td>
+<td style="padding-right: 12px; border: none;">
+(7.41)
+</td>
+<td style="padding-right: 12px; border: none;">
+(4.69)
+</td>
+<td style="padding-right: 12px; border: none;">
+(6.02)
+</td>
+<td style="padding-right: 12px; border: none;">
+(4.70)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+stratio
+</td>
+<td style="padding-right: 12px; border: none;">
+-2.28<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.10<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.00<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.31<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.01<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.48)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.38)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.24)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.31)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.24)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+english
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.65<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.12<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.49<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.13<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.04)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+lunch
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.55<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.53<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.02)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+calworks
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.79<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.05
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.05)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.06)
+</td>
+</tr>
+<tr>
+<td style="border-top: 1px solid black;">
+R<sup style="vertical-align: 0px;">2</sup>
+</td>
+<td style="border-top: 1px solid black;">
+0.05
+</td>
+<td style="border-top: 1px solid black;">
+0.43
+</td>
+<td style="border-top: 1px solid black;">
+0.77
+</td>
+<td style="border-top: 1px solid black;">
+0.63
+</td>
+<td style="border-top: 1px solid black;">
+0.77
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+Adj. R<sup style="vertical-align: 0px;">2</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.05
+</td>
+<td style="padding-right: 12px; border: none;">
+0.42
+</td>
+<td style="padding-right: 12px; border: none;">
+0.77
+</td>
+<td style="padding-right: 12px; border: none;">
+0.63
+</td>
+<td style="padding-right: 12px; border: none;">
+0.77
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+Num. obs.
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid black;">
+RMSE
+</td>
+<td style="border-bottom: 2px solid black;">
+18.58
+</td>
+<td style="border-bottom: 2px solid black;">
+14.46
+</td>
+<td style="border-bottom: 2px solid black;">
+9.08
+</td>
+<td style="border-bottom: 2px solid black;">
+11.65
+</td>
+<td style="border-bottom: 2px solid black;">
+9.08
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;" colspan="7">
+<span style="font-size:0.8em"><sup style="vertical-align: 0px;"><em><strong></sup>p &lt; 0.001, <sup style="vertical-align: 0px;"></strong></sup>p &lt; 0.01, <sup style="vertical-align: 0px;"></em></sup>p &lt; 0.05</span>
+</td>
+</tr>
+</table>
+<p>ロバスト分散を指定すると次のようになる.</p>
+<pre class="r"><code>selist &lt;- ll %&gt;% map(~coeftest(.,vcovHC(.,type=&quot;HC1&quot;))[,2])
+pvlist &lt;- ll %&gt;% map(~coeftest(.,vcovHC(.,type=&quot;HC1&quot;))[,4])
+htmlreg(ll, override.se=selist,override.pvalues=pvlist)</code></pre>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<table cellspacing="0" align="center" style="border: none;">
+<caption align="bottom" style="margin-top:0.3em;">
+Statistical models
+</caption>
+<tr>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b></b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 1</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 2</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 3</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 4</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 5</b>
+</th>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+(Intercept)
+</td>
+<td style="padding-right: 12px; border: none;">
+698.93<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+686.03<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+700.15<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+698.00<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+700.39<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(10.36)
+</td>
+<td style="padding-right: 12px; border: none;">
+(8.73)
+</td>
+<td style="padding-right: 12px; border: none;">
+(5.57)
+</td>
+<td style="padding-right: 12px; border: none;">
+(6.92)
+</td>
+<td style="padding-right: 12px; border: none;">
+(5.54)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+stratio
+</td>
+<td style="padding-right: 12px; border: none;">
+-2.28<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.10<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.00<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.31<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.01<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.52)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.43)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.27)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.34)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.27)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+english
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.65<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.12<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.49<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.13<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+lunch
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.55<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.53<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.02)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+calworks
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.79<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.05
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.07)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.06)
+</td>
+</tr>
+<tr>
+<td style="border-top: 1px solid black;">
+R<sup style="vertical-align: 0px;">2</sup>
+</td>
+<td style="border-top: 1px solid black;">
+0.05
+</td>
+<td style="border-top: 1px solid black;">
+0.43
+</td>
+<td style="border-top: 1px solid black;">
+0.77
+</td>
+<td style="border-top: 1px solid black;">
+0.63
+</td>
+<td style="border-top: 1px solid black;">
+0.77
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+Adj. R<sup style="vertical-align: 0px;">2</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.05
+</td>
+<td style="padding-right: 12px; border: none;">
+0.42
+</td>
+<td style="padding-right: 12px; border: none;">
+0.77
+</td>
+<td style="padding-right: 12px; border: none;">
+0.63
+</td>
+<td style="padding-right: 12px; border: none;">
+0.77
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+Num. obs.
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid black;">
+RMSE
+</td>
+<td style="border-bottom: 2px solid black;">
+18.58
+</td>
+<td style="border-bottom: 2px solid black;">
+14.46
+</td>
+<td style="border-bottom: 2px solid black;">
+9.08
+</td>
+<td style="border-bottom: 2px solid black;">
+11.65
+</td>
+<td style="border-bottom: 2px solid black;">
+9.08
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;" colspan="7">
+<span style="font-size:0.8em"><sup style="vertical-align: 0px;"><em><strong></sup>p &lt; 0.001, <sup style="vertical-align: 0px;"></strong></sup>p &lt; 0.01, <sup style="vertical-align: 0px;"></em></sup>p &lt; 0.05</span>
+</td>
+</tr>
+</table>
+<p>0.1%有意水準を使わないように指定し, 注釈をつける.</p>
+<pre class="r"><code>cn = &quot;係数下の括弧内はロバスト標準誤差を表す. 各係数の統計的な有意性は両側検定にもとづいてテストされる. 個々の係数は, 5%水準 (*), 1%水準 (**) でそれぞれ有意.&quot;
+htmlreg(ll, stars = c(0.05, 0.01), custom.note = cn, override.se=selist,override.pvalues=pvlist)</code></pre>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<table cellspacing="0" align="center" style="border: none;">
+<caption align="bottom" style="margin-top:0.3em;">
+Statistical models
+</caption>
+<tr>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b></b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 1</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 2</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 3</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 4</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 5</b>
+</th>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+(Intercept)
+</td>
+<td style="padding-right: 12px; border: none;">
+698.93<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+686.03<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+700.15<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+698.00<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+700.39<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(10.36)
+</td>
+<td style="padding-right: 12px; border: none;">
+(8.73)
+</td>
+<td style="padding-right: 12px; border: none;">
+(5.57)
+</td>
+<td style="padding-right: 12px; border: none;">
+(6.92)
+</td>
+<td style="padding-right: 12px; border: none;">
+(5.54)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+stratio
+</td>
+<td style="padding-right: 12px; border: none;">
+-2.28<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.10<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.00<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.31<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.01<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.52)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.43)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.27)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.34)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.27)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+english
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.65<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.12<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.49<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.13<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+lunch
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.55<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.53<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.02)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+calworks
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.79<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.05
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.07)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.06)
+</td>
+</tr>
+<tr>
+<td style="border-top: 1px solid black;">
+R<sup style="vertical-align: 0px;">2</sup>
+</td>
+<td style="border-top: 1px solid black;">
+0.05
+</td>
+<td style="border-top: 1px solid black;">
+0.43
+</td>
+<td style="border-top: 1px solid black;">
+0.77
+</td>
+<td style="border-top: 1px solid black;">
+0.63
+</td>
+<td style="border-top: 1px solid black;">
+0.77
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+Adj. R<sup style="vertical-align: 0px;">2</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.05
+</td>
+<td style="padding-right: 12px; border: none;">
+0.42
+</td>
+<td style="padding-right: 12px; border: none;">
+0.77
+</td>
+<td style="padding-right: 12px; border: none;">
+0.63
+</td>
+<td style="padding-right: 12px; border: none;">
+0.77
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+Num. obs.
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid black;">
+RMSE
+</td>
+<td style="border-bottom: 2px solid black;">
+18.58
+</td>
+<td style="border-bottom: 2px solid black;">
+14.46
+</td>
+<td style="border-bottom: 2px solid black;">
+9.08
+</td>
+<td style="border-bottom: 2px solid black;">
+11.65
+</td>
+<td style="border-bottom: 2px solid black;">
+9.08
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;" colspan="7">
+<span style="font-size:0.8em">係数下の括弧内はロバスト標準誤差を表す. 各係数の統計的な有意性は両側検定にもとづいてテストされる. 個々の係数は, 5%水準 (*), 1%水準 (**) でそれぞれ有意.</span>
+</td>
+</tr>
+</table>
+<p>係数の順序を変更</p>
+<pre class="r"><code>htmlreg(ll, reorder.coef = c(2, 3, 4, 5, 1),
+          stars = c(0.05, 0.01), custom.note = cn,
+          override.se=selist,override.pvalues=pvlist)</code></pre>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<table cellspacing="0" align="center" style="border: none;">
+<caption align="bottom" style="margin-top:0.3em;">
+Statistical models
+</caption>
+<tr>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b></b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 1</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 2</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 3</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 4</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 5</b>
+</th>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+stratio
+</td>
+<td style="padding-right: 12px; border: none;">
+-2.28<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.10<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.00<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.31<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.01<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.52)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.43)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.27)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.34)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.27)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+english
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.65<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.12<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.49<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.13<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+lunch
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.55<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.53<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.02)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+calworks
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.79<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.05
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.07)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.06)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+(Intercept)
+</td>
+<td style="padding-right: 12px; border: none;">
+698.93<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+686.03<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+700.15<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+698.00<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+700.39<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(10.36)
+</td>
+<td style="padding-right: 12px; border: none;">
+(8.73)
+</td>
+<td style="padding-right: 12px; border: none;">
+(5.57)
+</td>
+<td style="padding-right: 12px; border: none;">
+(6.92)
+</td>
+<td style="padding-right: 12px; border: none;">
+(5.54)
+</td>
+</tr>
+<tr>
+<td style="border-top: 1px solid black;">
+R<sup style="vertical-align: 0px;">2</sup>
+</td>
+<td style="border-top: 1px solid black;">
+0.05
+</td>
+<td style="border-top: 1px solid black;">
+0.43
+</td>
+<td style="border-top: 1px solid black;">
+0.77
+</td>
+<td style="border-top: 1px solid black;">
+0.63
+</td>
+<td style="border-top: 1px solid black;">
+0.77
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+Adj. R<sup style="vertical-align: 0px;">2</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.05
+</td>
+<td style="padding-right: 12px; border: none;">
+0.42
+</td>
+<td style="padding-right: 12px; border: none;">
+0.77
+</td>
+<td style="padding-right: 12px; border: none;">
+0.63
+</td>
+<td style="padding-right: 12px; border: none;">
+0.77
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+Num. obs.
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+<td style="padding-right: 12px; border: none;">
+420
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid black;">
+RMSE
+</td>
+<td style="border-bottom: 2px solid black;">
+18.58
+</td>
+<td style="border-bottom: 2px solid black;">
+14.46
+</td>
+<td style="border-bottom: 2px solid black;">
+9.08
+</td>
+<td style="border-bottom: 2px solid black;">
+11.65
+</td>
+<td style="border-bottom: 2px solid black;">
+9.08
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;" colspan="7">
+<span style="font-size:0.8em">係数下の括弧内はロバスト標準誤差を表す. 各係数の統計的な有意性は両側検定にもとづいてテストされる. 個々の係数は, 5%水準 (*), 1%水準 (**) でそれぞれ有意.</span>
+</td>
+</tr>
+</table>
+<p>決定係数を表示しないように指定し, 統計量の順序を変更する.</p>
+<pre class="r"><code>htmlreg(ll, reorder.coef = c(2, 3, 4, 5, 1),
+          include.rsquared=FALSE, reorder.gof = c(3, 1, 2),
+           stars = c(0.05, 0.01), custom.note= cn,
+           override.se=selist,override.pvalues=pvlist)</code></pre>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<table cellspacing="0" align="center" style="border: none;">
+<caption align="bottom" style="margin-top:0.3em;">
+Statistical models
+</caption>
+<tr>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b></b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 1</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 2</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 3</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 4</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 5</b>
+</th>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+stratio
+</td>
+<td style="padding-right: 12px; border: none;">
+-2.28<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.10<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.00<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.31<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.01<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.52)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.43)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.27)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.34)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.27)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+english
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.65<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.12<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.49<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.13<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+lunch
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.55<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.53<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.02)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+calworks
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.79<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.05
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.07)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.06)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+(Intercept)
+</td>
+<td style="padding-right: 12px; border: none;">
+698.93<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+686.03<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+700.15<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+698.00<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+700.39<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(10.36)
+</td>
+<td style="padding-right: 12px; border: none;">
+(8.73)
+</td>
+<td style="padding-right: 12px; border: none;">
+(5.57)
+</td>
+<td style="padding-right: 12px; border: none;">
+(6.92)
+</td>
+<td style="padding-right: 12px; border: none;">
+(5.54)
+</td>
+</tr>
+<tr>
+<td style="border-top: 1px solid black;">
+RMSE
+</td>
+<td style="border-top: 1px solid black;">
+18.58
+</td>
+<td style="border-top: 1px solid black;">
+14.46
+</td>
+<td style="border-top: 1px solid black;">
+9.08
+</td>
+<td style="border-top: 1px solid black;">
+11.65
+</td>
+<td style="border-top: 1px solid black;">
+9.08
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+Adj. R<sup style="vertical-align: 0px;">2</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.05
+</td>
+<td style="padding-right: 12px; border: none;">
+0.42
+</td>
+<td style="padding-right: 12px; border: none;">
+0.77
+</td>
+<td style="padding-right: 12px; border: none;">
+0.63
+</td>
+<td style="padding-right: 12px; border: none;">
+0.77
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid black;">
+Num. obs.
+</td>
+<td style="border-bottom: 2px solid black;">
+420
+</td>
+<td style="border-bottom: 2px solid black;">
+420
+</td>
+<td style="border-bottom: 2px solid black;">
+420
+</td>
+<td style="border-bottom: 2px solid black;">
+420
+</td>
+<td style="border-bottom: 2px solid black;">
+420
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;" colspan="7">
+<span style="font-size:0.8em">係数下の括弧内はロバスト標準誤差を表す. 各係数の統計的な有意性は両側検定にもとづいてテストされる. 個々の係数は, 5%水準 (*), 1%水準 (**) でそれぞれ有意.</span>
+</td>
+</tr>
+</table>
+<p>名前を変更する.</p>
+<pre class="r"><code>cnm = c(&quot;(1)&quot;,&quot;(2)&quot;,&quot;(3)&quot;,&quot;(4)&quot;,&quot;(5)&quot;)
+ccn = c(&quot;切片&quot;,&quot;教員一人あたり学生数&quot;,&quot;英語学習者割合&quot;,&quot;昼食補助者割合&quot;,&quot;所得支援家計&quot;)
+cgn=c(&quot;調整済み決定係数&quot;,&quot;観測数&quot;,&quot;SER&quot;)
+htmlreg(ll, custom.model.names =cnm,
+       custom.coef.names =ccn,reorder.coef = c(2, 3, 4, 5, 1),
+       include.rsquared=FALSE, reorder.gof = c(3, 1, 2),
+       custom.gof.names= cgn, 
+       stars = c(0.05, 0.01),  custom.note =cn, 
+       override.se=selist,override.pvalues=pvlist)</code></pre>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<table cellspacing="0" align="center" style="border: none;">
+<caption align="bottom" style="margin-top:0.3em;">
+Statistical models
+</caption>
+<tr>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b></b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(1)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(2)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(3)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(4)</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>(5)</b>
+</th>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+教員一人あたり学生数
+</td>
+<td style="padding-right: 12px; border: none;">
+-2.28<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.10<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.00<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.31<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-1.01<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.52)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.43)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.27)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.34)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.27)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+英語学習者割合
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.65<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.12<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.49<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.13<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.03)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+昼食補助者割合
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.55<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.53<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.02)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+所得支援家計
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.79<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.05
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.07)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.06)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+切片
+</td>
+<td style="padding-right: 12px; border: none;">
+698.93<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+686.03<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+700.15<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+698.00<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+700.39<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(10.36)
+</td>
+<td style="padding-right: 12px; border: none;">
+(8.73)
+</td>
+<td style="padding-right: 12px; border: none;">
+(5.57)
+</td>
+<td style="padding-right: 12px; border: none;">
+(6.92)
+</td>
+<td style="padding-right: 12px; border: none;">
+(5.54)
+</td>
+</tr>
+<tr>
+<td style="border-top: 1px solid black;">
+SER
+</td>
+<td style="border-top: 1px solid black;">
+18.58
+</td>
+<td style="border-top: 1px solid black;">
+14.46
+</td>
+<td style="border-top: 1px solid black;">
+9.08
+</td>
+<td style="border-top: 1px solid black;">
+11.65
+</td>
+<td style="border-top: 1px solid black;">
+9.08
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+調整済み決定係数
+</td>
+<td style="padding-right: 12px; border: none;">
+0.05
+</td>
+<td style="padding-right: 12px; border: none;">
+0.42
+</td>
+<td style="padding-right: 12px; border: none;">
+0.77
+</td>
+<td style="padding-right: 12px; border: none;">
+0.63
+</td>
+<td style="padding-right: 12px; border: none;">
+0.77
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid black;">
+観測数
+</td>
+<td style="border-bottom: 2px solid black;">
+420
+</td>
+<td style="border-bottom: 2px solid black;">
+420
+</td>
+<td style="border-bottom: 2px solid black;">
+420
+</td>
+<td style="border-bottom: 2px solid black;">
+420
+</td>
+<td style="border-bottom: 2px solid black;">
+420
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;" colspan="7">
+<span style="font-size:0.8em">係数下の括弧内はロバスト標準誤差を表す. 各係数の統計的な有意性は両側検定にもとづいてテストされる. 個々の係数は, 5%水準 (*), 1%水準 (**) でそれぞれ有意.</span>
+</td>
+</tr>
+</table>
+<p>tex形式で保存</p>
+<pre class="r"><code>cn = &quot;係数下の括弧内はロバスト標準誤差を表す. 各係数の統計的な有意性は両側検定にもとづいてテストされる. 個々の係数は, 5\\%水準 (*), 1\\%水準 (**) でそれぞれ有意.&quot;
+texreg(ll, custom.model.names =cnm,
+       custom.coef.names =ccn,reorder.coef = c(2, 3, 4, 5, 1),
+       include.rsquared=FALSE, reorder.gof = c(3, 1, 2),
+       custom.gof.names= cgn, 
+       stars = c(0.05, 0.01),  custom.note =cn, 
+       override.se=selist,override.pvalues=pvlist,
+       table=FALSE, file=&quot;tab5.tex&quot;)</code></pre>
+<pre><code>## The table was written to the file &#39;tab5.tex&#39;.</code></pre>
+<p>OS がwindowsなら以下のように文字コードを変更する必要がある.</p>
+<pre class="r"><code>if(.Platform$OS.type == &quot;windows&quot;) {
+  texfile=&quot;tab5.tex&quot;
+  fout&lt;-file(texfile,encoding = &quot;UTF8&quot;)
+  writeLines(iconv(readLines(texfile), from = &quot;SJIS&quot;, to = &quot;UTF8&quot;),fout)
+  close(fout)
+  }</code></pre>
+<p>ファイルは <a href="https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab5.tex">ここ</a> にある.</p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="../../../../index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="../../../../js/math-code.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    processEscapes: true
+  }
+});
+</script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

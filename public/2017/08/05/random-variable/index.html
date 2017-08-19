@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja-jp">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.21" />
+
+
+<title>random variable - A Hugo website</title>
+<meta property="og:title" content="random variable - A Hugo website">
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="../../../../css/fonts.css" media="all">
+<link rel="stylesheet" href="../../../../css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="../../../../" class="nav-logo">
+    <img src="../../../../images/sarah.jpg"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="https://github.com/rstudio/blogdown">GitHub</a></li>
+    
+    <li><a href="../../../../about/">Kenji Miyazaki</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">1 min read</span>
+    
+
+    <h1 class="article-title">random variable</h1>
+
+    
+    <span class="article-date">2017/08/05</span>
+    
+
+    <div class="article-content">
+      <pre class="r"><code>set.seed(2017)
+library(mosaic)
+library(knitr)</code></pre>
+<p>コインを20回投げる.</p>
+<pre class="r"><code>rflip(20)</code></pre>
+<pre><code>## 
+## Flipping 20 coins [ Prob(Heads) = 0.5 ] ...
+## 
+## H H T T H H T T T T H T T T T T T H H H
+## 
+## Number of Heads: 8 [Proportion Heads: 0.4]</code></pre>
+<p>そうした行為を1000回繰り返す</p>
+<pre class="r"><code>simulation &lt;- do(10000)*rflip(20)
+simulation %&gt;% head() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">n</th>
+<th align="right">heads</th>
+<th align="right">tails</th>
+<th align="right">prop</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">20</td>
+<td align="right">14</td>
+<td align="right">6</td>
+<td align="right">0.70</td>
+</tr>
+<tr class="even">
+<td align="right">20</td>
+<td align="right">11</td>
+<td align="right">9</td>
+<td align="right">0.55</td>
+</tr>
+<tr class="odd">
+<td align="right">20</td>
+<td align="right">10</td>
+<td align="right">10</td>
+<td align="right">0.50</td>
+</tr>
+<tr class="even">
+<td align="right">20</td>
+<td align="right">7</td>
+<td align="right">13</td>
+<td align="right">0.35</td>
+</tr>
+<tr class="odd">
+<td align="right">20</td>
+<td align="right">8</td>
+<td align="right">12</td>
+<td align="right">0.40</td>
+</tr>
+<tr class="even">
+<td align="right">20</td>
+<td align="right">10</td>
+<td align="right">10</td>
+<td align="right">0.50</td>
+</tr>
+</tbody>
+</table>
+<p>図にすると以下になる.</p>
+<pre class="r"><code>simulation %&gt;% gf_histogram(~ prop)</code></pre>
+<p><img src="../../../../post/2017-08-05-random-variable_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>次に200回にして図示する</p>
+<pre class="r"><code>simulation &lt;- do(10000)*rflip(200)
+simulation %&gt;% gf_histogram(~ prop)</code></pre>
+<p><img src="../../../../post/2017-08-05-random-variable_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>同じようにみえるが, 横軸の幅が縮まっていることに注意されたい.</p>
+<p>これを基準化してみていくと次のように標準正規分布に近似できる.</p>
+<pre class="r"><code>simulation %&gt;% mutate(z=(prop-0.5)/sqrt(0.5*0.5/200)) %&gt;%
+  gf_histogram(..density..~ z) %&gt;% gf_dist(&quot;norm&quot;,col=2)</code></pre>
+<p><img src="../../../../post/2017-08-05-random-variable_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>このような性質を <strong>中心極限定理</strong> という.</p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="../../../../index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+

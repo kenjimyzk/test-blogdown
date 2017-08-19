@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>A Hugo website</title>
+    <link>/</link>
+    <description>Recent content on A Hugo website</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja-jp</language>
+    <lastBuildDate>Sat, 19 Aug 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>stargazer</title>
+      <link>/2017/08/19/stargazer/</link>
+      <pubDate>Sat, 19 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/19/stargazer/</guid>
+      <description>library(tidyverse) ## Loading tidyverse: ggplot2 ## Loading tidyverse: tibble ## Loading tidyverse: tidyr ## Loading tidyverse: readr ## Loading tidyverse: purrr ## Loading tidyverse: dplyr ## Conflicts with tidy packages ---------------------------------------------- ## filter(): dplyr, stats ## lag(): dplyr, stats library(stringr) library(stargazer) ## ## Please cite as: ## Hlavac, Marek (2015). stargazer: Well-Formatted Regression and Summary Statistics Tables. ## R package version 5.2. http://CRAN.R-project.org/package=stargazer statics stargazer(cars, type=&amp;quot;html&amp;quot;) Statistic N Mean St.</description>
+    </item>
+    
+    <item>
+      <title>ggformula</title>
+      <link>/2017/08/05/ggformula/</link>
+      <pubDate>Sat, 05 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/05/ggformula/</guid>
+      <description>ggformula というパッケージがある. https://cran.r-project.org/web/packages/ggformula/index.html ひとことでいうと, ggplot2 を lattice のように扱えるようにしたパッケージである. 詳しくは以下を参照. https://cran.r-project.org/web/packages/ggformula/vignettes/ggformula.html 自分の備忘録のために記録</description>
+    </item>
+    
+    <item>
+      <title>random variable</title>
+      <link>/2017/08/05/random-variable/</link>
+      <pubDate>Sat, 05 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/05/random-variable/</guid>
+      <description>set.seed(2017) library(mosaic) library(knitr) コインを20回投げる. rflip(20) ## ## Flipping 20 coins [ Prob(Heads) = 0.5 ] ... ## ## H H T T H H T T T T H T T T T T T H H H ## ## Number of Heads: 8 [Proportion Heads: 0.4] そうした行為を1000回繰</description>
+    </item>
+    
+    <item>
+      <title>Project-Star</title>
+      <link>/2017/08/04/project-star/</link>
+      <pubDate>Fri, 04 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/04/project-star/</guid>
+      <description>SW本13章の再現を試みる. 以下のライブラリを導入する library(knitr) library(mosaic) library(AER) library(texreg) library(tidyverse) library(stargazer) またロバスト分散を何度も計算するため次の関数を作っておく. ## convenience function: HC1 covariances hc1 &amp;lt;- function(x)</description>
+    </item>
+    
+    <item>
+      <title>caschools</title>
+      <link>/2017/08/04/caschools/</link>
+      <pubDate>Fri, 04 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/04/caschools/</guid>
+      <description>SW本8章の表8.3を再現する. まず以下のライブラリを導入する library(knitr) library(mosaic) library(AER) library(texreg) library(tidyverse) library(mosaic) またロバスト分散を何度も計算するため次の関数を作っておく. ## convenience function: HC1</description>
+    </item>
+    
+    <item>
+      <title>figure</title>
+      <link>/2017/08/04/figure/</link>
+      <pubDate>Fri, 04 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/04/figure/</guid>
+      <description>library library(tidyverse) library(knitr) library(broom) library(AER) library(mosaic) データを少し加工する. data(&amp;quot;CASchools&amp;quot;, package = &amp;quot;AER&amp;quot;) CASchools &amp;lt;- CASchools %&amp;gt;% mutate(score=(math + read)/2, STR = students/teachers, HiEL = I(english&amp;gt;=10)) 図8.2 lm(score ~ income, data = CASchools) %&amp;gt;% plotModel() 図8.3 fm2 &amp;lt;- lm(score ~ income + I(income^2), data = CASchools) fn2 &amp;lt;- makeFun(fm2) plotFun(fn2, add=T, col=2) ## converting numerical color</description>
+    </item>
+    
+    <item>
+      <title>iv</title>
+      <link>/2017/08/04/iv/</link>
+      <pubDate>Fri, 04 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/04/iv/</guid>
+      <description>SW12章の表12.1を再現する. まず以下のライブラリを導入する library(knitr) library(mosaic) library(AER) library(texreg) library(tidyverse) library(broom) データ生成は以下のとおりである data(&amp;quot;CigarettesSW&amp;quot;, package = &amp;quot;AER&amp;quot;) df &amp;lt;- CigarettesSW %&amp;gt;% mutate(tdiff=(taxs - tax)/cpi, rprice=price/cpi, rincome = income/population/cpi) df1995 &amp;lt;-</description>
+    </item>
+    
+    <item>
+      <title>journal</title>
+      <link>/2017/08/04/journal/</link>
+      <pubDate>Fri, 04 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/04/journal/</guid>
+      <description>SW本8章の表8.2再現を試みる. 以下のライブラリを導入する library(knitr) library(mosaic) library(AER) library(texreg) library(tidyverse) またロバスト分散を何度も計算するため次の関数を作っておく. ## convenience function: HC1 covariances hc1</description>
+    </item>
+    
+    <item>
+      <title>maschools</title>
+      <link>/2017/08/04/maschools/</link>
+      <pubDate>Fri, 04 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/04/maschools/</guid>
+      <description>SW本9章の表9.2を再現する. まず以下のライブラリを導入する library(knitr) library(mosaic) library(AER) library(texreg) library(tidyverse) またロバスト分散を何度も計算するため次の関数を作っておく. ## convenience function: HC1 covariances</description>
+    </item>
+    
+    <item>
+      <title>panel</title>
+      <link>/2017/08/03/panel/</link>
+      <pubDate>Thu, 03 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/03/panel/</guid>
+      <description>librarylibrary(tidyverse)library(knitr)library(broom)library(AER)library(plm)library(texreg)library(mosaic)datadata(&amp;quot;Fatalities&amp;quot;)df &amp;lt;- Fatalities %&amp;gt;% mutate(frate = 10000 * fatal/pop,vmiles = miles/1000,punish= factor(jail == &amp;quot;yes&amp;quot; | service == &amp;quot;yes&amp;quot;, labels = c(&amp;quot;no&amp;quot;, &amp;quot;yes&amp;quot;)),drinkagec=relevel(cut(drinkage, breaks =18:22, include.lowest = TRUE, right = FALSE), ref = 4))head(df) %&amp;gt;% kable()stateyearspiritsunempincomeemppopbeertaxbaptistmormondrinkagedryyoungdriversmilesbreathjailservicefatalnfatalsfatalfatal1517nfatal1517fatal1820nfatal1820fatal2124nfatal2124afatalpoppop1517pop1820pop2124milestotunempusemppopusgspfratevmilespunishdrinkagecal19821.</description>
+    </item>
+    
+    <item>
+      <title>mosaic</title>
+      <link>/2017/08/02/lattice/</link>
+      <pubDate>Wed, 02 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/02/lattice/</guid>
+      <description>パッケージ mosaic がアップグレードされた. library(mosaic) model &amp;lt;- lm(length ~ width + sex, data = KidsFeet) l &amp;lt;- makeFun(model) l(width = 8.25, sex = &amp;quot;B&amp;quot;) ## 1 ## 23.59689 gf_point(length ~ width, data = KidsFeet, color = ~ sex) %&amp;gt;% gf_fun(l(w, sex = &amp;quot;B&amp;quot;) ~ w, color = ~&amp;quot;B&amp;quot;) %&amp;gt;% gf_fun(l(w, sex = &amp;quot;G&amp;quot;) ~ w, color</description>
+    </item>
+    
+    <item>
+      <title>texreg</title>
+      <link>/2017/08/02/texreg/</link>
+      <pubDate>Wed, 02 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/02/texreg/</guid>
+      <description>ライブラリ AER データ を用いる. library(AER) data(&amp;quot;CASchools&amp;quot;, package = &amp;quot;AER&amp;quot;) データ加工したうえで幾つか選択する. library(tidyverse) library(knitr) df &amp;lt;- CASchools %&amp;gt;% mutate(stratio=students/teachers,score=(math+read)/2) %&amp;gt;% select(score,stratio,english,lunch,calworks) df %&amp;gt;% head() %&amp;gt;% kable() score stratio english lunch calworks 690.80 17.88991 0.000000 2.0408 0.5102 661.20 21.52466 4.583334 47.9167 15.4167 643.60 18.69723 30.000002 76.3226</description>
+    </item>
+    
+    <item>
+      <title>texreg poly</title>
+      <link>/2017/08/02/mosaic/</link>
+      <pubDate>Wed, 02 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/02/mosaic/</guid>
+      <description>初期設定 library(tidyverse) library(mosaic) library(broom) library(knitr) Births78 %&amp;gt;% head(3) %&amp;gt;% kable() date births dayofyear wday 1978-01-01 7701 1 Sun 1978-01-02 7527 2 Mon 1978-01-03 8825 3 Tues bwplot(births ~ wday, data=Births78) bwplot(wday ~ births, data=Births78, pch = &amp;quot;|&amp;quot;) mean(births ~ wday, data = Births78) ## Sun Mon Tues Wed Thurs Fri Sat ## 7950.943 9371.327 9708.808 9498.019 9483.635 9625.788 8309.327 cars.mod1 &amp;lt;- lm(dist ~ speed, data = cars)</description>
+    </item>
+    
+    <item>
+      <title>rnorm</title>
+      <link>/2017/06/01/rnorm/</link>
+      <pubDate>Thu, 01 Jun 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/06/01/rnorm/</guid>
+      <description>ここで例を示す. (x&amp;lt;-rnorm(10)) ## [1] -1.1381348 -0.1381654 0.3880907 -0.7682564 1.0794758 -0.3094736 ## [7] -0.1980610 1.4109492 0.2679349 0.7209181 (y&amp;lt;-rnorm(10)) ## [1] -0.2040125 0.4654058 0.4133872 1.0794545 1.1701796 -0.1025558 ## [7] -0.8385952 1.0735630 -1.1624506 2.2278470 作図すると以下になる. plot(x,y)</description>
+    </item>
+    
+    <item>
+      <title>ols</title>
+      <link>/2017/05/27/ols/</link>
+      <pubDate>Sat, 27 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/05/27/ols/</guid>
+      <description>library(mosaic) ## 要求されたパッケージ dplyr をロード中です ## ## 次のパッケージを付け加えます: &amp;#39;dplyr&amp;#39; ## 以下のオブジェクトは &amp;#39;package:stats&amp;#39; からマスクされています: ## ## filter, lag ## 以下の</description>
+    </item>
+    
+    <item>
+      <title>test</title>
+      <link>/2017/05/27/test/</link>
+      <pubDate>Sat, 27 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/05/27/test/</guid>
+      <description>This is a test.
+rnorm(10)## [1] -0.138031793 -0.567666742 0.605156319 -1.648776619 0.487952181## [6] -0.062455675 -0.002697867 -0.756855558 -0.608292813 -0.401918792</description>
+    </item>
+    
+    <item>
+      <title>test2</title>
+      <link>/2017/05/27/test2/</link>
+      <pubDate>Sat, 27 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/05/27/test2/</guid>
+      <description>日本語 plot(cars) \[ y_t=\alpha+\beta x_t + \epsilon_t \]</description>
+    </item>
+    
+    <item>
+      <title>About</title>
+      <link>/about/</link>
+      <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
+      
+      <guid>/about/</guid>
+      <description>This is a &amp;ldquo;hello world&amp;rdquo; example website for the blogdown package. The theme was forked from @jrutheiser/hugo-lithium-theme and modified by Yihui Xie.</description>
+    </item>
+    
+    <item>
+      <title>Hello R Markdown</title>
+      <link>/2015/07/23/hello-r-markdown/</link>
+      <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
+      
+      <guid>/2015/07/23/hello-r-markdown/</guid>
+      <description>R MarkdownThis is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
+You can embed an R code chunk like this:
+summary(cars)## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 26.00 ## Median :15.0 Median : 36.00 ## Mean :15.4 Mean : 42.98 ## 3rd Qu.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>/1/01/01/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/1/01/01/</guid>
+      <description>itle: gf_pointuthor: Kenji Miyazakiate: ‘2017-08-05’lug: gf-pointategories:- Rags:- regressionlibrary(mosaic)散布図に回帰直線を加えた式は次のようにすればよい.
+cars %&amp;gt;% gf_point(dist ~ speed) %&amp;gt;% gf_lm()これは以下と同様である.
+fn &amp;lt;- lm(dist ~ speed, data = cars) %&amp;gt;% makeFun()cars %&amp;gt;% gf_point(dist ~ speed) %&amp;gt;% gf_fun(fn, color = 4)自乗項をつける場合には次のようにすればよい.
+fn &amp;lt;- lm(dist ~ speed + I(speed^2), data = cars) %&amp;gt;% makeFun()cars %&amp;gt;% gf_point(dist ~ speed) %&amp;gt;% gf_fun(fn, color = 4)次のように男女別に色分けした散布図に回帰直線を付け加えることもできる.</description>
+    </item>
+    
+  </channel>
+</rss>
