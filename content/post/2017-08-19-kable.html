@@ -1,0 +1,180 @@
+---
+title: "kable"
+author: "Kenji Miyazaki"
+date: '2017-08-19'
+output:
+  html_document: default
+  word_document: default
+slug: kable
+tags: []
+categories: []
+---
+
+
+
+<pre class="r"><code>library(tidyverse)
+library(AER)
+library(knitr)
+library(broom)
+library(stringr)
+library(xtable)</code></pre>
+<div class="section level1">
+<h1>基本</h1>
+<p>分析を実行する.</p>
+<pre class="r"><code>fm &lt;- lm(dist ~ speed, data= cars)
+summary(fm)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = dist ~ speed, data = cars)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -29.069  -9.525  -2.272   9.215  43.201 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -17.5791     6.7584  -2.601   0.0123 *  
+## speed         3.9324     0.4155   9.464 1.49e-12 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 15.38 on 48 degrees of freedom
+## Multiple R-squared:  0.6511, Adjusted R-squared:  0.6438 
+## F-statistic: 89.57 on 1 and 48 DF,  p-value: 1.49e-12</code></pre>
+<p>ロバスト分散の結果を示す.</p>
+<pre class="r"><code>hc &lt;-  vcovHC(fm, type=&quot;HC1&quot;)
+coeftest(fm, vcov=hc)</code></pre>
+<pre><code>## 
+## t test of coefficients:
+## 
+##             Estimate Std. Error t value  Pr(&gt;|t|)    
+## (Intercept) -17.5791     5.6562 -3.1080  0.003163 ** 
+## speed         3.9324     0.4069  9.6643 7.654e-13 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>ロバスト分散でない結果をまとめると以下になる.</p>
+<pre class="r"><code>fm %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-17.579095</td>
+<td align="right">6.7584402</td>
+<td align="right">-2.601058</td>
+<td align="right">0.0123188</td>
+</tr>
+<tr class="even">
+<td align="left">speed</td>
+<td align="right">3.932409</td>
+<td align="right">0.4155128</td>
+<td align="right">9.463990</td>
+<td align="right">0.0000000</td>
+</tr>
+</tbody>
+</table>
+<p>ロバスト分散の結果をまとめると以下になる.</p>
+<pre class="r"><code>tab1 &lt;- fm %&gt;% coeftest(vcov=hc) %&gt;% tidy()
+kable(tab1)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-17.579095</td>
+<td align="right">5.656150</td>
+<td align="right">-3.107961</td>
+<td align="right">0.0031627</td>
+</tr>
+<tr class="even">
+<td align="left">speed</td>
+<td align="right">3.932409</td>
+<td align="right">0.406902</td>
+<td align="right">9.664266</td>
+<td align="right">0.0000000</td>
+</tr>
+</tbody>
+</table>
+<div class="section level2">
+<h2>日本語変換</h2>
+<p>データフレーム形式の名前の変換なら次のようにしてもよい. つぎのようにしてもよい.</p>
+<pre class="r"><code>tab1[&quot;term&quot;] &lt;- c(&quot;定数項&quot;,&quot;速度&quot;)
+tab1 %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">定数項</td>
+<td align="right">-17.579095</td>
+<td align="right">5.656150</td>
+<td align="right">-3.107961</td>
+<td align="right">0.0031627</td>
+</tr>
+<tr class="even">
+<td align="left">速度</td>
+<td align="right">3.932409</td>
+<td align="right">0.406902</td>
+<td align="right">9.664266</td>
+<td align="right">0.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level2">
+<h2>その他の修飾</h2>
+<p>数字の一部を太字するには次のようにする.</p>
+<pre class="r"><code>tab1[,2] &lt;- c(&quot;-17,58&quot;,&quot;**3.932**&quot;)
+kable(tab1)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="left">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">定数項</td>
+<td align="left">-17,58</td>
+<td align="right">5.656150</td>
+<td align="right">-3.107961</td>
+<td align="right">0.0031627</td>
+</tr>
+<tr class="even">
+<td align="left">速度</td>
+<td align="left"><strong>3.932</strong></td>
+<td align="right">0.406902</td>
+<td align="right">9.664266</td>
+<td align="right">0.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>

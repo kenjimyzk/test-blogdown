@@ -1,0 +1,60 @@
+---
+title: "kable"
+author: "Kenji Miyazaki"
+date: '2017-08-19'
+output:
+  html_document: default
+  word_document: default
+slug: kable
+tags: []
+categories: []
+---
+
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(AER)
+library(knitr)
+library(broom)
+library(stringr)
+library(xtable)
+```
+
+# 基本
+分析を実行する.
+```{r}
+fm <- lm(dist ~ speed, data= cars)
+summary(fm)
+```
+
+ロバスト分散の結果を示す.
+```{r}
+hc <-  vcovHC(fm, type="HC1")
+coeftest(fm, vcov=hc)
+```
+
+ロバスト分散でない結果をまとめると以下になる.
+```{r, results="asis"}
+fm %>% tidy() %>% kable()
+```
+
+ロバスト分散の結果をまとめると以下になる.
+```{r, results="asis"}
+tab1 <- fm %>% coeftest(vcov=hc) %>% tidy()
+kable(tab1)
+```
+
+## 日本語変換
+データフレーム形式の名前の変換なら次のようにしてもよい.
+つぎのようにしてもよい.
+```{r, results="asis"}
+tab1["term"] <- c("定数項","速度")
+tab1 %>% kable()
+```
+
+## その他の修飾
+数字の一部を太字するには次のようにする.
+```{r, results="asis"}
+tab1[,2] <- c("-17,58","**3.932**")
+kable(tab1)
+```
