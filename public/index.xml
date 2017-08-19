@@ -17,7 +17,7 @@
       <pubDate>Sat, 19 Aug 2017 00:00:00 +0000</pubDate>
       
       <guid>/2017/08/19/stargazer/</guid>
-      <description>library(tidyverse) ## Loading tidyverse: ggplot2 ## Loading tidyverse: tibble ## Loading tidyverse: tidyr ## Loading tidyverse: readr ## Loading tidyverse: purrr ## Loading tidyverse: dplyr ## Conflicts with tidy packages ---------------------------------------------- ## filter(): dplyr, stats ## lag(): dplyr, stats library(stringr) library(stargazer) ## ## Please cite as: ## Hlavac, Marek (2015). stargazer: Well-Formatted Regression and Summary Statistics Tables. ## R package version 5.2. http://CRAN.R-project.org/package=stargazer statics stargazer(cars, type=&amp;quot;html&amp;quot;) Statistic N Mean St.</description>
+      <description>library(tidyverse) library(stringr) library(stargazer) 基本統計量 基本統計量は以下を実施する. stargazer(cars, type=&amp;quot;html&amp;quot;) Statistic N Mean St. Dev. Min Max speed 50 15.400 5.288 4 25 dist 50 42.980 25.769 2 120 latex形式のファイルの保存は以下を実施する. stargazer(cars, file=&amp;quot;tab1.tex&amp;quot;) フ</description>
     </item>
     
     <item>
@@ -134,7 +134,7 @@
       <pubDate>Thu, 01 Jun 2017 00:00:00 +0000</pubDate>
       
       <guid>/2017/06/01/rnorm/</guid>
-      <description>ここで例を示す. (x&amp;lt;-rnorm(10)) ## [1] -1.1381348 -0.1381654 0.3880907 -0.7682564 1.0794758 -0.3094736 ## [7] -0.1980610 1.4109492 0.2679349 0.7209181 (y&amp;lt;-rnorm(10)) ## [1] -0.2040125 0.4654058 0.4133872 1.0794545 1.1701796 -0.1025558 ## [7] -0.8385952 1.0735630 -1.1624506 2.2278470 作図すると以下になる. plot(x,y)</description>
+      <description>ここで例を示す. (x&amp;lt;-rnorm(10)) ## [1] -1.2345044 -0.8173068 0.6888094 1.3621511 1.3997573 -0.6611807 ## [7] -1.4918297 -0.5168402 -0.4478023 -2.6745733 (y&amp;lt;-rnorm(10)) ## [1] -1.1238749 1.0458130 0.6400722 0.1788965 -0.8416527 0.3151544 ## [7] -0.1275523 0.1411757 0.3041461 -0.1065094 作図すると以下になる. plot(x,y)</description>
     </item>
     
     <item>
@@ -153,7 +153,7 @@
       
       <guid>/2017/05/27/test/</guid>
       <description>This is a test.
-rnorm(10)## [1] -0.138031793 -0.567666742 0.605156319 -1.648776619 0.487952181## [6] -0.062455675 -0.002697867 -0.756855558 -0.608292813 -0.401918792</description>
+rnorm(10)## [1] -0.06862172 -1.52502864 0.94133193 -0.24822775 0.10449446## [6] -0.17483682 -0.33148435 1.79382227 -0.63178622 -2.10638868</description>
     </item>
     
     <item>

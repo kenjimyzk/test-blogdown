@@ -1,33 +1,36 @@
 ---
-title: stargazer
-author: kenji miyzaki
+title: "stargazer"
+author: "kenji miyzaki"
 date: '2017-08-19'
 slug: stargazer
 ---
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(stringr)
 library(stargazer)
 ```
 
-## statics
+## 基本統計量
+基本統計量は以下を実施する.
 ```{r, results="asis"}
 stargazer(cars, type="html")
 ```
 
-latex形式のファイルの保存は以下を実施
+latex形式のファイルの保存は以下を実施する.
 ```{r, results="hide"}
 stargazer(cars, file="tab1.tex")
 ```
+ファイルは [ここ](https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab1.tex
+) にある.
 
-変数名は日本語に変換できる.
+変数名は以下を実施すれば日本語に変換できる.
 ```{r, results="asis"}
 tab1_html<-stargazer(cars, type="html",
                      covariate.labels = c("速度","距離"))
 ```
 
-ほかも変更するには以下を実施する.
+他も変更するには以下を実施する必要がある.
 ```{r, results="hide"}
 tab1_html<- tab1_html %>% 
   str_replace("Mean","平均") %>%
@@ -51,16 +54,17 @@ fout <- file("tab1j.tex",encoding = "UTF8")
 write(tab1, file=fout)
 close(fout)
 ```
+ファイルは [ここ](https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab1j.tex
+) にある.
 
-
-## lm
-回帰分析結果
+## 回帰分析の結果
+回帰分析する.
 ```{r}
 fm1<-lm(dist~speed,data=cars)
 fm2<-lm(dist~speed+I(speed^2),data=cars)
 ```
 
-結果の表示
+分析結果の表示するには以下を実施する.
 ```{r, results="asis"}
 stargazer(fm1,fm2, type="html")
 ```
@@ -69,8 +73,10 @@ latex形式のファイルの保存は以下を実施
 ```{r, results="hide"}
 stargazer(fm1,fm2, file="tab2.tex")
 ```
+ファイルは [ここ](https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab2.tex
+) にある.
 
-変数名は日本語に変換できる.
+変数名は以下を実施すれば日本語に変換できる.
 ```{r, results="asis"}
 tab2_html <- stargazer(fm1,fm2, type="html",
                        covariate.labels = c("速度", "速度自乗"),
@@ -107,4 +113,5 @@ write(tab2, file=fout)
 close(fout)
 ```
 
-
+ファイルは [ここ](https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab2j.tex
+) にある.

@@ -1,30 +1,18 @@
 ---
-title: stargazer
-author: kenji miyzaki
+title: "stargazer"
+author: "kenji miyzaki"
 date: '2017-08-19'
 slug: stargazer
 ---
 
 
 
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## Loading tidyverse: ggplot2
-## Loading tidyverse: tibble
-## Loading tidyverse: tidyr
-## Loading tidyverse: readr
-## Loading tidyverse: purrr
-## Loading tidyverse: dplyr</code></pre>
-<pre><code>## Conflicts with tidy packages ----------------------------------------------</code></pre>
-<pre><code>## filter(): dplyr, stats
-## lag():    dplyr, stats</code></pre>
-<pre class="r"><code>library(stringr)
+<pre class="r"><code>library(tidyverse)
+library(stringr)
 library(stargazer)</code></pre>
-<pre><code>## 
-## Please cite as:</code></pre>
-<pre><code>##  Hlavac, Marek (2015). stargazer: Well-Formatted Regression and Summary Statistics Tables.</code></pre>
-<pre><code>##  R package version 5.2. http://CRAN.R-project.org/package=stargazer</code></pre>
-<div id="statics" class="section level2">
-<h2>statics</h2>
+<div class="section level2">
+<h2>基本統計量</h2>
+<p>基本統計量は以下を実施する.</p>
 <pre class="r"><code>stargazer(cars, type=&quot;html&quot;)</code></pre>
 <table style="text-align:center">
 <tr>
@@ -100,9 +88,10 @@ dist
 </td>
 </tr>
 </table>
-<p>latex形式のファイルの保存は以下を実施</p>
+<p>latex形式のファイルの保存は以下を実施する.</p>
 <pre class="r"><code>stargazer(cars, file=&quot;tab1.tex&quot;)</code></pre>
-<p>変数名は日本語に変換できる.</p>
+<p>ファイルは <a href="https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab1.tex">ここ</a> にある.</p>
+<p>変数名は以下を実施すれば日本語に変換できる.</p>
 <pre class="r"><code>tab1_html&lt;-stargazer(cars, type=&quot;html&quot;,
                      covariate.labels = c(&quot;速度&quot;,&quot;距離&quot;))</code></pre>
 <table style="text-align:center">
@@ -179,7 +168,7 @@ Max
 </td>
 </tr>
 </table>
-<p>ほかも変更するには以下を実施する.</p>
+<p>他も変更するには以下を実施する必要がある.</p>
 <pre class="r"><code>tab1_html&lt;- tab1_html %&gt;% 
   str_replace(&quot;Mean&quot;,&quot;平均&quot;) %&gt;%
   str_replace(&quot;St. Dev.&quot;,&quot;標準誤差&quot;) %&gt;%
@@ -269,13 +258,14 @@ N
 fout &lt;- file(&quot;tab1j.tex&quot;,encoding = &quot;UTF8&quot;)
 write(tab1, file=fout)
 close(fout)</code></pre>
+<p>ファイルは <a href="https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab1j.tex">ここ</a> にある.</p>
 </div>
-<div id="lm" class="section level2">
-<h2>lm</h2>
-<p>回帰分析結果</p>
+<div class="section level2">
+<h2>回帰分析の結果</h2>
+<p>回帰分析する.</p>
 <pre class="r"><code>fm1&lt;-lm(dist~speed,data=cars)
 fm2&lt;-lm(dist~speed+I(speed^2),data=cars)</code></pre>
-<p>結果の表示</p>
+<p>分析結果の表示するには以下を実施する.</p>
 <pre class="r"><code>stargazer(fm1,fm2, type=&quot;html&quot;)</code></pre>
 <table style="text-align:center">
 <tr>
@@ -475,7 +465,8 @@ F Statistic
 </table>
 <p>latex形式のファイルの保存は以下を実施</p>
 <pre class="r"><code>stargazer(fm1,fm2, file=&quot;tab2.tex&quot;)</code></pre>
-<p>変数名は日本語に変換できる.</p>
+<p>ファイルは <a href="https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab2.tex">ここ</a> にある.</p>
+<p>変数名は以下を実施すれば日本語に変換できる.</p>
 <pre class="r"><code>tab2_html &lt;- stargazer(fm1,fm2, type=&quot;html&quot;,
                        covariate.labels = c(&quot;速度&quot;, &quot;速度自乗&quot;),
                        dep.var.caption  = &quot;被説明変数&quot;,
@@ -889,4 +880,5 @@ F Statistic
 <pre class="r"><code>fout &lt;- file(&quot;tab2j.tex&quot;,encoding = &quot;UTF8&quot;)
 write(tab2, file=fout)
 close(fout)</code></pre>
+<p>ファイルは <a href="https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab2j.tex">ここ</a> にある.</p>
 </div>
