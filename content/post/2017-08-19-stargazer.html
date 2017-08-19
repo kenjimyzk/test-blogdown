@@ -253,7 +253,7 @@ Max
 </td>
 </tr>
 </table>
-<p>latex形式のファイル保存は以下を実施する.</p>
+<p>latex形式でのファイル保存は以下を実施する.</p>
 <pre class="r"><code>tab1 &lt;- stargazer(cars)  %&gt;%
   str_replace(&quot;Statistic&quot;,&quot;統計量&quot;) %&gt;%
   str_replace(&quot;\\{N\\}&quot;,&quot;\\{観測数\\}&quot;) %&gt;%
@@ -474,7 +474,7 @@ F Statistic
 <p>ファイルは <a href="https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab2.tex">ここ</a> にある.</p>
 <p>変数名は以下を実施すれば日本語に変換できる.</p>
 <pre class="r"><code>tab2_html &lt;- stargazer(fm1,fm2, type=&quot;html&quot;,
-                       covariate.labels = c(&quot;速度&quot;, &quot;速度自乗&quot;),
+                       covariate.labels = c(&quot;速度&quot;, &quot;速度自乗&quot;,&quot;定数項&quot;),
                        dep.var.caption  = &quot;被説明変数&quot;,
                        dep.var.labels   = &quot;距離&quot;)</code></pre>
 <table style="text-align:center">
@@ -574,7 +574,7 @@ F Statistic
 </tr>
 <tr>
 <td style="text-align:left">
-Constant
+定数項
 </td>
 <td>
 -17.579<sup>**</sup>
@@ -675,7 +675,6 @@ F Statistic
 </table>
 <p>それ以外の変換は次のようにする.</p>
 <pre class="r"><code>tab2_html &lt;- tab2_html %&gt;% 
-  str_replace(&quot;Constant&quot;,&quot;定数項&quot;) %&gt;%
   str_replace(&quot;Observations&quot;,&quot;観測数&quot;) %&gt;%
   str_replace(&quot;Adjusted&quot;,&quot;修正済み&quot;)</code></pre>
 <pre class="r"><code>cat(tab2_html)</code></pre>
@@ -875,12 +874,11 @@ F Statistic
 </td>
 </tr>
 </table>
-<p>latex 形式ので保存は以下のようにする.</p>
+<p>latex 形式での保存は以下のようにする.</p>
 <pre class="r"><code>tab2 &lt;- stargazer(fm1, fm2, type = &quot;html&quot;,
                   covariate.labels = c(&quot;速度&quot;, &quot;速度自乗&quot;),
                   dep.var.caption  = &quot;被説明変数&quot;,
                   dep.var.labels   = &quot;距離&quot;) %&gt;%
-  str_replace(&quot;Constant&quot;, &quot;定数項&quot;) %&gt;%
   str_replace(&quot;Observations&quot;, &quot;観測数&quot;) %&gt;%
   str_replace(&quot;Adjusted&quot;, &quot;修正済み&quot;)</code></pre>
 <pre class="r"><code>fout &lt;- file(&quot;tab2j.tex&quot;,encoding = &quot;UTF8&quot;)

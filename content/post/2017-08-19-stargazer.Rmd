@@ -49,7 +49,7 @@ tab1_html<- tab1_html %>%
 cat(tab1_html)
 ```
 
-latex形式のファイル保存は以下を実施する.
+latex形式でのファイル保存は以下を実施する.
 ```{r, results="hide"}
 tab1 <- stargazer(cars)  %>%
   str_replace("Statistic","統計量") %>%
@@ -88,7 +88,7 @@ stargazer(fm1,fm2, file="tab2.tex")
 変数名は以下を実施すれば日本語に変換できる.
 ```{r, results="asis"}
 tab2_html <- stargazer(fm1,fm2, type="html",
-                       covariate.labels = c("速度", "速度自乗"),
+                       covariate.labels = c("速度", "速度自乗","定数項"),
                        dep.var.caption  = "被説明変数",
                        dep.var.labels   = "距離")
 ```
@@ -96,7 +96,6 @@ tab2_html <- stargazer(fm1,fm2, type="html",
 それ以外の変換は次のようにする.
 ```{r, results="hide"}
 tab2_html <- tab2_html %>% 
-  str_replace("Constant","定数項") %>%
   str_replace("Observations","観測数") %>%
   str_replace("Adjusted","修正済み")
 ```
@@ -105,13 +104,12 @@ tab2_html <- tab2_html %>%
 cat(tab2_html)
 ```
 
-latex 形式ので保存は以下のようにする.
+latex 形式での保存は以下のようにする.
 ```{r, results="hide"}
 tab2 <- stargazer(fm1, fm2, type = "html",
                   covariate.labels = c("速度", "速度自乗"),
                   dep.var.caption  = "被説明変数",
                   dep.var.labels   = "距離") %>%
-  str_replace("Constant", "定数項") %>%
   str_replace("Observations", "観測数") %>%
   str_replace("Adjusted", "修正済み")
 ```
