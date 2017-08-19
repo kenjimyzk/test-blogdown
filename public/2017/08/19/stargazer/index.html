@@ -59,7 +59,7 @@
 
   <article class="article">
     
-    <span class="article-duration">3 min read</span>
+    <span class="article-duration">4 min read</span>
     
 
     <h1 class="article-title">stargazer</h1>
@@ -69,7 +69,7 @@
     
 
     <div class="article-content">
-      <p><a href="https://cran.r-project.org/package=stargazer">stargazer</a> を紹介する. 計量経済学の基本の表を簡単に作成してくれる. 細かいカスタマイズは<a href="http://www.jakeruss.com/cheatsheets/stargazer/">この</a>チートシートが参考になる.</p>
+      <p><a href="https://cran.r-project.org/package=stargazer">stargazer</a>を紹介する. 計量経済学の基本の表を簡単に作成してくれる. 細かいカスタマイズは<a href="http://www.jakeruss.com/cheatsheets/stargazer/">この</a>チートシートが参考になる.</p>
 <pre class="r"><code>library(tidyverse)
 library(stringr)
 library(stargazer)</code></pre>
@@ -233,10 +233,13 @@ Max
 </table>
 <p>他も変更するには以下を実施する必要がある.</p>
 <pre class="r"><code>tab1_html&lt;- tab1_html %&gt;% 
+  str_replace(&quot;Statistic&quot;,&quot;統計量&quot;) %&gt;%
+  str_replace(&quot;&gt;N&lt;&quot;,&quot;&gt;観測数&lt;&quot;) %&gt;%
   str_replace(&quot;Mean&quot;,&quot;平均&quot;) %&gt;%
   str_replace(&quot;St. Dev.&quot;,&quot;標準誤差&quot;) %&gt;%
   str_replace(&quot;Min&quot;,&quot;最小&quot;) %&gt;%
   str_replace(&quot;Max&quot;,&quot;最大&quot;)</code></pre>
+<p>3行目の変換は他を置換する可能性があるのでこのようにしている.</p>
 <pre class="r"><code>cat(tab1_html)</code></pre>
 <table style="text-align:center">
 <tr>
@@ -245,10 +248,10 @@ Max
 </tr>
 <tr>
 <td style="text-align:left">
-Statistic
+統計量
 </td>
 <td>
-N
+観測数
 </td>
 <td>
 平均
@@ -314,6 +317,8 @@ N
 </table>
 <p>latex形式のファイル保存は以下を実施する.</p>
 <pre class="r"><code>tab1 &lt;- stargazer(cars)  %&gt;%
+  str_replace(&quot;Statistic&quot;,&quot;統計量&quot;) %&gt;%
+  str_replace(&quot;\\{N\\}&quot;,&quot;\\{観測数\\}&quot;) %&gt;%
   str_replace(&quot;Mean&quot;,&quot;平均&quot;) %&gt;%
   str_replace(&quot;St. Dev.&quot;,&quot;標準誤差&quot;) %&gt;%
   str_replace(&quot;Min&quot;,&quot;最小&quot;) %&gt;%
@@ -321,7 +326,7 @@ N
 fout &lt;- file(&quot;tab1.tex&quot;,encoding = &quot;UTF8&quot;)
 write(tab1, file=fout)
 close(fout)</code></pre>
-<p>ファイルは <a href="https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab1j.tex">ここ</a> にある.</p>
+<p>3行目の変換はhtmlのときと違うことに注意されたい. ファイルは <a href="https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab1j.tex">ここ</a> にある.</p>
 </div>
 <div class="section level2">
 <h2>回帰分析の結果</h2>
@@ -981,6 +986,17 @@ close(fout)</code></pre>
 
 
     
+<script src="../../../../js/math-code.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    processEscapes: true
+  }
+});
+</script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
 
     
   </body>

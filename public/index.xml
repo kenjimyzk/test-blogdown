@@ -17,7 +17,7 @@
       <pubDate>Sat, 19 Aug 2017 00:00:00 +0000</pubDate>
       
       <guid>/2017/08/19/stargazer/</guid>
-      <description>stargazer を紹介する. 計量経済学の基本の表を簡単に作成してくれる. 細かいカスタマイズはこのチートシートが参考になる. library(tidyverse) library(stringr) library(stargazer) 基本統計量 基本統計量は以下</description>
+      <description>stargazerを紹介する. 計量経済学の基本の表を簡単に作成してくれる. 細かいカスタマイズはこのチートシートが参考になる. library(tidyverse) library(stringr) library(stargazer) 基本統計量</description>
     </item>
     
     <item>

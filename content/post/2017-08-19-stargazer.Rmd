@@ -4,7 +4,7 @@ author: "kenji miyzaki"
 date: '2017-08-19'
 slug: stargazer
 ---
-[stargazer](https://cran.r-project.org/package=stargazer) を紹介する.
+[stargazer](https://cran.r-project.org/package=stargazer)を紹介する.
 計量経済学の基本の表を簡単に作成してくれる.
 細かいカスタマイズは[この](http://www.jakeruss.com/cheatsheets/stargazer/)チートシートが参考になる.
 
@@ -36,11 +36,14 @@ tab1_html<-stargazer(cars, type="html",
 他も変更するには以下を実施する必要がある.
 ```{r, results="hide"}
 tab1_html<- tab1_html %>% 
+  str_replace("Statistic","統計量") %>%
+  str_replace(">N<",">観測数<") %>%
   str_replace("Mean","平均") %>%
   str_replace("St. Dev.","標準誤差") %>%
   str_replace("Min","最小") %>%
   str_replace("Max","最大")
 ```
+3行目の変換は他を置換する可能性があるのでこのようにしている.
 
 ```{r, results="asis"}
 cat(tab1_html)
@@ -49,6 +52,8 @@ cat(tab1_html)
 latex形式のファイル保存は以下を実施する.
 ```{r, results="hide"}
 tab1 <- stargazer(cars)  %>%
+  str_replace("Statistic","統計量") %>%
+  str_replace("\\{N\\}","\\{観測数\\}") %>%
   str_replace("Mean","平均") %>%
   str_replace("St. Dev.","標準誤差") %>%
   str_replace("Min","最小") %>%
@@ -57,6 +62,7 @@ fout <- file("tab1.tex",encoding = "UTF8")
 write(tab1, file=fout)
 close(fout)
 ```
+3行目の変換はhtmlのときと違うことに注意されたい.
 ファイルは [ここ](https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab1j.tex
 ) にある.
 
