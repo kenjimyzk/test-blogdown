@@ -17,7 +17,7 @@
       <pubDate>Sat, 19 Aug 2017 00:00:00 +0000</pubDate>
       
       <guid>/2017/08/19/stargazer/</guid>
-      <description>library(tidyverse) library(stringr) library(stargazer) 基本統計量 基本統計量は以下を実施する. stargazer(cars, type=&amp;quot;html&amp;quot;) Statistic N Mean St. Dev. Min Max speed 50 15.400 5.288 4 25 dist 50 42.980 25.769 2 120 latex形式のファイルの保存は以下を実施する. stargazer(cars, file=&amp;quot;tab1.tex&amp;quot;) フ</description>
+      <description>stargazer を紹介する. 計量経済学の基本の表を簡単に作成してくれる. 細かいカスタマイズはこのチートシートが参考になる. library(tidyverse) library(stringr) library(stargazer) 基本統計量 基本統計量は以下</description>
     </item>
     
     <item>

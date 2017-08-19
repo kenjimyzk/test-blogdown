@@ -7,6 +7,7 @@ slug: stargazer
 
 
 
+<p><a href="https://cran.r-project.org/package=stargazer">stargazer</a> を紹介する. 計量経済学の基本の表を簡単に作成してくれる. 細かいカスタマイズは<a href="http://www.jakeruss.com/cheatsheets/stargazer/">この</a>チートシートが参考になる.</p>
 <pre class="r"><code>library(tidyverse)
 library(stringr)
 library(stargazer)</code></pre>
@@ -255,7 +256,7 @@ N
   str_replace(&quot;St. Dev.&quot;,&quot;標準誤差&quot;) %&gt;%
   str_replace(&quot;Min&quot;,&quot;最小&quot;) %&gt;%
   str_replace(&quot;Max&quot;,&quot;最大&quot;)
-fout &lt;- file(&quot;tab1j.tex&quot;,encoding = &quot;UTF8&quot;)
+fout &lt;- file(&quot;tab1.tex&quot;,encoding = &quot;UTF8&quot;)
 write(tab1, file=fout)
 close(fout)</code></pre>
 <p>ファイルは <a href="https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab1j.tex">ここ</a> にある.</p>
