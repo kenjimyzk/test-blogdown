@@ -1,0 +1,89 @@
+---
+title: xtable
+author: Kenji Miyazaki
+date: '2017-08-19'
+slug: xtable
+categories: []
+tags: []
+---
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(AER)
+library(knitr)
+library(broom)
+library(stringr)
+library(xtable)
+```
+
+# 基本
+分析を実行する.
+```{r}
+fm <- lm(dist ~ speed, data= cars)
+summary(fm)
+```
+
+ロバスト分散の結果を示す.
+```{r}
+hc <-  vcovHC(fm, type="HC1")
+coeftest(fm, vcov=hc)
+```
+
+ロバスト分散でない結果をまとめると以下になる.
+```{r, results="asis"}
+fm %>% tidy() %>% xtable() %>% 
+  print(include.rownames=FALSE,type="html")
+```
+
+ロバスト分散の結果をまとめると以下になる.
+```{r, results="asis"}
+tab1 <- fm %>% coeftest(vcov=hc) %>% tidy()
+print(xtable(tab1),include.rownames=FALSE,type="html")
+```
+
+latex形式には以下のように変換する.
+```{r}
+print(xtable(tab1),floating=FALSE,file="tab1_latex.tex")
+```
+ファイルは [ここ](https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab1_latex.tex) にある.
+
+## 日本語変換
+データフレーム形式の名前の変換なら次のようにしてもよい.
+つぎのようにしてもよい.
+```{r, results="asis"}
+tab1["term"] <- c("定数項","速度")
+print(xtable(tab1),include.rownames=FALSE,type="html")
+```
+latex形式の保存は以下の通り.
+```{r, results='asis'}
+print(xtable(tab1),floating=FALSE,file="tab1j_latex.tex")
+```
+OS がwindowsなら以下のように文字コードを変更する必要がある.
+```{r}
+if(.Platform$OS.type == "windows") {
+  texfile="tab1j_latex.tex"
+  fout<-file(texfile,encoding = "UTF8")
+  writeLines(iconv(readLines(texfile), from = "SJIS", to = "UTF8"),fout)
+  close(fout)
+  }
+```
+ファイルは [ここ](https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab1j_latex.tex) にある.
+
+## その他の修飾
+数字の一部を太字するには次のようにする.
+```{r, results="asis"}
+# https://stackoverflow.com/questions/2853393/using-gsub-to-modify-output-of-xtable-command
+tab2 <- capture.output(print(xtable(tab1),include.rownames=FALSE,type="html")) %>%
+  str_replace("3.93","<b>3.93</b>")
+cat(tab2,sep="\n")
+```
+
+latex 形式での保存は以下のようにする.
+```{r}
+tab2 <-capture.output(print(xtable(tab1),floating=FALSE)) %>%
+  str_replace("3.93","\\bf{3.93}")
+fout <- file("tab2_latex.tex",encoding = "UTF8")
+write(tab2, file=fout)
+close(fout)
+```
+ファイルは [ここ](https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab2_latex.tex) にある.

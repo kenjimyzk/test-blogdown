@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ja-jp">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.21" />
+
+
+<title>xtable - A Hugo website</title>
+<meta property="og:title" content="xtable - A Hugo website">
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="../../../../css/fonts.css" media="all">
+<link rel="stylesheet" href="../../../../css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="../../../../" class="nav-logo">
+    <img src="../../../../images/sarah.jpg"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="https://github.com/rstudio/blogdown">GitHub</a></li>
+    
+    <li><a href="../../../../about/">Kenji Miyazaki</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">2 min read</span>
+    
+
+    <h1 class="article-title">xtable</h1>
+
+    
+    <span class="article-date">2017/08/19</span>
+    
+
+    <div class="article-content">
+      <pre class="r"><code>library(tidyverse)
+library(AER)
+library(knitr)
+library(broom)
+library(stringr)
+library(xtable)</code></pre>
+<div class="section level1">
+<h1>基本</h1>
+<p>分析を実行する.</p>
+<pre class="r"><code>fm &lt;- lm(dist ~ speed, data= cars)
+summary(fm)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = dist ~ speed, data = cars)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -29.069  -9.525  -2.272   9.215  43.201 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -17.5791     6.7584  -2.601   0.0123 *  
+## speed         3.9324     0.4155   9.464 1.49e-12 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 15.38 on 48 degrees of freedom
+## Multiple R-squared:  0.6511, Adjusted R-squared:  0.6438 
+## F-statistic: 89.57 on 1 and 48 DF,  p-value: 1.49e-12</code></pre>
+<p>ロバスト分散の結果を示す.</p>
+<pre class="r"><code>hc &lt;-  vcovHC(fm, type=&quot;HC1&quot;)
+coeftest(fm, vcov=hc)</code></pre>
+<pre><code>## 
+## t test of coefficients:
+## 
+##             Estimate Std. Error t value  Pr(&gt;|t|)    
+## (Intercept) -17.5791     5.6562 -3.1080  0.003163 ** 
+## speed         3.9324     0.4069  9.6643 7.654e-13 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>ロバスト分散でない結果をまとめると以下になる.</p>
+<pre class="r"><code>fm %&gt;% tidy() %&gt;% xtable() %&gt;% 
+  print(include.rownames=FALSE,type=&quot;html&quot;)</code></pre>
+<!-- html table generated in R 3.4.1 by xtable 1.8-2 package -->
+<!-- Sat Aug 19 17:20:10 2017 -->
+<table border="1">
+<tr>
+<th>
+term
+</th>
+<th>
+estimate
+</th>
+<th>
+std.error
+</th>
+<th>
+statistic
+</th>
+<th>
+p.value
+</th>
+</tr>
+<tr>
+<td>
+(Intercept)
+</td>
+<td align="right">
+-17.58
+</td>
+<td align="right">
+6.76
+</td>
+<td align="right">
+-2.60
+</td>
+<td align="right">
+0.01
+</td>
+</tr>
+<tr>
+<td>
+speed
+</td>
+<td align="right">
+3.93
+</td>
+<td align="right">
+0.42
+</td>
+<td align="right">
+9.46
+</td>
+<td align="right">
+0.00
+</td>
+</tr>
+</table>
+<p>ロバスト分散の結果をまとめると以下になる.</p>
+<pre class="r"><code>tab1 &lt;- fm %&gt;% coeftest(vcov=hc) %&gt;% tidy()
+print(xtable(tab1),include.rownames=FALSE,type=&quot;html&quot;)</code></pre>
+<!-- html table generated in R 3.4.1 by xtable 1.8-2 package -->
+<!-- Sat Aug 19 17:20:10 2017 -->
+<table border="1">
+<tr>
+<th>
+term
+</th>
+<th>
+estimate
+</th>
+<th>
+std.error
+</th>
+<th>
+statistic
+</th>
+<th>
+p.value
+</th>
+</tr>
+<tr>
+<td>
+(Intercept)
+</td>
+<td align="right">
+-17.58
+</td>
+<td align="right">
+5.66
+</td>
+<td align="right">
+-3.11
+</td>
+<td align="right">
+0.00
+</td>
+</tr>
+<tr>
+<td>
+speed
+</td>
+<td align="right">
+3.93
+</td>
+<td align="right">
+0.41
+</td>
+<td align="right">
+9.66
+</td>
+<td align="right">
+0.00
+</td>
+</tr>
+</table>
+<p>latex形式には以下のように変換する.</p>
+<pre class="r"><code>print(xtable(tab1),floating=FALSE,file=&quot;tab1_latex.tex&quot;)</code></pre>
+<p>ファイルは <a href="https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab1_latex.tex">ここ</a> にある.</p>
+<div class="section level2">
+<h2>日本語変換</h2>
+<p>データフレーム形式の名前の変換なら次のようにしてもよい. つぎのようにしてもよい.</p>
+<pre class="r"><code>tab1[&quot;term&quot;] &lt;- c(&quot;定数項&quot;,&quot;速度&quot;)
+print(xtable(tab1),include.rownames=FALSE,type=&quot;html&quot;)</code></pre>
+<!-- html table generated in R 3.4.1 by xtable 1.8-2 package -->
+<!-- Sat Aug 19 17:20:10 2017 -->
+<table border="1">
+<tr>
+<th>
+term
+</th>
+<th>
+estimate
+</th>
+<th>
+std.error
+</th>
+<th>
+statistic
+</th>
+<th>
+p.value
+</th>
+</tr>
+<tr>
+<td>
+定数項
+</td>
+<td align="right">
+-17.58
+</td>
+<td align="right">
+5.66
+</td>
+<td align="right">
+-3.11
+</td>
+<td align="right">
+0.00
+</td>
+</tr>
+<tr>
+<td>
+速度
+</td>
+<td align="right">
+3.93
+</td>
+<td align="right">
+0.41
+</td>
+<td align="right">
+9.66
+</td>
+<td align="right">
+0.00
+</td>
+</tr>
+</table>
+<p>latex形式の保存は以下の通り.</p>
+<pre class="r"><code>print(xtable(tab1),floating=FALSE,file=&quot;tab1j_latex.tex&quot;)</code></pre>
+<p>OS がwindowsなら以下のように文字コードを変更する必要がある.</p>
+<pre class="r"><code>if(.Platform$OS.type == &quot;windows&quot;) {
+  texfile=&quot;tab1j_latex.tex&quot;
+  fout&lt;-file(texfile,encoding = &quot;UTF8&quot;)
+  writeLines(iconv(readLines(texfile), from = &quot;SJIS&quot;, to = &quot;UTF8&quot;),fout)
+  close(fout)
+  }</code></pre>
+<p>ファイルは <a href="https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab1j_latex.tex">ここ</a> にある.</p>
+</div>
+<div class="section level2">
+<h2>その他の修飾</h2>
+<p>数字の一部を太字するには次のようにする.</p>
+<pre class="r"><code># https://stackoverflow.com/questions/2853393/using-gsub-to-modify-output-of-xtable-command
+tab2 &lt;- capture.output(print(xtable(tab1),include.rownames=FALSE,type=&quot;html&quot;)) %&gt;%
+  str_replace(&quot;3.93&quot;,&quot;&lt;b&gt;3.93&lt;/b&gt;&quot;)
+cat(tab2,sep=&quot;\n&quot;)</code></pre>
+<!-- html table generated in R 3.4.1 by xtable 1.8-2 package -->
+<!-- Sat Aug 19 17:20:11 2017 -->
+<table border="1">
+<tr>
+<th>
+term
+</th>
+<th>
+estimate
+</th>
+<th>
+std.error
+</th>
+<th>
+statistic
+</th>
+<th>
+p.value
+</th>
+</tr>
+<tr>
+<td>
+定数項
+</td>
+<td align="right">
+-17.58
+</td>
+<td align="right">
+5.66
+</td>
+<td align="right">
+-3.11
+</td>
+<td align="right">
+0.00
+</td>
+</tr>
+<tr>
+<td>
+速度
+</td>
+<td align="right">
+<b>3.93</b>
+</td>
+<td align="right">
+0.41
+</td>
+<td align="right">
+9.66
+</td>
+<td align="right">
+0.00
+</td>
+</tr>
+</table>
+<p>latex 形式での保存は以下のようにする.</p>
+<pre class="r"><code>tab2 &lt;-capture.output(print(xtable(tab1),floating=FALSE)) %&gt;%
+  str_replace(&quot;3.93&quot;,&quot;\\bf{3.93}&quot;)
+fout &lt;- file(&quot;tab2_latex.tex&quot;,encoding = &quot;UTF8&quot;)
+write(tab2, file=fout)
+close(fout)</code></pre>
+<p>ファイルは <a href="https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab2_latex.tex">ここ</a> にある.</p>
+</div>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="../../../../index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="../../../../js/math-code.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    processEscapes: true
+  }
+});
+</script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+
