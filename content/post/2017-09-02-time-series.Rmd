@@ -1,0 +1,86 @@
+---
+title: time series
+author: Kenji Miyazaki
+date: '2017-09-02'
+slug: time-series
+categories:
+  - R
+tags: []
+---
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(AER)
+library(dynlm)
+library(knitr)
+library(broom)
+data("USMacroSW",package="AER")
+```
+
+
+時系列データからデータフレイムに変換
+```{r}
+df <- data.frame(zoo::coredata(USMacroSW),time=zoo::index(USMacroSW))
+inspect(df)
+```
+
+変数インフレーション (infl) を作成
+```{r}
+df <- dplyr::mutate(df, infl=4*100*log(cpi/lag(cpi)))
+```
+
+作図
+```{r}
+df %>% dplyr::select(time,infl) %>% ggformula::gf_line(infl~time)
+```
+
+tbond と tbill の両方を作図する.
+```{r}
+df %>% dplyr::select(time,tbond,tbill) %>% 
+  tidyr::gather(variable,value,-time) %>% 
+  ggformula::gf_line(value~time, color =~variable)
+```
+
+さて時系列データ・セットに戻す.
+```{r}
+usm <- df %>% 
+  dplyr::select(-time) %>%
+  zoo::zoo(order.by=zoo::as.yearqtr(zoo::index(USMacroSW)))
+```
+
+パッケージ `dynlm` を導入して時系列分析をおこなう.
+```{r}
+fm_ar1 <- dynlm(d(infl) ~ L(d(infl)),
+                data = usm, start = c(1962,1), end = c(2004,4))
+coeftest(fm_ar1, vcov = sandwich) %>% tidy() %>% kable()
+```
+
+四半期データなので4つのラグの場合を計算する.
+```{r}
+fm_ar4 <- dynlm(d(infl) ~ L(d(infl), 1:4), 
+                data = usm, start = c(1962,1), end = c(2004,4))
+coeftest(fm_ar4, vcov = sandwich) %>% tidy() %>% kable()
+
+```
+
+失業率を付け加える.
+```{r}
+fm_adl41 <- dynlm(d(infl) ~ L(d(infl), 1:4) + L(unemp),
+  data = usm, start = c(1962,1), end = c(2004,4))
+coeftest(fm_adl41, vcov = sandwich) %>% tidy() %>% kable()
+```
+
+ラグ4つの失業率データを付け加える.
+```{r}
+fm_adl44 <- dynlm(d(infl) ~ L(d(infl), 1:4) + L(unemp, 1:4),
+  data = usm, start = c(1962,1), end = c(2004,4))
+coeftest(fm_adl44, vcov = sandwich) %>% tidy() %>% kable()
+```
+
+グランジャー因果性検定を実施する.
+```{r}
+## Granger causality test mentioned on p. 547
+waldtest(fm_ar4, fm_adl44, vcov = sandwich)  %>% tidy() %>% kable()
+```
+

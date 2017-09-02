@@ -1,0 +1,306 @@
+---
+title: time series
+author: Kenji Miyazaki
+date: '2017-09-02'
+slug: time-series
+categories:
+  - R
+tags: []
+---
+
+
+
+<pre class="r"><code>library(tidyverse)
+library(mosaic)
+library(AER)
+library(dynlm)
+library(knitr)
+library(broom)
+data(&quot;USMacroSW&quot;,package=&quot;AER&quot;)</code></pre>
+<p>時系列データからデータフレイムに変換</p>
+<pre class="r"><code>df &lt;- data.frame(zoo::coredata(USMacroSW),time=zoo::index(USMacroSW))
+inspect(df)</code></pre>
+<pre><code>## 
+## quantitative variables:  
+##     name   class         min          Q1       median           Q3
+## 1  unemp numeric     3.40000     5.00000      5.70000 6.833333e+00
+## 2    cpi numeric    27.77667    35.86666     87.93333 1.430667e+02
+## 3 ffrate numeric     0.93000     3.48000      5.40000 7.760000e+00
+## 4  tbill numeric     0.83000     3.50000      5.08000 6.740000e+00
+## 5  tbond numeric     1.01000     3.91000      5.62000 7.550000e+00
+## 6 gbpusd numeric   112.53000   159.64999    185.45750 2.469400e+02
+## 7  gdpjp numeric 10149.00000 57632.00000 254559.90625 4.823281e+05
+## 8   time numeric  1957.00000  1969.00000   1981.00000 1.993000e+03
+##            max         mean           sd   n missing
+## 1     10.66667 5.891019e+00 1.438074e+00 193       0
+## 2    192.16667 9.173378e+01 5.488108e+01 193       0
+## 3     19.10000 5.953161e+00 3.376566e+00 193       0
+## 4     15.49000 5.434560e+00 2.800325e+00 193       0
+## 5     16.52000 6.040207e+00 2.954469e+00 193       0
+## 6    281.53979 2.049216e+02 5.150879e+01 193       0
+## 7 523638.00000 2.593062e+05 1.922400e+05 193       0
+## 8   2005.00000 1.981000e+03 1.396461e+01 193       0</code></pre>
+<p>変数インフレーション (infl) を作成</p>
+<pre class="r"><code>df &lt;- dplyr::mutate(df, infl=4*100*log(cpi/lag(cpi)))</code></pre>
+<p>作図</p>
+<pre class="r"><code>df %&gt;% dplyr::select(time,infl) %&gt;% ggformula::gf_line(infl~time)</code></pre>
+<pre><code>## Warning: Removed 1 rows containing missing values (geom_path).</code></pre>
+<p><img src="/post/2017-09-02-time-series_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>tbond と tbill の両方を作図する.</p>
+<pre class="r"><code>df %&gt;% dplyr::select(time,tbond,tbill) %&gt;% 
+  tidyr::gather(variable,value,-time) %&gt;% 
+  ggformula::gf_line(value~time, color =~variable)</code></pre>
+<p><img src="/post/2017-09-02-time-series_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>さて時系列データ・セットに戻す.</p>
+<pre class="r"><code>usm &lt;- df %&gt;% 
+  dplyr::select(-time) %&gt;%
+  zoo::zoo(order.by=zoo::as.yearqtr(zoo::index(USMacroSW)))</code></pre>
+<p>パッケージ <code>dynlm</code> を導入して時系列分析をおこなう.</p>
+<pre class="r"><code>fm_ar1 &lt;- dynlm(d(infl) ~ L(d(infl)),
+                data = usm, start = c(1962,1), end = c(2004,4))
+coeftest(fm_ar1, vcov = sandwich) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.0171008</td>
+<td align="right">0.126145</td>
+<td align="right">0.1355644</td>
+<td align="right">0.8923260</td>
+</tr>
+<tr class="even">
+<td align="left">L(d(infl))</td>
+<td align="right">-0.2380471</td>
+<td align="right">0.095939</td>
+<td align="right">-2.4812323</td>
+<td align="right">0.0140652</td>
+</tr>
+</tbody>
+</table>
+<p>四半期データなので4つのラグの場合を計算する.</p>
+<pre class="r"><code>fm_ar4 &lt;- dynlm(d(infl) ~ L(d(infl), 1:4), 
+                data = usm, start = c(1962,1), end = c(2004,4))
+coeftest(fm_ar4, vcov = sandwich) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.0224294</td>
+<td align="right">0.1159119</td>
+<td align="right">0.1935041</td>
+<td align="right">0.8467994</td>
+</tr>
+<tr class="even">
+<td align="left">L(d(infl), 1:4)1</td>
+<td align="right">-0.2579426</td>
+<td align="right">0.0912377</td>
+<td align="right">-2.8271503</td>
+<td align="right">0.0052707</td>
+</tr>
+<tr class="odd">
+<td align="left">L(d(infl), 1:4)2</td>
+<td align="right">-0.3220312</td>
+<td align="right">0.0793671</td>
+<td align="right">-4.0574890</td>
+<td align="right">0.0000760</td>
+</tr>
+<tr class="even">
+<td align="left">L(d(infl), 1:4)3</td>
+<td align="right">0.1576089</td>
+<td align="right">0.0828703</td>
+<td align="right">1.9018746</td>
+<td align="right">0.0589092</td>
+</tr>
+<tr class="odd">
+<td align="left">L(d(infl), 1:4)4</td>
+<td align="right">-0.0302511</td>
+<td align="right">0.0916847</td>
+<td align="right">-0.3299473</td>
+<td align="right">0.7418533</td>
+</tr>
+</tbody>
+</table>
+<p>失業率を付け加える.</p>
+<pre class="r"><code>fm_adl41 &lt;- dynlm(d(infl) ~ L(d(infl), 1:4) + L(unemp),
+  data = usm, start = c(1962,1), end = c(2004,4))
+coeftest(fm_adl41, vcov = sandwich) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">1.2795614</td>
+<td align="right">0.5266342</td>
+<td align="right">2.4296966</td>
+<td align="right">0.0161775</td>
+</tr>
+<tr class="even">
+<td align="left">L(d(infl), 1:4)1</td>
+<td align="right">-0.3055874</td>
+<td align="right">0.0869178</td>
+<td align="right">-3.5158185</td>
+<td align="right">0.0005653</td>
+</tr>
+<tr class="odd">
+<td align="left">L(d(infl), 1:4)2</td>
+<td align="right">-0.3909666</td>
+<td align="right">0.0890158</td>
+<td align="right">-4.3921021</td>
+<td align="right">0.0000199</td>
+</tr>
+<tr class="even">
+<td align="left">L(d(infl), 1:4)3</td>
+<td align="right">0.0864719</td>
+<td align="right">0.0839997</td>
+<td align="right">1.0294310</td>
+<td align="right">0.3047748</td>
+</tr>
+<tr class="odd">
+<td align="left">L(d(infl), 1:4)4</td>
+<td align="right">-0.0810726</td>
+<td align="right">0.0885411</td>
+<td align="right">-0.9156495</td>
+<td align="right">0.3611790</td>
+</tr>
+<tr class="even">
+<td align="left">L(unemp)</td>
+<td align="right">-0.2121464</td>
+<td align="right">0.0952274</td>
+<td align="right">-2.2277862</td>
+<td align="right">0.0272387</td>
+</tr>
+</tbody>
+</table>
+<p>ラグ4つの失業率データを付け加える.</p>
+<pre class="r"><code>fm_adl44 &lt;- dynlm(d(infl) ~ L(d(infl), 1:4) + L(unemp, 1:4),
+  data = usm, start = c(1962,1), end = c(2004,4))
+coeftest(fm_adl44, vcov = sandwich) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">1.3042864</td>
+<td align="right">0.4396306</td>
+<td align="right">2.9667780</td>
+<td align="right">0.0034624</td>
+</tr>
+<tr class="even">
+<td align="left">L(d(infl), 1:4)1</td>
+<td align="right">-0.4198222</td>
+<td align="right">0.0863446</td>
+<td align="right">-4.8621684</td>
+<td align="right">0.0000027</td>
+</tr>
+<tr class="odd">
+<td align="left">L(d(infl), 1:4)2</td>
+<td align="right">-0.3666297</td>
+<td align="right">0.0915443</td>
+<td align="right">-4.0049439</td>
+<td align="right">0.0000941</td>
+</tr>
+<tr class="even">
+<td align="left">L(d(infl), 1:4)3</td>
+<td align="right">0.0565683</td>
+<td align="right">0.0825491</td>
+<td align="right">0.6852685</td>
+<td align="right">0.4941479</td>
+</tr>
+<tr class="odd">
+<td align="left">L(d(infl), 1:4)4</td>
+<td align="right">-0.0364582</td>
+<td align="right">0.0813141</td>
+<td align="right">-0.4483628</td>
+<td align="right">0.6544868</td>
+</tr>
+<tr class="even">
+<td align="left">L(unemp, 1:4)1</td>
+<td align="right">-2.6355678</td>
+<td align="right">0.4622278</td>
+<td align="right">-5.7018813</td>
+<td align="right">0.0000001</td>
+</tr>
+<tr class="odd">
+<td align="left">L(unemp, 1:4)2</td>
+<td align="right">3.0430883</td>
+<td align="right">0.8564201</td>
+<td align="right">3.5532658</td>
+<td align="right">0.0004979</td>
+</tr>
+<tr class="even">
+<td align="left">L(unemp, 1:4)3</td>
+<td align="right">-0.3773713</td>
+<td align="right">0.8874767</td>
+<td align="right">-0.4252182</td>
+<td align="right">0.6712384</td>
+</tr>
+<tr class="odd">
+<td align="left">L(unemp, 1:4)4</td>
+<td align="right">-0.2484241</td>
+<td align="right">0.4482963</td>
+<td align="right">-0.5541517</td>
+<td align="right">0.5802345</td>
+</tr>
+</tbody>
+</table>
+<p>グランジャー因果性検定を実施する.</p>
+<pre class="r"><code>## Granger causality test mentioned on p. 547
+waldtest(fm_ar4, fm_adl44, vcov = sandwich)  %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">res.df</th>
+<th align="right">df</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">167</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="right">163</td>
+<td align="right">4</td>
+<td align="right">8.909487</td>
+<td align="right">1.6e-06</td>
+</tr>
+</tbody>
+</table>
