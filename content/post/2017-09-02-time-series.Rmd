@@ -30,14 +30,23 @@ inspect(df)
 df <- dplyr::mutate(df, infl=4*100*log(cpi/lag(cpi)))
 ```
 
-作図
+インフレーションを作図する.
 ```{r}
 df %>% dplyr::select(time,infl) %>% ggformula::gf_line(infl~time)
 ```
 
-tbond と tbill の両方を作図する.
+
+infl と unemp の両方を別々のパネルで作図する.
 ```{r}
-df %>% dplyr::select(time,tbond,tbill) %>% 
+df %>% dplyr::select(time,unemp,infl) %>% 
+  tidyr::gather(variable,value,-time) %>% 
+  ggformula::gf_line(value~time|variable)
+```
+
+
+infl と unemp を一つのパネルに作図する.
+```{r}
+df %>% dplyr::select(time,unemp,infl) %>% 
   tidyr::gather(variable,value,-time) %>% 
   ggformula::gf_line(value~time, color =~variable)
 ```

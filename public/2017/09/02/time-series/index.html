@@ -101,15 +101,22 @@ inspect(df)</code></pre>
 ## 8   2005.00000 1.981000e+03 1.396461e+01 193       0</code></pre>
 <p>変数インフレーション (infl) を作成</p>
 <pre class="r"><code>df &lt;- dplyr::mutate(df, infl=4*100*log(cpi/lag(cpi)))</code></pre>
-<p>作図</p>
+<p>インフレーションを作図する.</p>
 <pre class="r"><code>df %&gt;% dplyr::select(time,infl) %&gt;% ggformula::gf_line(infl~time)</code></pre>
 <pre><code>## Warning: Removed 1 rows containing missing values (geom_path).</code></pre>
 <p><img src="../../../../post/2017-09-02-time-series_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<p>tbond と tbill の両方を作図する.</p>
-<pre class="r"><code>df %&gt;% dplyr::select(time,tbond,tbill) %&gt;% 
+<p>infl と unemp の両方を別々のパネルで作図する.</p>
+<pre class="r"><code>df %&gt;% dplyr::select(time,unemp,infl) %&gt;% 
+  tidyr::gather(variable,value,-time) %&gt;% 
+  ggformula::gf_line(value~time|variable)</code></pre>
+<pre><code>## Warning: Removed 1 rows containing missing values (geom_path).</code></pre>
+<p><img src="../../../../post/2017-09-02-time-series_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>infl と unemp を一つのパネルに作図する.</p>
+<pre class="r"><code>df %&gt;% dplyr::select(time,unemp,infl) %&gt;% 
   tidyr::gather(variable,value,-time) %&gt;% 
   ggformula::gf_line(value~time, color =~variable)</code></pre>
-<p><img src="../../../../post/2017-09-02-time-series_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre><code>## Warning: Removed 1 rows containing missing values (geom_path).</code></pre>
+<p><img src="../../../../post/2017-09-02-time-series_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>さて時系列データ・セットに戻す.</p>
 <pre class="r"><code>usm &lt;- df %&gt;% 
   dplyr::select(-time) %&gt;%
