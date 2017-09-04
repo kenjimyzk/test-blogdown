@@ -47,10 +47,9 @@ abline(fm1)
 
 
 ```{r}
-fm2 <- update(fm1, .~ . + age + chars)
-fm3 <- update(fm2, .~ . + I(citeprice^2) + I(citeprice^3) + I(age * citeprice))
-fm4 <- update(fm2, .~ . + I(age * citeprice))
-fm4 <- lm(subs ~ citeprice + age + I(age * citeprice) + chars, data = log(journals))
+fm2 <- update(fm1, .~ citeprice + age + chars)
+fm3 <- update(fm1, .~ citeprice * age + chars)
+fm4 <- update(fm3, .~ . + I(citeprice^2) + I(citeprice^3))
 ```
 
 
@@ -58,10 +57,9 @@ fm4 <- lm(subs ~ citeprice + age + I(age * citeprice) + chars, data = log(journa
 ll = list(fm1,fm2,fm3,fm4)
 selist <- ll %>% map(~coeftest(.,hc1)[,2])
 pvlist <- ll %>% map(~coeftest(.,hc1)[,4])
-hc1 <- function(x) vcovHC(x, type = "HC1")
 htmlreg(ll, override.se=selist,override.pvalues=pvlist,
         custom.model.names = c("(1)","(2)","(3)","(4)"),
-        reorder.coef = c(2,5,6,3,7,4,1),
+        reorder.coef = c(2,6,7,4,3,5,1),
         include.rsquared = FALSE,digits=3)
 ```
 

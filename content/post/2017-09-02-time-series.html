@@ -15,10 +15,10 @@ library(mosaic)
 library(AER)
 library(dynlm)
 library(knitr)
-library(broom)
-data(&quot;USMacroSW&quot;,package=&quot;AER&quot;)</code></pre>
+library(broom)</code></pre>
 <p>時系列データからデータフレイムに変換</p>
-<pre class="r"><code>df &lt;- data.frame(zoo::coredata(USMacroSW),time=zoo::index(USMacroSW))
+<pre class="r"><code>data(&quot;USMacroSW&quot;,package=&quot;AER&quot;)
+df &lt;- data.frame(zoo::coredata(USMacroSW),time=zoo::index(USMacroSW))
 inspect(df)</code></pre>
 <pre><code>## 
 ## quantitative variables:  
@@ -41,7 +41,7 @@ inspect(df)</code></pre>
 ## 7 523638.00000 2.593062e+05 1.922400e+05 193       0
 ## 8   2005.00000 1.981000e+03 1.396461e+01 193       0</code></pre>
 <p>変数インフレーション (infl) を作成</p>
-<pre class="r"><code>df &lt;- dplyr::mutate(df, infl=4*100*log(cpi/lag(cpi)))</code></pre>
+<pre class="r"><code>df &lt;- df %&gt;% dplyr::mutate(infl=4*100*log(cpi/lag(cpi)))</code></pre>
 <p>インフレーションを作図する.</p>
 <pre class="r"><code>df %&gt;% dplyr::select(time,infl) %&gt;% ggformula::gf_line(infl~time)</code></pre>
 <pre><code>## Warning: Removed 1 rows containing missing values (geom_path).</code></pre>
@@ -311,3 +311,9 @@ waldtest(fm_ar4, fm_adl44, vcov = sandwich)  %&gt;% tidy() %&gt;% kable()</code>
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>merge(resid(fm_ar1),resid(fm_ar4)) %&gt;%
+  data.frame(time=zoo::index(.)) %&gt;%
+  tidyr::gather(variable,value,-time) %&gt;% 
+  ggformula::gf_line(value~time, color=~variable)</code></pre>
+<pre><code>## Don&#39;t know how to automatically pick scale for object of type yearqtr. Defaulting to continuous.</code></pre>
+<p><img src="/post/2017-09-02-time-series_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>

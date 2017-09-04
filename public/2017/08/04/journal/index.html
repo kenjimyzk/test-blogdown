@@ -91,17 +91,15 @@ journals &lt;- Journals %&gt;% mutate(citeprice = price/citations,
 fm1 &lt;- lm(subs ~ citeprice, data = log(journals))
 abline(fm1)</code></pre>
 <p><img src="../../../../post/2017-08-04-journal_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<pre class="r"><code>fm2 &lt;- update(fm1, .~ . + age + chars)
-fm3 &lt;- update(fm2, .~ . + I(citeprice^2) + I(citeprice^3) + I(age * citeprice))
-fm4 &lt;- update(fm2, .~ . + I(age * citeprice))
-fm4 &lt;- lm(subs ~ citeprice + age + I(age * citeprice) + chars, data = log(journals))</code></pre>
+<pre class="r"><code>fm2 &lt;- update(fm1, .~ citeprice + age + chars)
+fm3 &lt;- update(fm1, .~ citeprice * age + chars)
+fm4 &lt;- update(fm3, .~ . + I(citeprice^2) + I(citeprice^3))</code></pre>
 <pre class="r"><code>ll = list(fm1,fm2,fm3,fm4)
 selist &lt;- ll %&gt;% map(~coeftest(.,hc1)[,2])
 pvlist &lt;- ll %&gt;% map(~coeftest(.,hc1)[,4])
-hc1 &lt;- function(x) vcovHC(x, type = &quot;HC1&quot;)
 htmlreg(ll, override.se=selist,override.pvalues=pvlist,
         custom.model.names = c(&quot;(1)&quot;,&quot;(2)&quot;,&quot;(3)&quot;,&quot;(4)&quot;),
-        reorder.coef = c(2,5,6,3,7,4,1),
+        reorder.coef = c(2,6,7,4,3,5,1),
         include.rsquared = FALSE,digits=3)</code></pre>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <table cellspacing="0" align="center" style="border: none;">
@@ -136,10 +134,10 @@ citeprice
 -0.408<sup style="vertical-align: 0px;">***</sup>
 </td>
 <td style="padding-right: 12px; border: none;">
--0.961<sup style="vertical-align: 0px;">***</sup>
+-0.899<sup style="vertical-align: 0px;">***</sup>
 </td>
 <td style="padding-right: 12px; border: none;">
--0.899<sup style="vertical-align: 0px;">***</sup>
+-0.961<sup style="vertical-align: 0px;">***</sup>
 </td>
 </tr>
 <tr>
@@ -152,10 +150,10 @@ citeprice
 (0.044)
 </td>
 <td style="padding-right: 12px; border: none;">
-(0.160)
+(0.145)
 </td>
 <td style="padding-right: 12px; border: none;">
-(0.145)
+(0.160)
 </td>
 </tr>
 <tr>
@@ -167,9 +165,9 @@ I(citeprice^2)
 <td style="padding-right: 12px; border: none;">
 </td>
 <td style="padding-right: 12px; border: none;">
-0.017
 </td>
 <td style="padding-right: 12px; border: none;">
+0.017
 </td>
 </tr>
 <tr>
@@ -180,9 +178,9 @@ I(citeprice^2)
 <td style="padding-right: 12px; border: none;">
 </td>
 <td style="padding-right: 12px; border: none;">
-(0.025)
 </td>
 <td style="padding-right: 12px; border: none;">
+(0.025)
 </td>
 </tr>
 <tr>
@@ -194,9 +192,9 @@ I(citeprice^3)
 <td style="padding-right: 12px; border: none;">
 </td>
 <td style="padding-right: 12px; border: none;">
-0.004
 </td>
 <td style="padding-right: 12px; border: none;">
+0.004
 </td>
 </tr>
 <tr>
@@ -207,9 +205,40 @@ I(citeprice^3)
 <td style="padding-right: 12px; border: none;">
 </td>
 <td style="padding-right: 12px; border: none;">
-(0.006)
 </td>
 <td style="padding-right: 12px; border: none;">
+(0.006)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+chars
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+0.206<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.229<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.235<sup style="vertical-align: 0px;">*</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.098)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.096)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.098)
 </td>
 </tr>
 <tr>
@@ -222,10 +251,10 @@ age
 0.424<sup style="vertical-align: 0px;">***</sup>
 </td>
 <td style="padding-right: 12px; border: none;">
-0.373<sup style="vertical-align: 0px;">**</sup>
+0.374<sup style="vertical-align: 0px;">**</sup>
 </td>
 <td style="padding-right: 12px; border: none;">
-0.374<sup style="vertical-align: 0px;">**</sup>
+0.373<sup style="vertical-align: 0px;">**</sup>
 </td>
 </tr>
 <tr>
@@ -245,18 +274,18 @@ age
 </tr>
 <tr>
 <td style="padding-right: 12px; border: none;">
-I(age * citeprice)
+citeprice:age
 </td>
 <td style="padding-right: 12px; border: none;">
 </td>
 <td style="padding-right: 12px; border: none;">
-</td>
-<td style="padding-right: 12px; border: none;">
-0.156<sup style="vertical-align: 0px;">**</sup>
 </td>
 <td style="padding-right: 12px; border: none;">
 0.141<sup style="vertical-align: 0px;">***</sup>
 </td>
+<td style="padding-right: 12px; border: none;">
+0.156<sup style="vertical-align: 0px;">**</sup>
+</td>
 </tr>
 <tr>
 <td style="padding-right: 12px; border: none;">
@@ -264,43 +293,12 @@ I(age * citeprice)
 <td style="padding-right: 12px; border: none;">
 </td>
 <td style="padding-right: 12px; border: none;">
-</td>
-<td style="padding-right: 12px; border: none;">
-(0.052)
 </td>
 <td style="padding-right: 12px; border: none;">
 (0.040)
 </td>
-</tr>
-<tr>
 <td style="padding-right: 12px; border: none;">
-chars
-</td>
-<td style="padding-right: 12px; border: none;">
-</td>
-<td style="padding-right: 12px; border: none;">
-0.206<sup style="vertical-align: 0px;">*</sup>
-</td>
-<td style="padding-right: 12px; border: none;">
-0.235<sup style="vertical-align: 0px;">*</sup>
-</td>
-<td style="padding-right: 12px; border: none;">
-0.229<sup style="vertical-align: 0px;">*</sup>
-</td>
-</tr>
-<tr>
-<td style="padding-right: 12px; border: none;">
-</td>
-<td style="padding-right: 12px; border: none;">
-</td>
-<td style="padding-right: 12px; border: none;">
-(0.098)
-</td>
-<td style="padding-right: 12px; border: none;">
-(0.098)
-</td>
-<td style="padding-right: 12px; border: none;">
-(0.096)
+(0.052)
 </td>
 </tr>
 <tr>
@@ -314,10 +312,10 @@ chars
 3.680<sup style="vertical-align: 0px;">***</sup>
 </td>
 <td style="padding-right: 12px; border: none;">
-3.948<sup style="vertical-align: 0px;">***</sup>
+3.962<sup style="vertical-align: 0px;">***</sup>
 </td>
 <td style="padding-right: 12px; border: none;">
-3.962<sup style="vertical-align: 0px;">***</sup>
+3.948<sup style="vertical-align: 0px;">***</sup>
 </td>
 </tr>
 <tr>
@@ -330,10 +328,10 @@ chars
 (0.416)
 </td>
 <td style="padding-right: 12px; border: none;">
-(0.417)
+(0.411)
 </td>
 <td style="padding-right: 12px; border: none;">
-(0.411)
+(0.417)
 </td>
 </tr>
 <tr>
@@ -347,10 +345,10 @@ Adj. R<sup style="vertical-align: 0px;">2</sup>
 0.607
 </td>
 <td style="border-top: 1px solid black;">
-0.622
+0.626
 </td>
 <td style="border-top: 1px solid black;">
-0.626
+0.622
 </td>
 </tr>
 <tr>
@@ -381,10 +379,10 @@ RMSE
 0.705
 </td>
 <td style="border-bottom: 2px solid black;">
-0.691
+0.688
 </td>
 <td style="border-bottom: 2px solid black;">
-0.688
+0.691
 </td>
 </tr>
 <tr>

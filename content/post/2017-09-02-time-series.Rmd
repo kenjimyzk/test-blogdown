@@ -15,19 +15,19 @@ library(AER)
 library(dynlm)
 library(knitr)
 library(broom)
-data("USMacroSW",package="AER")
 ```
 
 
 時系列データからデータフレイムに変換
 ```{r}
+data("USMacroSW",package="AER")
 df <- data.frame(zoo::coredata(USMacroSW),time=zoo::index(USMacroSW))
 inspect(df)
 ```
 
 変数インフレーション (infl) を作成
 ```{r}
-df <- dplyr::mutate(df, infl=4*100*log(cpi/lag(cpi)))
+df <- df %>% dplyr::mutate(infl=4*100*log(cpi/lag(cpi)))
 ```
 
 インフレーションを作図する.
@@ -91,5 +91,13 @@ coeftest(fm_adl44, vcov = sandwich) %>% tidy() %>% kable()
 ```{r}
 ## Granger causality test mentioned on p. 547
 waldtest(fm_ar4, fm_adl44, vcov = sandwich)  %>% tidy() %>% kable()
+```
+
+
+```{r}
+merge(resid(fm_ar1),resid(fm_ar4)) %>%
+  data.frame(time=zoo::index(.)) %>%
+  tidyr::gather(variable,value,-time) %>% 
+  ggformula::gf_line(value~time, color=~variable)
 ```
 
