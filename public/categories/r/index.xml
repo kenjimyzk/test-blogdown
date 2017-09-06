@@ -6,10 +6,19 @@
     <description>Recent content in R on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja-jp</language>
-    <lastBuildDate>Sat, 02 Sep 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 06 Sep 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>journal2</title>
+      <link>/2017/09/06/journal2/</link>
+      <pubDate>Wed, 06 Sep 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/09/06/journal2/</guid>
+      <description>library(knitr) library(tidyverse) library(mosaic) library(AER) データを次のように整形 data(&amp;quot;Journals&amp;quot;, package = &amp;quot;AER&amp;quot;) journals &amp;lt;- Journals %&amp;gt;% mutate(citeprice = price/citations, age = 2000 - foundingyear, chars = charpp*pages/10^7) %&amp;gt;% select(subs,price,citeprice,age,chars) 基本統計量は以下のとおりである. inspect(journals) ## ## quantitative variables: ## name class min Q1 median Q3 ## 1 subs integer 2.000000000 52.0000000</description>
+    </item>
     
     <item>
       <title>dataframe</title>

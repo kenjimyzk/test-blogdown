@@ -1,0 +1,114 @@
+---
+title: journal2
+author: Kenji Miyazaki
+date: '2017-09-06'
+slug: journal2
+categories:
+  - R
+tags:
+  - regression
+---
+
+```{r, message=FALSE, warning=FALSE}
+library(knitr)
+library(tidyverse)
+library(mosaic)
+library(AER)
+```
+
+データを次のように整形
+```{r}
+data("Journals", package = "AER")
+journals <- Journals %>% 
+  mutate(citeprice = price/citations,
+         age = 2000 - foundingyear,
+         chars = charpp*pages/10^7) %>%
+  select(subs,price,citeprice,age,chars)
+```
+
+基本統計量は以下のとおりである.
+```{r}
+inspect(journals)
+```
+
+対数表記して散布図を表示する. 
+```{r}
+plot(subs ~ citeprice, data = log(journals), pch = 19)
+```
+
+
+単回帰式の結果である.
+```{r}
+fm1 <- lm(subs ~ citeprice, data = log(journals))
+summary(fm1)
+```
+
+回帰直線は次のようにして表示する.
+```{r}
+plot(subs ~ citeprice, data = log(journals), pch = 19)
+abline(fm1)
+```
+
+パッケージ `ggformula` を使えば以下のコマンドを実施する.
+```{r}
+gf_point(subs ~ citeprice, data = log(journals)) %>% gf_lm()
+```
+
+`gf_lm` でなく `gf_fun` を使うこともできる.
+```{r}
+fn1<-makeFun(fm1)
+gf_point(subs ~ citeprice, data = log(journals)) %>% gf_fun(fn1)
+```
+
+多変量回帰モデルのときは `gf_fun` のほうが柔軟に対応できる.
+結果は以下の通り.
+```{r}
+fm2 <- update(fm1, .~ citeprice + age + chars)
+summary(fm2)
+```
+
+図の軸に表示しない変数は平均値として図示すると以下になる.
+```{r}
+fn2 <- makeFun(fm2)
+fn2m <- makeFun(fn2(citeprice, age=mage, chars=mchars) ~ citeprice, 
+                mage = with(log(journals), mean(age)),
+                mchars = with(log(journals), mean(age)))
+gf_point(subs ~ citeprice, data = log(journals)) %>% 
+  gf_fun(fn1) %>% gf_fun(fn2m,color="red")
+```
+
+交差項は次のようにして組み込むことができる.
+```{r}
+fm3 <- update(fm1, .~ citeprice * age + chars)
+summary(fm3)
+```
+
+図の軸に表示しない変数は平均値として図示すると以下になる.
+```{r}
+fn3 <- makeFun(fm3)
+fn3m <- makeFun(fn3(citeprice, age=mage, chars=mchars) ~ citeprice, 
+                mage = with(log(journals), mean(age)),
+                mchars = with(log(journals), mean(age)))
+gf_point(subs ~ citeprice, data = log(journals)) %>% 
+  gf_fun(fn2m,color="red") %>% gf_fun(fn3m,color="blue")
+```
+
+多項式は次のように組み込むことができる.
+```{r}
+fm4 <- update(fm3, .~ . + I(citeprice^2) + I(citeprice^3))
+summary(fm4)
+```
+
+図の軸に表示しない変数は平均値として図示すると以下になる.
+```{r}
+fn4 <- makeFun(fm4)
+fn4m <- makeFun(fn4(citeprice, age=mage, chars=mchars) ~ citeprice, 
+                mage = with(log(journals), mean(age)),
+                mchars = with(log(journals), mean(age)))
+gf_point(subs ~ citeprice, data = log(journals)) %>% 
+  gf_fun(fn3m,color="blue") %>% gf_fun(fn4m,color="purple")
+```
+
+
+
+
