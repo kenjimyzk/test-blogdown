@@ -106,7 +106,7 @@ cat(tab2_html,sep='\n')
 
 latex 形式での保存は以下のようにする.
 ```{r, results="hide"}
-tab2 <- stargazer(fm1, fm2, type = "html",
+tab2 <- stargazer(fm1, fm2,
                   covariate.labels = c("速度", "速度自乗"),
                   dep.var.caption  = "被説明変数",
                   dep.var.labels   = "距離") %>%

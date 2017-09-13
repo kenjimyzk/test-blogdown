@@ -1,0 +1,559 @@
+---
+title: dataframe
+author: Kenji Miyazaki
+date: '2017-09-02'
+slug: dataframe
+categories:
+  - R
+tags: []
+---
+## introduction
+
+## 基本
+
+### 変数
+Rはオブジェクト指向言語とよばれる.
+オブジェクトとは, 値や関数などをすべてオブジェクトとしてひとまとめに扱うことができる言語である. 
+
+R は値として, 数値 (numeric), 文字 (character) などの型をもつ. 
+数値は整数値 (integer) と実数をコンピュータとして近似した倍精度浮動小数点数 (double) にわけられる. 整数は数の末尾に `L` をつける.
+`pi` のようにすでに割り当てらている変数もある.
+文字は ダブルクオーテーション (") もしくは シングルクォーテーション (') で区切られる.
+
+
+`TRUE` もしくは `FALSE` を取る値を論理値 (logical) という. 省略して `T` と `F` とあわらせることもできるが混乱するので個人的に推奨しない. 
+欠損値を意味する `NA` は型として論理値として分類される.
+空を意味する `NULL` という型もある.
+他にも複素数 (complex) や日付 (Date) やバイナリ (raw) などがある.
+
+それぞれの型は `tyepof` で確認できる.
+```{r}
+typeof(3)
+typeof(pi)
+typeof(3L)
+typeof('dog')
+typeof("3")
+typeof(TRUE)
+typeof(NA)
+```
+
+値が代入されたオブジェクトを変数という.
+値をある変数に代入することによって再利用することが可能になる.
+`R` では変数の代入を 付値 (assign) とよび `<-` もしくは `assign("a",2)` で実施される.
+```{r}
+a <- 2 #assign("a",2)
+b <- "character"
+c <- FALSE
+```
+
+変数は事前に型の宣言をしなくてよい.
+次のようにして変換することができる.
+```{r}
+as.character(a)
+d <- "3"
+as.numeric(d)
+```
+
+
+### 算術演算子
+型が数値の場合, 四則演算およびべき算が使える.
+```{r}
+2+3
+2-3
+2*3
+2/5
+12^2
+```
+
+演算の結果によっては, 無限大 `Inf` や数値ではあわせない `NaN` となる.
+```{r}
+1/0
+0/0
+```
+
+
+### 比較演算子
+```{r}
+2+3 == 4
+2+3 > 4
+2+3 < 4
+```
+
+```{r}
+is.character(a)
+is.numeric(a)
+is.na(a)
+```
+
+
+```{r}
+2+3 != 4
+2+3 >= 4
+2+3 <= 4
+```
+
+
+### 論理演算子
+```{r}
+x <- -2
+
+x > 2
+!(x > 2)
+x >3 & x<5 
+x >3 | x<5 
+```
+
+
+### 関数
+Rでは幾つかの関数が使える.
+```{r}
+exp(2)
+log(3)
+abs(-2)
+round(3.6)
+round(3.2)
+floor(3.6)
+ceiling(3.2)
+```
+丸括弧 () に入るものを引数という.
+
+関数のヘルプは次を実行する.
+
+```
+help(function) ##?function
+```
+
+関数の例は次を実行すればよい.
+```
+example(function)
+```
+
+また自分で関数を作成することもできる.
+```{r}
+squared<-function (x) {
+  x^2
+}
+squared(6)
+```
+
+
+## ベクトル
+同じ型を値を集めたものをベクトルという.
+数値ベクトル, 文字ベクトル, 論理値ベクトルなどがある.
+```{r}
+(num<-c(2,3,7,9))
+(chr <- c("cat","dog","cow"))
+```
+
+ベクトルには長さという属性 (attribute) が付く.
+```{r}
+length(num)
+length(chr)
+```
+ベクトルはオブジェクトの基本であり, 一つの値は長さが1のベクトルと考えらる.
+
+
+名前という属性も付けられる.
+```{r}
+(num2<- c(a=3,b=4,c=5))
+names(num2)
+```
+
+また次のようにし後からも付けられる.
+```{r}
+names(num) <- c("A","B","C","D")
+num
+```
+
+### 演算子
+ベクトルの算術演算子はその要素ごと行う.
+```{r}
+a<-c(2,3,3,3)
+b<-c(3,3,5,7)
+a+b
+a-b
+a*b
+a/b
+a^b
+```
+
+片方が値, 一次元のベクトルの場合, 同じ長さのベクトルとして演算が実行される.
+```{r}
+a+2
+a-2
+a*2
+a/2
+a^2
+```
+
+一般に長さが違う場合, 短いほうが繰り返される.
+```{r}
+c<-c(1,2)
+a+c
+a-c
+a*c
+a/c
+a^c
+```
+なお 短いほうが長い方の約数でないと警告がでる.
+
+比較演算子も同様である.
+```{r}
+a>2
+a<2
+a==b
+```
+ちなみに 完全に一致しているかどうかは `setequal(a,b)` を用いる. 
+
+論理演算子も同様である.
+```{r}
+a>1|b<3
+a>2&b==3
+```
+
+第一要素だけ評価する以下の論理演算子もあることに注意されたい.
+```{r}
+a>1||b<3
+a>2&&b==3
+```
+
+
+ベクトルの算術演算子はその要素ごと行う.
+```{r}
+a<-c(2,3,3,3)
+b<-c(3,3,5,7)
+a+b
+a-b
+a*b
+a/b
+a^b
+```
+
+片方が値, 一次元のベクトルの場合, 同じ長さのベクトルとして演算が実行される.
+```{r}
+a+2
+a-2
+a*2
+a/2
+a^2
+```
+
+一般に長さが違う場合, 短いほうが繰り返される.
+```{r}
+c<-c(1,2)
+a+c
+a-c
+a*c
+a/c
+a^c
+```
+なお 短いほうが長い方の約数でないと警告がでる.
+
+比較演算子も同様である.
+```{r}
+a>2
+a<2
+a==b
+```
+ちなみに 完全に一致しているかどうかは `setequal(a,b)` を用いる. 
+
+論理演算子も同様である.
+```{r}
+a>1|b<3
+a>2&b==3
+```
+
+第一要素だけ評価する以下の論理演算子もあることに注意されたい.
+```{r}
+a>1||b<3
+a>2&&b==3
+```
+
+### ベクトルの関数
+```{r}
+x<-1:10
+sqrt(x)
+```
+
+```{r}
+sum(x)
+```
+
+```{r}
+x[4] <- NA
+sum(x)
+mean(x)
+```
+
+```{r}
+sum(x,na.rm=TRUE)
+mean(x,na.rm=TRUE)
+```
+
+```{r}
+moment <- function(x,k){
+  mean(x^k)
+} 
+```
+
+```{r}
+y<-c(3,3,3)
+moment(y,2)
+```
+
+```{r}
+mmoment <- function (x,k=1,...){
+  mean(x^k,...)
+}
+mmoment(y)
+mmoment(x,na.rm=TRUE)
+```
+
+
+### 要素
+ベクトルの要素はカギカッコで取り出す.
+```{r}
+num<-c(2,3,7,9)
+num[3]
+```
+
+```{r}
+num[3] <- 500
+num
+```
+
+マイナスをつけるとその要素以外を取り出す.
+```{r}
+num[-3]
+```
+
+複数取り出すこともできる.
+```{r}
+num[c(1,4)]
+```
+
+論理値ベクトルを使って取り出すことができる.
+```{r}
+idx <- c(TRUE,FALSE,TRUE,TRUE)
+num[idx]
+```
+
+論理演算子と組み合わせることができる.
+```{r}
+(num>4)
+num[num>4]
+```
+
+また `:` をもちいて連続したベクトルが作れるので, それを利用してベクトルを抜き出すことができる.
+```{r}
+2:4
+num[2:4]
+```
+
+## いくつかのベクトル
+### seq
+
+```{r}
+seq(1,5)
+seq(1,5,by=0.5)
+seq(1,5,length.out=3)
+```
+
+### rep
+```{r}
+rep(1,5)
+rep(1:2,times=4)
+rep(1:4,each=2)
+```
+
+### アルファベット
+```{r}
+letters
+LETTERS
+```
+
+### 乱数ベクトル
+```{r}
+set.seed(20)
+runif(10)
+rnorm(5)
+```
+
+
+## ベクトルの拡張
+### factor
+```{r}
+(fac<-factor(c("S","L","L","M")))
+levels(fac)
+```
+
+```{r}
+factor(c("S","L","L","M"),levels=c("S","M","L"))
+levels(fac) <- c("S","M","L")
+```
+
+```{r}
+factor(c("S","L","L","M"),ordered=TRUE,levels=c("S","M","L"))
+```
+
++ length
++ levels
+
+### matrix
++ dim
++ nrow
++ ncol
++ rownames
++ colnames
+
+```{r}
+(mat <- matrix(1:6,nrow=3,ncol=2))
+```
+
+```{r}
+(matrix(1:6,nrow=3,ncol=2,byrow = TRUE))
+```
+
+```{r}
+typeof(mat)
+class(mat)
+dim(mat)
+nrow(mat)
+ncol(mat)
+```
+
+```{r}
+rownames(mat) <- c("A","B","C")
+colnames(mat) <- c("a","b")
+mat
+```
+
+```{r}
+mat[,1] # mat[,"a"]
+is.matrix(mat[,1])
+```
+
+```{r}
+mat[,1,drop=FALSE]
+```
+
+
+```{r}
+mat[2,] #mat["B",]
+```
+
+
+### list
+```{r}
+lst <- list(x="A",y=c(2,3,3))
+length(lst)
+names(lst)
+```
+
+```{r}
+a<-list(1,1,1)
+a
+b<-c(1,1,1)
+a==b
+identical(a,b)
+```
+
+
+```{r}
+lst["x"]
+is.list(lst["x"])
+```
+
+```{r}
+lst[["x"]]
+is.list(lst[["x"]])
+```
+
+
+### array
+```{r}
+vec <- 1:12
+arr <- array(vec,dim=c(2,3,2))
+arr
+dim(arr)
+length(arr)
+```
+
+```{r}
+dim(vec) <- c(3,2,2)
+vec
+```
+
+```{r}
+arr <- array(vec,dim=c(2,3,2),dimnames=list(c("A","B"),1:3,c("a","b")))
+arr
+```
+
+```{r}
+dimnames(vec) <- list(c("x","y","z")) 
+vec
+```
+
+```{r}
+arr[,2:3,]
+```
+
+
+```{r}
+arr[1,3,]
+is.vector(arr[1,3,])
+is.array(arr[1,3,,drop=FALSE])
+```
+
+```{r}
+arr[,2,]
+is.matrix(arr[,2,])
+is.array(arr[,2,,drop=FALSE])
+```
+
+
+
+## dataframe
++ length
++ names
++ dim
++ nrow
++ ncol
++ rownames
++ colnames
+
+```{r}
+df <- data.frame(x=c("A","B","A"),y=c(3,3,5))
+length(df)
+names(df)
+```
+
+```{r}
+dim(df)
+nrow(df)
+ncol(df)
+rownames(df)
+colnames(df)
+```
+
+```{r}
+df["x"]
+# df[1]
+# df[,"x",drop=FALSE]
+# df[,1,drop=FALSE]
+```
+
+```{r}
+df[["x"]]
+# df$x
+# df[,"x"]
+#df[,1]
+```
+
+```{r}
+mean(df$y)
+with(df,mean(y))
+```
+
+
+

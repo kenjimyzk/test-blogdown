@@ -1,0 +1,609 @@
+---
+title: dataframe
+author: Kenji Miyazaki
+date: '2017-09-02'
+slug: dataframe
+categories:
+  - R
+tags: []
+---
+
+
+
+<div id="introduction" class="section level2">
+<h2>introduction</h2>
+</div>
+<div class="section level2">
+<h2>基本</h2>
+<div class="section level3">
+<h3>変数</h3>
+<p>Rはオブジェクト指向言語とよばれる. オブジェクトとは, 値や関数などをすべてオブジェクトとしてひとまとめに扱うことができる言語である.</p>
+<p>R は値として, 数値 (numeric), 文字 (character) などの型をもつ. 数値は整数値 (integer) と実数をコンピュータとして近似した倍精度浮動小数点数 (double) にわけられる. 整数は数の末尾に <code>L</code> をつける. <code>pi</code> のようにすでに割り当てらている変数もある. 文字は ダブルクオーテーション (“) もしくは シングルクォーテーション (’) で区切られる.</p>
+<p><code>TRUE</code> もしくは <code>FALSE</code> を取る値を論理値 (logical) という. 省略して <code>T</code> と <code>F</code> とあわらせることもできるが混乱するので個人的に推奨しない. 欠損値を意味する <code>NA</code> は型として論理値として分類される. 空を意味する <code>NULL</code> という型もある. 他にも複素数 (complex) や日付 (Date) やバイナリ (raw) などがある.</p>
+<p>それぞれの型は <code>tyepof</code> で確認できる.</p>
+<pre class="r"><code>typeof(3)</code></pre>
+<pre><code>## [1] &quot;double&quot;</code></pre>
+<pre class="r"><code>typeof(pi)</code></pre>
+<pre><code>## [1] &quot;double&quot;</code></pre>
+<pre class="r"><code>typeof(3L)</code></pre>
+<pre><code>## [1] &quot;integer&quot;</code></pre>
+<pre class="r"><code>typeof(&#39;dog&#39;)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<pre class="r"><code>typeof(&quot;3&quot;)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<pre class="r"><code>typeof(TRUE)</code></pre>
+<pre><code>## [1] &quot;logical&quot;</code></pre>
+<pre class="r"><code>typeof(NA)</code></pre>
+<pre><code>## [1] &quot;logical&quot;</code></pre>
+<p>値が代入されたオブジェクトを変数という. 値をある変数に代入することによって再利用することが可能になる. <code>R</code> では変数の代入を 付値 (assign) とよび <code>&lt;-</code> もしくは <code>assign(&quot;a&quot;,2)</code> で実施される.</p>
+<pre class="r"><code>a &lt;- 2 #assign(&quot;a&quot;,2)
+b &lt;- &quot;character&quot;
+c &lt;- FALSE</code></pre>
+<p>変数は事前に型の宣言をしなくてよい. 次のようにして変換することができる.</p>
+<pre class="r"><code>as.character(a)</code></pre>
+<pre><code>## [1] &quot;2&quot;</code></pre>
+<pre class="r"><code>d &lt;- &quot;3&quot;
+as.numeric(d)</code></pre>
+<pre><code>## [1] 3</code></pre>
+</div>
+<div class="section level3">
+<h3>算術演算子</h3>
+<p>型が数値の場合, 四則演算およびべき算が使える.</p>
+<pre class="r"><code>2+3</code></pre>
+<pre><code>## [1] 5</code></pre>
+<pre class="r"><code>2-3</code></pre>
+<pre><code>## [1] -1</code></pre>
+<pre class="r"><code>2*3</code></pre>
+<pre><code>## [1] 6</code></pre>
+<pre class="r"><code>2/5</code></pre>
+<pre><code>## [1] 0.4</code></pre>
+<pre class="r"><code>12^2</code></pre>
+<pre><code>## [1] 144</code></pre>
+<p>演算の結果によっては, 無限大 <code>Inf</code> や数値ではあわせない <code>NaN</code> となる.</p>
+<pre class="r"><code>1/0</code></pre>
+<pre><code>## [1] Inf</code></pre>
+<pre class="r"><code>0/0</code></pre>
+<pre><code>## [1] NaN</code></pre>
+</div>
+<div class="section level3">
+<h3>比較演算子</h3>
+<pre class="r"><code>2+3 == 4</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>2+3 &gt; 4</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>2+3 &lt; 4</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>is.character(a)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>is.numeric(a)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>is.na(a)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>2+3 != 4</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>2+3 &gt;= 4</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>2+3 &lt;= 4</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+</div>
+<div class="section level3">
+<h3>論理演算子</h3>
+<pre class="r"><code>x &lt;- -2
+
+x &gt; 2</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>!(x &gt; 2)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>x &gt;3 &amp; x&lt;5 </code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>x &gt;3 | x&lt;5 </code></pre>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+<div class="section level3">
+<h3>関数</h3>
+<p>Rでは幾つかの関数が使える.</p>
+<pre class="r"><code>exp(2)</code></pre>
+<pre><code>## [1] 7.389056</code></pre>
+<pre class="r"><code>log(3)</code></pre>
+<pre><code>## [1] 1.098612</code></pre>
+<pre class="r"><code>abs(-2)</code></pre>
+<pre><code>## [1] 2</code></pre>
+<pre class="r"><code>round(3.6)</code></pre>
+<pre><code>## [1] 4</code></pre>
+<pre class="r"><code>round(3.2)</code></pre>
+<pre><code>## [1] 3</code></pre>
+<pre class="r"><code>floor(3.6)</code></pre>
+<pre><code>## [1] 3</code></pre>
+<pre class="r"><code>ceiling(3.2)</code></pre>
+<pre><code>## [1] 4</code></pre>
+<p>丸括弧 () に入るものを引数という.</p>
+<p>関数のヘルプは次を実行する.</p>
+<pre><code>help(function) ##?function</code></pre>
+<p>関数の例は次を実行すればよい.</p>
+<pre><code>example(function)</code></pre>
+<p>また自分で関数を作成することもできる.</p>
+<pre class="r"><code>squared&lt;-function (x) {
+  x^2
+}
+squared(6)</code></pre>
+<pre><code>## [1] 36</code></pre>
+</div>
+</div>
+<div class="section level2">
+<h2>ベクトル</h2>
+<p>同じ型を値を集めたものをベクトルという. 数値ベクトル, 文字ベクトル, 論理値ベクトルなどがある.</p>
+<pre class="r"><code>(num&lt;-c(2,3,7,9))</code></pre>
+<pre><code>## [1] 2 3 7 9</code></pre>
+<pre class="r"><code>(chr &lt;- c(&quot;cat&quot;,&quot;dog&quot;,&quot;cow&quot;))</code></pre>
+<pre><code>## [1] &quot;cat&quot; &quot;dog&quot; &quot;cow&quot;</code></pre>
+<p>ベクトルには長さという属性 (attribute) が付く.</p>
+<pre class="r"><code>length(num)</code></pre>
+<pre><code>## [1] 4</code></pre>
+<pre class="r"><code>length(chr)</code></pre>
+<pre><code>## [1] 3</code></pre>
+<p>ベクトルはオブジェクトの基本であり, 一つの値は長さが1のベクトルと考えらる.</p>
+<p>名前という属性も付けられる.</p>
+<pre class="r"><code>(num2&lt;- c(a=3,b=4,c=5))</code></pre>
+<pre><code>## a b c 
+## 3 4 5</code></pre>
+<pre class="r"><code>names(num2)</code></pre>
+<pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;</code></pre>
+<p>また次のようにし後からも付けられる.</p>
+<pre class="r"><code>names(num) &lt;- c(&quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;D&quot;)
+num</code></pre>
+<pre><code>## A B C D 
+## 2 3 7 9</code></pre>
+<div class="section level3">
+<h3>演算子</h3>
+<p>ベクトルの算術演算子はその要素ごと行う.</p>
+<pre class="r"><code>a&lt;-c(2,3,3,3)
+b&lt;-c(3,3,5,7)
+a+b</code></pre>
+<pre><code>## [1]  5  6  8 10</code></pre>
+<pre class="r"><code>a-b</code></pre>
+<pre><code>## [1] -1  0 -2 -4</code></pre>
+<pre class="r"><code>a*b</code></pre>
+<pre><code>## [1]  6  9 15 21</code></pre>
+<pre class="r"><code>a/b</code></pre>
+<pre><code>## [1] 0.6666667 1.0000000 0.6000000 0.4285714</code></pre>
+<pre class="r"><code>a^b</code></pre>
+<pre><code>## [1]    8   27  243 2187</code></pre>
+<p>片方が値, 一次元のベクトルの場合, 同じ長さのベクトルとして演算が実行される.</p>
+<pre class="r"><code>a+2</code></pre>
+<pre><code>## [1] 4 5 5 5</code></pre>
+<pre class="r"><code>a-2</code></pre>
+<pre><code>## [1] 0 1 1 1</code></pre>
+<pre class="r"><code>a*2</code></pre>
+<pre><code>## [1] 4 6 6 6</code></pre>
+<pre class="r"><code>a/2</code></pre>
+<pre><code>## [1] 1.0 1.5 1.5 1.5</code></pre>
+<pre class="r"><code>a^2</code></pre>
+<pre><code>## [1] 4 9 9 9</code></pre>
+<p>一般に長さが違う場合, 短いほうが繰り返される.</p>
+<pre class="r"><code>c&lt;-c(1,2)
+a+c</code></pre>
+<pre><code>## [1] 3 5 4 5</code></pre>
+<pre class="r"><code>a-c</code></pre>
+<pre><code>## [1] 1 1 2 1</code></pre>
+<pre class="r"><code>a*c</code></pre>
+<pre><code>## [1] 2 6 3 6</code></pre>
+<pre class="r"><code>a/c</code></pre>
+<pre><code>## [1] 2.0 1.5 3.0 1.5</code></pre>
+<pre class="r"><code>a^c</code></pre>
+<pre><code>## [1] 2 9 3 9</code></pre>
+<p>なお 短いほうが長い方の約数でないと警告がでる.</p>
+<p>比較演算子も同様である.</p>
+<pre class="r"><code>a&gt;2</code></pre>
+<pre><code>## [1] FALSE  TRUE  TRUE  TRUE</code></pre>
+<pre class="r"><code>a&lt;2</code></pre>
+<pre><code>## [1] FALSE FALSE FALSE FALSE</code></pre>
+<pre class="r"><code>a==b</code></pre>
+<pre><code>## [1] FALSE  TRUE FALSE FALSE</code></pre>
+<p>ちなみに 完全に一致しているかどうかは <code>setequal(a,b)</code> を用いる.</p>
+<p>論理演算子も同様である.</p>
+<pre class="r"><code>a&gt;1|b&lt;3</code></pre>
+<pre><code>## [1] TRUE TRUE TRUE TRUE</code></pre>
+<pre class="r"><code>a&gt;2&amp;b==3</code></pre>
+<pre><code>## [1] FALSE  TRUE FALSE FALSE</code></pre>
+<p>第一要素だけ評価する以下の論理演算子もあることに注意されたい.</p>
+<pre class="r"><code>a&gt;1||b&lt;3</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>a&gt;2&amp;&amp;b==3</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<p>ベクトルの算術演算子はその要素ごと行う.</p>
+<pre class="r"><code>a&lt;-c(2,3,3,3)
+b&lt;-c(3,3,5,7)
+a+b</code></pre>
+<pre><code>## [1]  5  6  8 10</code></pre>
+<pre class="r"><code>a-b</code></pre>
+<pre><code>## [1] -1  0 -2 -4</code></pre>
+<pre class="r"><code>a*b</code></pre>
+<pre><code>## [1]  6  9 15 21</code></pre>
+<pre class="r"><code>a/b</code></pre>
+<pre><code>## [1] 0.6666667 1.0000000 0.6000000 0.4285714</code></pre>
+<pre class="r"><code>a^b</code></pre>
+<pre><code>## [1]    8   27  243 2187</code></pre>
+<p>片方が値, 一次元のベクトルの場合, 同じ長さのベクトルとして演算が実行される.</p>
+<pre class="r"><code>a+2</code></pre>
+<pre><code>## [1] 4 5 5 5</code></pre>
+<pre class="r"><code>a-2</code></pre>
+<pre><code>## [1] 0 1 1 1</code></pre>
+<pre class="r"><code>a*2</code></pre>
+<pre><code>## [1] 4 6 6 6</code></pre>
+<pre class="r"><code>a/2</code></pre>
+<pre><code>## [1] 1.0 1.5 1.5 1.5</code></pre>
+<pre class="r"><code>a^2</code></pre>
+<pre><code>## [1] 4 9 9 9</code></pre>
+<p>一般に長さが違う場合, 短いほうが繰り返される.</p>
+<pre class="r"><code>c&lt;-c(1,2)
+a+c</code></pre>
+<pre><code>## [1] 3 5 4 5</code></pre>
+<pre class="r"><code>a-c</code></pre>
+<pre><code>## [1] 1 1 2 1</code></pre>
+<pre class="r"><code>a*c</code></pre>
+<pre><code>## [1] 2 6 3 6</code></pre>
+<pre class="r"><code>a/c</code></pre>
+<pre><code>## [1] 2.0 1.5 3.0 1.5</code></pre>
+<pre class="r"><code>a^c</code></pre>
+<pre><code>## [1] 2 9 3 9</code></pre>
+<p>なお 短いほうが長い方の約数でないと警告がでる.</p>
+<p>比較演算子も同様である.</p>
+<pre class="r"><code>a&gt;2</code></pre>
+<pre><code>## [1] FALSE  TRUE  TRUE  TRUE</code></pre>
+<pre class="r"><code>a&lt;2</code></pre>
+<pre><code>## [1] FALSE FALSE FALSE FALSE</code></pre>
+<pre class="r"><code>a==b</code></pre>
+<pre><code>## [1] FALSE  TRUE FALSE FALSE</code></pre>
+<p>ちなみに 完全に一致しているかどうかは <code>setequal(a,b)</code> を用いる.</p>
+<p>論理演算子も同様である.</p>
+<pre class="r"><code>a&gt;1|b&lt;3</code></pre>
+<pre><code>## [1] TRUE TRUE TRUE TRUE</code></pre>
+<pre class="r"><code>a&gt;2&amp;b==3</code></pre>
+<pre><code>## [1] FALSE  TRUE FALSE FALSE</code></pre>
+<p>第一要素だけ評価する以下の論理演算子もあることに注意されたい.</p>
+<pre class="r"><code>a&gt;1||b&lt;3</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>a&gt;2&amp;&amp;b==3</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+</div>
+<div class="section level3">
+<h3>ベクトルの関数</h3>
+<pre class="r"><code>x&lt;-1:10
+sqrt(x)</code></pre>
+<pre><code>##  [1] 1.000000 1.414214 1.732051 2.000000 2.236068 2.449490 2.645751
+##  [8] 2.828427 3.000000 3.162278</code></pre>
+<pre class="r"><code>sum(x)</code></pre>
+<pre><code>## [1] 55</code></pre>
+<pre class="r"><code>x[4] &lt;- NA
+sum(x)</code></pre>
+<pre><code>## [1] NA</code></pre>
+<pre class="r"><code>mean(x)</code></pre>
+<pre><code>## [1] NA</code></pre>
+<pre class="r"><code>sum(x,na.rm=TRUE)</code></pre>
+<pre><code>## [1] 51</code></pre>
+<pre class="r"><code>mean(x,na.rm=TRUE)</code></pre>
+<pre><code>## [1] 5.666667</code></pre>
+<pre class="r"><code>moment &lt;- function(x,k){
+  mean(x^k)
+} </code></pre>
+<pre class="r"><code>y&lt;-c(3,3,3)
+moment(y,2)</code></pre>
+<pre><code>## [1] 9</code></pre>
+<pre class="r"><code>mmoment &lt;- function (x,k=1,...){
+  mean(x^k,...)
+}
+mmoment(y)</code></pre>
+<pre><code>## [1] 3</code></pre>
+<pre class="r"><code>mmoment(x,na.rm=TRUE)</code></pre>
+<pre><code>## [1] 5.666667</code></pre>
+</div>
+<div class="section level3">
+<h3>要素</h3>
+<p>ベクトルの要素はカギカッコで取り出す.</p>
+<pre class="r"><code>num&lt;-c(2,3,7,9)
+num[3]</code></pre>
+<pre><code>## [1] 7</code></pre>
+<pre class="r"><code>num[3] &lt;- 500
+num</code></pre>
+<pre><code>## [1]   2   3 500   9</code></pre>
+<p>マイナスをつけるとその要素以外を取り出す.</p>
+<pre class="r"><code>num[-3]</code></pre>
+<pre><code>## [1] 2 3 9</code></pre>
+<p>複数取り出すこともできる.</p>
+<pre class="r"><code>num[c(1,4)]</code></pre>
+<pre><code>## [1] 2 9</code></pre>
+<p>論理値ベクトルを使って取り出すことができる.</p>
+<pre class="r"><code>idx &lt;- c(TRUE,FALSE,TRUE,TRUE)
+num[idx]</code></pre>
+<pre><code>## [1]   2 500   9</code></pre>
+<p>論理演算子と組み合わせることができる.</p>
+<pre class="r"><code>(num&gt;4)</code></pre>
+<pre><code>## [1] FALSE FALSE  TRUE  TRUE</code></pre>
+<pre class="r"><code>num[num&gt;4]</code></pre>
+<pre><code>## [1] 500   9</code></pre>
+<p>また <code>:</code> をもちいて連続したベクトルが作れるので, それを利用してベクトルを抜き出すことができる.</p>
+<pre class="r"><code>2:4</code></pre>
+<pre><code>## [1] 2 3 4</code></pre>
+<pre class="r"><code>num[2:4]</code></pre>
+<pre><code>## [1]   3 500   9</code></pre>
+</div>
+</div>
+<div class="section level2">
+<h2>いくつかのベクトル</h2>
+<div id="seq" class="section level3">
+<h3>seq</h3>
+<pre class="r"><code>seq(1,5)</code></pre>
+<pre><code>## [1] 1 2 3 4 5</code></pre>
+<pre class="r"><code>seq(1,5,by=0.5)</code></pre>
+<pre><code>## [1] 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0</code></pre>
+<pre class="r"><code>seq(1,5,length.out=3)</code></pre>
+<pre><code>## [1] 1 3 5</code></pre>
+</div>
+<div id="rep" class="section level3">
+<h3>rep</h3>
+<pre class="r"><code>rep(1,5)</code></pre>
+<pre><code>## [1] 1 1 1 1 1</code></pre>
+<pre class="r"><code>rep(1:2,times=4)</code></pre>
+<pre><code>## [1] 1 2 1 2 1 2 1 2</code></pre>
+<pre class="r"><code>rep(1:4,each=2)</code></pre>
+<pre><code>## [1] 1 1 2 2 3 3 4 4</code></pre>
+</div>
+<div class="section level3">
+<h3>アルファベット</h3>
+<pre class="r"><code>letters</code></pre>
+<pre><code>##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;k&quot; &quot;l&quot; &quot;m&quot; &quot;n&quot; &quot;o&quot; &quot;p&quot; &quot;q&quot;
+## [18] &quot;r&quot; &quot;s&quot; &quot;t&quot; &quot;u&quot; &quot;v&quot; &quot;w&quot; &quot;x&quot; &quot;y&quot; &quot;z&quot;</code></pre>
+<pre class="r"><code>LETTERS</code></pre>
+<pre><code>##  [1] &quot;A&quot; &quot;B&quot; &quot;C&quot; &quot;D&quot; &quot;E&quot; &quot;F&quot; &quot;G&quot; &quot;H&quot; &quot;I&quot; &quot;J&quot; &quot;K&quot; &quot;L&quot; &quot;M&quot; &quot;N&quot; &quot;O&quot; &quot;P&quot; &quot;Q&quot;
+## [18] &quot;R&quot; &quot;S&quot; &quot;T&quot; &quot;U&quot; &quot;V&quot; &quot;W&quot; &quot;X&quot; &quot;Y&quot; &quot;Z&quot;</code></pre>
+</div>
+<div class="section level3">
+<h3>乱数ベクトル</h3>
+<pre class="r"><code>set.seed(20)
+runif(10)</code></pre>
+<pre><code>##  [1] 0.87752139 0.76853321 0.27896314 0.52916369 0.96290703 0.98035458
+##  [7] 0.09133259 0.07074948 0.32759395 0.37007454</code></pre>
+<pre class="r"><code>rnorm(5)</code></pre>
+<pre><code>## [1]  0.5696061 -2.8897176 -0.8690183 -0.4617027 -0.5555409</code></pre>
+</div>
+</div>
+<div class="section level2">
+<h2>ベクトルの拡張</h2>
+<div id="factor" class="section level3">
+<h3>factor</h3>
+<pre class="r"><code>(fac&lt;-factor(c(&quot;S&quot;,&quot;L&quot;,&quot;L&quot;,&quot;M&quot;)))</code></pre>
+<pre><code>## [1] S L L M
+## Levels: L M S</code></pre>
+<pre class="r"><code>levels(fac)</code></pre>
+<pre><code>## [1] &quot;L&quot; &quot;M&quot; &quot;S&quot;</code></pre>
+<pre class="r"><code>factor(c(&quot;S&quot;,&quot;L&quot;,&quot;L&quot;,&quot;M&quot;),levels=c(&quot;S&quot;,&quot;M&quot;,&quot;L&quot;))</code></pre>
+<pre><code>## [1] S L L M
+## Levels: S M L</code></pre>
+<pre class="r"><code>levels(fac) &lt;- c(&quot;S&quot;,&quot;M&quot;,&quot;L&quot;)</code></pre>
+<pre class="r"><code>factor(c(&quot;S&quot;,&quot;L&quot;,&quot;L&quot;,&quot;M&quot;),ordered=TRUE,levels=c(&quot;S&quot;,&quot;M&quot;,&quot;L&quot;))</code></pre>
+<pre><code>## [1] S L L M
+## Levels: S &lt; M &lt; L</code></pre>
+<ul>
+<li>length</li>
+<li>levels</li>
+</ul>
+</div>
+<div id="matrix" class="section level3">
+<h3>matrix</h3>
+<ul>
+<li>dim</li>
+<li>nrow</li>
+<li>ncol</li>
+<li>rownames</li>
+<li>colnames</li>
+</ul>
+<pre class="r"><code>(mat &lt;- matrix(1:6,nrow=3,ncol=2))</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,]    1    4
+## [2,]    2    5
+## [3,]    3    6</code></pre>
+<pre class="r"><code>(matrix(1:6,nrow=3,ncol=2,byrow = TRUE))</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,]    1    2
+## [2,]    3    4
+## [3,]    5    6</code></pre>
+<pre class="r"><code>typeof(mat)</code></pre>
+<pre><code>## [1] &quot;integer&quot;</code></pre>
+<pre class="r"><code>class(mat)</code></pre>
+<pre><code>## [1] &quot;matrix&quot;</code></pre>
+<pre class="r"><code>dim(mat)</code></pre>
+<pre><code>## [1] 3 2</code></pre>
+<pre class="r"><code>nrow(mat)</code></pre>
+<pre><code>## [1] 3</code></pre>
+<pre class="r"><code>ncol(mat)</code></pre>
+<pre><code>## [1] 2</code></pre>
+<pre class="r"><code>rownames(mat) &lt;- c(&quot;A&quot;,&quot;B&quot;,&quot;C&quot;)
+colnames(mat) &lt;- c(&quot;a&quot;,&quot;b&quot;)
+mat</code></pre>
+<pre><code>##   a b
+## A 1 4
+## B 2 5
+## C 3 6</code></pre>
+<pre class="r"><code>mat[,1] # mat[,&quot;a&quot;]</code></pre>
+<pre><code>## A B C 
+## 1 2 3</code></pre>
+<pre class="r"><code>is.matrix(mat[,1])</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>mat[,1,drop=FALSE]</code></pre>
+<pre><code>##   a
+## A 1
+## B 2
+## C 3</code></pre>
+<pre class="r"><code>mat[2,] #mat[&quot;B&quot;,]</code></pre>
+<pre><code>## a b 
+## 2 5</code></pre>
+</div>
+<div id="list" class="section level3">
+<h3>list</h3>
+<pre class="r"><code>lst &lt;- list(x=&quot;A&quot;,y=c(2,3,3))
+length(lst)</code></pre>
+<pre><code>## [1] 2</code></pre>
+<pre class="r"><code>names(lst)</code></pre>
+<pre><code>## [1] &quot;x&quot; &quot;y&quot;</code></pre>
+<pre class="r"><code>a&lt;-list(1,1,1)
+a</code></pre>
+<pre><code>## [[1]]
+## [1] 1
+## 
+## [[2]]
+## [1] 1
+## 
+## [[3]]
+## [1] 1</code></pre>
+<pre class="r"><code>b&lt;-c(1,1,1)
+a==b</code></pre>
+<pre><code>## [1] TRUE TRUE TRUE</code></pre>
+<pre class="r"><code>identical(a,b)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>lst[&quot;x&quot;]</code></pre>
+<pre><code>## $x
+## [1] &quot;A&quot;</code></pre>
+<pre class="r"><code>is.list(lst[&quot;x&quot;])</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>lst[[&quot;x&quot;]]</code></pre>
+<pre><code>## [1] &quot;A&quot;</code></pre>
+<pre class="r"><code>is.list(lst[[&quot;x&quot;]])</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+</div>
+<div id="array" class="section level3">
+<h3>array</h3>
+<pre class="r"><code>vec &lt;- 1:12
+arr &lt;- array(vec,dim=c(2,3,2))
+arr</code></pre>
+<pre><code>## , , 1
+## 
+##      [,1] [,2] [,3]
+## [1,]    1    3    5
+## [2,]    2    4    6
+## 
+## , , 2
+## 
+##      [,1] [,2] [,3]
+## [1,]    7    9   11
+## [2,]    8   10   12</code></pre>
+<pre class="r"><code>dim(arr)</code></pre>
+<pre><code>## [1] 2 3 2</code></pre>
+<pre class="r"><code>length(arr)</code></pre>
+<pre><code>## [1] 12</code></pre>
+<pre class="r"><code>dim(vec) &lt;- c(3,2,2)
+vec</code></pre>
+<pre><code>## , , 1
+## 
+##      [,1] [,2]
+## [1,]    1    4
+## [2,]    2    5
+## [3,]    3    6
+## 
+## , , 2
+## 
+##      [,1] [,2]
+## [1,]    7   10
+## [2,]    8   11
+## [3,]    9   12</code></pre>
+<pre class="r"><code>arr &lt;- array(vec,dim=c(2,3,2),dimnames=list(c(&quot;A&quot;,&quot;B&quot;),1:3,c(&quot;a&quot;,&quot;b&quot;)))
+arr</code></pre>
+<pre><code>## , , a
+## 
+##   1 2 3
+## A 1 3 5
+## B 2 4 6
+## 
+## , , b
+## 
+##   1  2  3
+## A 7  9 11
+## B 8 10 12</code></pre>
+<pre class="r"><code>dimnames(vec) &lt;- list(c(&quot;x&quot;,&quot;y&quot;,&quot;z&quot;)) 
+vec</code></pre>
+<pre><code>## , , 1
+## 
+##   [,1] [,2]
+## x    1    4
+## y    2    5
+## z    3    6
+## 
+## , , 2
+## 
+##   [,1] [,2]
+## x    7   10
+## y    8   11
+## z    9   12</code></pre>
+<pre class="r"><code>arr[,2:3,]</code></pre>
+<pre><code>## , , a
+## 
+##   2 3
+## A 3 5
+## B 4 6
+## 
+## , , b
+## 
+##    2  3
+## A  9 11
+## B 10 12</code></pre>
+<pre class="r"><code>arr[1,3,]</code></pre>
+<pre><code>##  a  b 
+##  5 11</code></pre>
+<pre class="r"><code>is.vector(arr[1,3,])</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>is.array(arr[1,3,,drop=FALSE])</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>arr[,2,]</code></pre>
+<pre><code>##   a  b
+## A 3  9
+## B 4 10</code></pre>
+<pre class="r"><code>is.matrix(arr[,2,])</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>is.array(arr[,2,,drop=FALSE])</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+</div>
+<div id="dataframe" class="section level2">
+<h2>dataframe</h2>
+<ul>
+<li>length</li>
+<li>names</li>
+<li>dim</li>
+<li>nrow</li>
+<li>ncol</li>
+<li>rownames</li>
+<li>colnames</li>
+</ul>
+<pre class="r"><code>df &lt;- data.frame(x=c(&quot;A&quot;,&quot;B&quot;,&quot;A&quot;),y=c(3,3,5))
+length(df)</code></pre>
+<pre><code>## [1] 2</code></pre>
+<pre class="r"><code>names(df)</code></pre>
+<pre><code>## [1] &quot;x&quot; &quot;y&quot;</code></pre>
+<pre class="r"><code>dim(df)</code></pre>
+<pre><code>## [1] 3 2</code></pre>
+<pre class="r"><code>nrow(df)</code></pre>
+<pre><code>## [1] 3</code></pre>
+<pre class="r"><code>ncol(df)</code></pre>
+<pre><code>## [1] 2</code></pre>
+<pre class="r"><code>rownames(df)</code></pre>
+<pre><code>## [1] &quot;1&quot; &quot;2&quot; &quot;3&quot;</code></pre>
+<pre class="r"><code>colnames(df)</code></pre>
+<pre><code>## [1] &quot;x&quot; &quot;y&quot;</code></pre>
+<pre class="r"><code>df[&quot;x&quot;]</code></pre>
+<pre><code>##   x
+## 1 A
+## 2 B
+## 3 A</code></pre>
+<pre class="r"><code># df[1]
+# df[,&quot;x&quot;,drop=FALSE]
+# df[,1,drop=FALSE]</code></pre>
+<pre class="r"><code>df[[&quot;x&quot;]]</code></pre>
+<pre><code>## [1] A B A
+## Levels: A B</code></pre>
+<pre class="r"><code># df$x
+# df[,&quot;x&quot;]
+#df[,1]</code></pre>
+<pre class="r"><code>mean(df$y)</code></pre>
+<pre><code>## [1] 3.666667</code></pre>
+<pre class="r"><code>with(df,mean(y))</code></pre>
+<pre><code>## [1] 3.666667</code></pre>
+</div>

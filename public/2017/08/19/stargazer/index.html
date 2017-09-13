@@ -937,7 +937,7 @@ F Statistic
 </tr>
 </table>
 <p>latex 形式での保存は以下のようにする.</p>
-<pre class="r"><code>tab2 &lt;- stargazer(fm1, fm2, type = &quot;html&quot;,
+<pre class="r"><code>tab2 &lt;- stargazer(fm1, fm2,
                   covariate.labels = c(&quot;速度&quot;, &quot;速度自乗&quot;),
                   dep.var.caption  = &quot;被説明変数&quot;,
                   dep.var.labels   = &quot;距離&quot;) %&gt;%

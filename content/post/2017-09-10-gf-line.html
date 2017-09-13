@@ -11,76 +11,152 @@ tags:
 
 
 
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## Loading tidyverse: ggplot2
-## Loading tidyverse: tibble
-## Loading tidyverse: tidyr
-## Loading tidyverse: readr
-## Loading tidyverse: purrr
-## Loading tidyverse: dplyr</code></pre>
-<pre><code>## Conflicts with tidy packages ----------------------------------------------</code></pre>
-<pre><code>## filter(): dplyr, stats
-## lag():    dplyr, stats</code></pre>
-<pre class="r"><code>library(mosaic)</code></pre>
-<pre><code>##  要求されたパッケージ lattice をロード中です</code></pre>
-<pre><code>##  要求されたパッケージ ggformula をロード中です</code></pre>
-<pre><code>## 
-## New to ggformula?  Try the tutorials: 
-##  learnr::run_tutorial(&quot;introduction&quot;, package = &quot;ggformula&quot;)
-##  learnr::run_tutorial(&quot;refining&quot;, package = &quot;ggformula&quot;)</code></pre>
-<pre><code>##  要求されたパッケージ mosaicData をロード中です</code></pre>
-<pre><code>##  要求されたパッケージ Matrix をロード中です</code></pre>
-<pre><code>## 
-##  次のパッケージを付け加えます: &#39;Matrix&#39;</code></pre>
-<pre><code>##  以下のオブジェクトは &#39;package:tidyr&#39; からマスクされています: 
-## 
-##      expand</code></pre>
-<pre><code>## 
-## The &#39;mosaic&#39; package masks several functions from core packages in order to add 
-## additional features.  The original behavior of these functions should not be affected by this.
-## 
-## Note: If you use the Matrix package, be sure to load it BEFORE loading mosaic.</code></pre>
-<pre><code>## 
-##  次のパッケージを付け加えます: &#39;mosaic&#39;</code></pre>
-<pre><code>##  以下のオブジェクトは &#39;package:Matrix&#39; からマスクされています: 
-## 
-##      mean</code></pre>
-<pre><code>##  以下のオブジェクトは &#39;package:dplyr&#39; からマスクされています: 
-## 
-##      count, do, tally</code></pre>
-<pre><code>##  以下のオブジェクトは &#39;package:purrr&#39; からマスクされています: 
-## 
-##      cross</code></pre>
-<pre><code>##  以下のオブジェクトは &#39;package:stats&#39; からマスクされています: 
-## 
-##      binom.test, cor, cor.test, cov, fivenum, IQR, median,
-##     prop.test, quantile, sd, t.test, var</code></pre>
-<pre><code>##  以下のオブジェクトは &#39;package:base&#39; からマスクされています: 
-## 
-##      max, mean, min, prod, range, sample, sum</code></pre>
-<pre class="r"><code>library(modelr)</code></pre>
-<pre><code>## 
-##  次のパッケージを付け加えます: &#39;modelr&#39;</code></pre>
-<pre><code>##  以下のオブジェクトは &#39;package:mosaic&#39; からマスクされています: 
-## 
-##      resample</code></pre>
-<pre><code>##  以下のオブジェクトは &#39;package:ggformula&#39; からマスクされています: 
-## 
-##      na.warn</code></pre>
+<p>R4DS の以下を <code>mosaic</code> を使って再現する.</p>
+<p><a href="http://r4ds.had.co.nz/model-basics.html#formulas-and-model-families" class="uri">http://r4ds.had.co.nz/model-basics.html#formulas-and-model-families</a></p>
+<pre class="r"><code>library(tidyverse)
+library(mosaic)
+library(modelr)</code></pre>
+<div id="categorical-variables" class="section level2">
+<h2>Categorical variables</h2>
+<pre class="r"><code>sim2 %&gt;% gf_point(y~x)</code></pre>
+<p><img src="/post/2017-09-10-gf-line_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>mod2 &lt;- lm(y ~ x, data = sim2)
+grid &lt;- sim2 %&gt;% 
+  data_grid(x) %&gt;% 
+  add_predictions(mod2)</code></pre>
+<pre class="r"><code>sim2 %&gt;% gf_point(y~x) %&gt;% 
+  gf_point(data = grid, pred~x, color =&quot;red&quot;, size =4)</code></pre>
+<p><img src="/post/2017-09-10-gf-line_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="interactions-continuous-and-categorical" class="section level2">
+<h2>Interactions (continuous and categorical)</h2>
 <pre class="r"><code>mod1 &lt;- lm(y~ x1 + x2, data = sim3)
 mod2 &lt;- lm(y~ x1 * x2, data = sim3)</code></pre>
+<pre class="r"><code>summary(mod1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x1 + x2, data = sim3)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.4674 -0.8524 -0.0729  0.7886  4.3005 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.87167    0.38738   4.832 4.22e-06 ***
+## x1          -0.19674    0.04871  -4.039 9.72e-05 ***
+## x2b          2.88781    0.39571   7.298 4.07e-11 ***
+## x2c          4.80574    0.39571  12.145  &lt; 2e-16 ***
+## x2d          2.35959    0.39571   5.963 2.79e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.533 on 115 degrees of freedom
+## Multiple R-squared:  0.5911, Adjusted R-squared:  0.5768 
+## F-statistic: 41.55 on 4 and 115 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>summary(mod2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x1 * x2, data = sim3)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.87634 -0.67655  0.04837  0.69963  2.58607 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.30124    0.40400   3.221  0.00167 ** 
+## x1          -0.09302    0.06511  -1.429  0.15587    
+## x2b          7.06938    0.57134  12.373  &lt; 2e-16 ***
+## x2c          4.43090    0.57134   7.755 4.41e-12 ***
+## x2d          0.83455    0.57134   1.461  0.14690    
+## x1:x2b      -0.76029    0.09208  -8.257 3.30e-13 ***
+## x1:x2c       0.06815    0.09208   0.740  0.46076    
+## x1:x2d       0.27728    0.09208   3.011  0.00322 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.024 on 112 degrees of freedom
+## Multiple R-squared:  0.8221, Adjusted R-squared:  0.811 
+## F-statistic: 73.93 on 7 and 112 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code>sim3 %&gt;% gather_predictions(mod1,mod2) %&gt;% 
   gf_point(y ~ x1, color=~x2) %&gt;% gf_line(pred ~ x1 | model)</code></pre>
-<p><img src="/post/2017-09-10-gf-line_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="/post/2017-09-10-gf-line_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>anova(mod1, mod2)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: y ~ x1 + x2
+## Model 2: y ~ x1 * x2
+##   Res.Df    RSS Df Sum of Sq      F    Pr(&gt;F)    
+## 1    115 270.11                                  
+## 2    112 117.51  3    152.59 48.477 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="interactions-two-continuous" class="section level2">
+<h2>Interactions (two continuous)</h2>
 <pre class="r"><code>mod1 &lt;- lm(y~ x1 + x2, data = sim4)
 mod2 &lt;- lm(y~ x1 * x2, data = sim4)</code></pre>
-<pre class="r"><code>grid &lt;- sim4 %&gt;% data_grid(x1 = seq_range(x1,15),x2 = seq_range(x2,15)) %&gt;%
+<pre class="r"><code>summary(mod1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x1 + x2, data = sim4)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.5514 -1.3859 -0.1107  1.4928  4.7180 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.03546    0.12184   0.291    0.771    
+## x1           1.82167    0.19089   9.543   &lt;2e-16 ***
+## x2          -2.78252    0.19089 -14.577   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.11 on 297 degrees of freedom
+## Multiple R-squared:  0.5055, Adjusted R-squared:  0.5021 
+## F-statistic: 151.8 on 2 and 297 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>summary(mod2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x1 * x2, data = sim4)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.9629 -1.4165 -0.1032  1.4284  4.9957 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.03546    0.11995   0.296  0.76772    
+## x1           1.82167    0.18792   9.694  &lt; 2e-16 ***
+## x2          -2.78252    0.18792 -14.807  &lt; 2e-16 ***
+## x1:x2        0.95228    0.29441   3.235  0.00136 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.078 on 296 degrees of freedom
+## Multiple R-squared:  0.5223, Adjusted R-squared:  0.5175 
+## F-statistic: 107.9 on 3 and 296 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>grid &lt;- sim4 %&gt;% 
+  data_grid(x1 = seq_range(x1,15),x2 = seq_range(x2,15)) %&gt;%
   gather_predictions(mod1,mod2)
 gf_tile(grid, x2 ~ x1|model, fill = ~pred)</code></pre>
-<p><img src="/post/2017-09-10-gf-line_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="/post/2017-09-10-gf-line_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <pre class="r"><code>gf_point(sim4, y~x1,color=~x2) %&gt;% 
   gf_line(data =grid, pred ~ x1|model, group= ~x2)</code></pre>
-<p><img src="/post/2017-09-10-gf-line_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="/post/2017-09-10-gf-line_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <pre class="r"><code>gf_point(sim4, y~x2,color=~x1) %&gt;% 
   gf_line(data =grid, pred ~ x2|model, group= ~x1)</code></pre>
-<p><img src="/post/2017-09-10-gf-line_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="/post/2017-09-10-gf-line_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<pre class="r"><code>anova(mod1, mod2)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: y ~ x1 + x2
+## Model 2: y ~ x1 * x2
+##   Res.Df    RSS Df Sum of Sq      F   Pr(&gt;F)   
+## 1    297 1322.7                                
+## 2    296 1277.6  1    45.155 10.462 0.001356 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>

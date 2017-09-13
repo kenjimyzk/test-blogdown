@@ -8,11 +8,34 @@ categories:
 tags:
   - regression
 ---
-```{r}
+R4DS の以下を `mosaic` を使って再現する.
+
+http://r4ds.had.co.nz/model-basics.html#formulas-and-model-families
+
+```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(mosaic)
 library(modelr)
 ```
+
+## Categorical variables
+```{r}
+sim2 %>% gf_point(y~x)
+```
+
+```{r}
+mod2 <- lm(y ~ x, data = sim2)
+grid <- sim2 %>% 
+  data_grid(x) %>% 
+  add_predictions(mod2)
+```
+
+```{r}
+sim2 %>% gf_point(y~x) %>% 
+  gf_point(data = grid, pred~x, color ="red", size =4)
+```
+
+## Interactions (continuous and categorical)
 
 ```{r}
 mod1 <- lm(y~ x1 + x2, data = sim3)
@@ -20,18 +43,35 @@ mod2 <- lm(y~ x1 * x2, data = sim3)
 ```
 
 ```{r}
+summary(mod1)
+summary(mod2)
+```
+
+
+```{r}
 sim3 %>% gather_predictions(mod1,mod2) %>% 
   gf_point(y ~ x1, color=~x2) %>% gf_line(pred ~ x1 | model)
 ```
 
+```{r}
+anova(mod1, mod2)
+```
 
+
+##  Interactions (two continuous)
 ```{r}
 mod1 <- lm(y~ x1 + x2, data = sim4)
 mod2 <- lm(y~ x1 * x2, data = sim4)
 ```
 
 ```{r}
-grid <- sim4 %>% data_grid(x1 = seq_range(x1,15),x2 = seq_range(x2,15)) %>%
+summary(mod1)
+summary(mod2)
+```
+
+```{r}
+grid <- sim4 %>% 
+  data_grid(x1 = seq_range(x1,15),x2 = seq_range(x2,15)) %>%
   gather_predictions(mod1,mod2)
 gf_tile(grid, x2 ~ x1|model, fill = ~pred)
 ```
@@ -46,3 +86,6 @@ gf_point(sim4, y~x2,color=~x1) %>%
   gf_line(data =grid, pred ~ x2|model, group= ~x1)
 ```
 
+```{r}
+anova(mod1, mod2)
+```
