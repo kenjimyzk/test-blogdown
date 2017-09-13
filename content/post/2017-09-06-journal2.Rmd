@@ -12,8 +12,10 @@ tags:
 ```{r, message=FALSE, warning=FALSE}
 library(knitr)
 library(tidyverse)
+library(broom)
 library(mosaic)
 library(AER)
+
 ```
 
 データを次のように整形
@@ -40,7 +42,7 @@ plot(subs ~ citeprice, data = log(journals), pch = 19)
 単回帰式の結果である.
 ```{r}
 fm1 <- lm(subs ~ citeprice, data = log(journals))
-summary(fm1)
+summary(fm1) %>% tidy() %>% kable()
 ```
 
 回帰直線は次のようにして表示する.
@@ -54,7 +56,7 @@ abline(fm1)
 gf_point(subs ~ citeprice, data = log(journals)) %>% gf_lm()
 ```
 
-`gf_lm` でなく `gf_fun` を使うこともできる.
+パッケージ `mosaic` の `makeFun` で関数を作成すれば, `gf_fun` を使うこともできる.
 ```{r}
 fn1<-makeFun(fm1)
 gf_point(subs ~ citeprice, data = log(journals)) %>% gf_fun(fn1)
@@ -64,7 +66,7 @@ gf_point(subs ~ citeprice, data = log(journals)) %>% gf_fun(fn1)
 結果は以下の通り.
 ```{r}
 fm2 <- update(fm1, .~ citeprice + age + chars)
-summary(fm2)
+summary(fm2) %>% tidy() %>% kable()
 ```
 
 図の軸に表示しない変数は平均値として図示すると以下になる.
@@ -80,7 +82,7 @@ gf_point(subs ~ citeprice, data = log(journals)) %>%
 交差項は次のようにして組み込むことができる.
 ```{r}
 fm3 <- update(fm1, .~ citeprice * age + chars)
-summary(fm3)
+summary(fm3) %>% tidy() %>% kable()
 ```
 
 図の軸に表示しない変数は平均値として図示すると以下になる.
@@ -96,7 +98,7 @@ gf_point(subs ~ citeprice, data = log(journals)) %>%
 多項式は次のように組み込むことができる.
 ```{r}
 fm4 <- update(fm3, .~ . + I(citeprice^2) + I(citeprice^3))
-summary(fm4)
+summary(fm4) %>% tidy() %>% kable()
 ```
 
 図の軸に表示しない変数は平均値として図示すると以下になる.

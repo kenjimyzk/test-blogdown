@@ -1,0 +1,48 @@
+---
+title: gf_line
+author: Kenji Miyazaki
+date: '2017-09-10'
+slug: gf-line
+categories:
+  - R
+tags:
+  - regression
+---
+```{r}
+library(tidyverse)
+library(mosaic)
+library(modelr)
+```
+
+```{r}
+mod1 <- lm(y~ x1 + x2, data = sim3)
+mod2 <- lm(y~ x1 * x2, data = sim3)
+```
+
+```{r}
+sim3 %>% gather_predictions(mod1,mod2) %>% 
+  gf_point(y ~ x1, color=~x2) %>% gf_line(pred ~ x1 | model)
+```
+
+
+```{r}
+mod1 <- lm(y~ x1 + x2, data = sim4)
+mod2 <- lm(y~ x1 * x2, data = sim4)
+```
+
+```{r}
+grid <- sim4 %>% data_grid(x1 = seq_range(x1,15),x2 = seq_range(x2,15)) %>%
+  gather_predictions(mod1,mod2)
+gf_tile(grid, x2 ~ x1|model, fill = ~pred)
+```
+
+```{r}
+gf_point(sim4, y~x1,color=~x2) %>% 
+  gf_line(data =grid, pred ~ x1|model, group= ~x2)
+```
+
+```{r}
+gf_point(sim4, y~x2,color=~x1) %>% 
+  gf_line(data =grid, pred ~ x2|model, group= ~x1)
+```
+
