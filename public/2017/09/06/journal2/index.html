@@ -59,7 +59,7 @@
 
   <article class="article">
     
-    <span class="article-duration">3 min read</span>
+    <span class="article-duration">2 min read</span>
     
 
     <h1 class="article-title">journal2</h1>
@@ -71,6 +71,7 @@
     <div class="article-content">
       <pre class="r"><code>library(knitr)
 library(tidyverse)
+library(broom)
 library(mosaic)
 library(AER)</code></pre>
 <p>データを次のように整形</p>
@@ -101,25 +102,34 @@ journals &lt;- Journals %&gt;%
 <p><img src="../../../../post/2017-09-06-journal2_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>単回帰式の結果である.</p>
 <pre class="r"><code>fm1 &lt;- lm(subs ~ citeprice, data = log(journals))
-summary(fm1)</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = subs ~ citeprice, data = log(journals))
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -2.72478 -0.53609  0.03721  0.46619  1.84808 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  4.76621    0.05591   85.25   &lt;2e-16 ***
-## citeprice   -0.53305    0.03561  -14.97   &lt;2e-16 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 0.7497 on 178 degrees of freedom
-## Multiple R-squared:  0.5573, Adjusted R-squared:  0.5548 
-## F-statistic:   224 on 1 and 178 DF,  p-value: &lt; 2.2e-16</code></pre>
+summary(fm1) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">4.7662121</td>
+<td align="right">0.0559091</td>
+<td align="right">85.24934</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">citeprice</td>
+<td align="right">-0.5330535</td>
+<td align="right">0.0356132</td>
+<td align="right">-14.96786</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
 <p>回帰直線は次のようにして表示する.</p>
 <pre class="r"><code>plot(subs ~ citeprice, data = log(journals), pch = 19)
 abline(fm1)</code></pre>
@@ -127,33 +137,54 @@ abline(fm1)</code></pre>
 <p>パッケージ <code>ggformula</code> を使えば以下のコマンドを実施する.</p>
 <pre class="r"><code>gf_point(subs ~ citeprice, data = log(journals)) %&gt;% gf_lm()</code></pre>
 <p><img src="../../../../post/2017-09-06-journal2_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-<p><code>gf_lm</code> でなく <code>gf_fun</code> を使うこともできる.</p>
+<p>パッケージ <code>mosaic</code> の <code>makeFun</code> で関数を作成すれば, <code>gf_fun</code> を使うこともできる.</p>
 <pre class="r"><code>fn1&lt;-makeFun(fm1)
 gf_point(subs ~ citeprice, data = log(journals)) %&gt;% gf_fun(fn1)</code></pre>
 <p><img src="../../../../post/2017-09-06-journal2_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p>多変量回帰モデルのときは <code>gf_fun</code> のほうが柔軟に対応できる. 結果は以下の通り.</p>
 <pre class="r"><code>fm2 &lt;- update(fm1, .~ citeprice + age + chars)
-summary(fm2)</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = subs ~ citeprice + age + chars, data = log(journals))
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -2.51996 -0.41211  0.03173  0.44657  1.80588 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  3.68009    0.33289  11.055  &lt; 2e-16 ***
-## citeprice   -0.40772    0.04196  -9.717  &lt; 2e-16 ***
-## age          0.42365    0.08972   4.722 4.75e-06 ***
-## chars        0.20561    0.10747   1.913   0.0573 .  
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 0.7047 on 176 degrees of freedom
-## Multiple R-squared:  0.6132, Adjusted R-squared:  0.6066 
-## F-statistic: 93.01 on 3 and 176 DF,  p-value: &lt; 2.2e-16</code></pre>
+summary(fm2) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">3.6800919</td>
+<td align="right">0.3328895</td>
+<td align="right">11.054994</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">citeprice</td>
+<td align="right">-0.4077182</td>
+<td align="right">0.0419604</td>
+<td align="right">-9.716748</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">age</td>
+<td align="right">0.4236486</td>
+<td align="right">0.0897157</td>
+<td align="right">4.722122</td>
+<td align="right">0.0000047</td>
+</tr>
+<tr class="even">
+<td align="left">chars</td>
+<td align="right">0.2056141</td>
+<td align="right">0.1074660</td>
+<td align="right">1.913295</td>
+<td align="right">0.0573336</td>
+</tr>
+</tbody>
+</table>
 <p>図の軸に表示しない変数は平均値として図示すると以下になる.</p>
 <pre class="r"><code>fn2 &lt;- makeFun(fm2)
 fn2m &lt;- makeFun(fn2(citeprice, age=mage, chars=mchars) ~ citeprice, 
@@ -164,29 +195,55 @@ gf_point(subs ~ citeprice, data = log(journals)) %&gt;%
 <p><img src="../../../../post/2017-09-06-journal2_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <p>交差項は次のようにして組み込むことができる.</p>
 <pre class="r"><code>fm3 &lt;- update(fm1, .~ citeprice * age + chars)
-summary(fm3)</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = subs ~ citeprice + age + chars + citeprice:age, 
-##     data = log(journals))
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -2.19007 -0.43541  0.05901  0.39276  1.75026 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)    3.96189    0.33693  11.759  &lt; 2e-16 ***
-## citeprice     -0.89891    0.16151  -5.566 9.66e-08 ***
-## age            0.37351    0.08897   4.198 4.28e-05 ***
-## chars          0.22947    0.10513   2.183  0.03038 *  
-## citeprice:age  0.14096    0.04483   3.144  0.00196 ** 
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 0.6876 on 175 degrees of freedom
-## Multiple R-squared:  0.6339, Adjusted R-squared:  0.6255 
-## F-statistic: 75.75 on 4 and 175 DF,  p-value: &lt; 2.2e-16</code></pre>
+summary(fm3) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">3.9618858</td>
+<td align="right">0.3369330</td>
+<td align="right">11.758676</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">citeprice</td>
+<td align="right">-0.8989097</td>
+<td align="right">0.1615082</td>
+<td align="right">-5.565722</td>
+<td align="right">0.0000001</td>
+</tr>
+<tr class="odd">
+<td align="left">age</td>
+<td align="right">0.3735148</td>
+<td align="right">0.0889742</td>
+<td align="right">4.198014</td>
+<td align="right">0.0000428</td>
+</tr>
+<tr class="even">
+<td align="left">chars</td>
+<td align="right">0.2294661</td>
+<td align="right">0.1051262</td>
+<td align="right">2.182767</td>
+<td align="right">0.0303848</td>
+</tr>
+<tr class="odd">
+<td align="left">citeprice:age</td>
+<td align="right">0.1409591</td>
+<td align="right">0.0448348</td>
+<td align="right">3.143963</td>
+<td align="right">0.0019584</td>
+</tr>
+</tbody>
+</table>
 <p>図の軸に表示しない変数は平均値として図示すると以下になる.</p>
 <pre class="r"><code>fn3 &lt;- makeFun(fm3)
 fn3m &lt;- makeFun(fn3(citeprice, age=mage, chars=mchars) ~ citeprice, 
@@ -197,31 +254,69 @@ gf_point(subs ~ citeprice, data = log(journals)) %&gt;%
 <p><img src="../../../../post/2017-09-06-journal2_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>多項式は次のように組み込むことができる.</p>
 <pre class="r"><code>fm4 &lt;- update(fm3, .~ . + I(citeprice^2) + I(citeprice^3))
-summary(fm4)</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = subs ~ citeprice + age + chars + I(citeprice^2) + 
-##     I(citeprice^3) + citeprice:age, data = log(journals))
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -2.25623 -0.41477  0.07605  0.40056  1.77711 
-## 
-## Coefficients:
-##                 Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)     3.947823   0.339917  11.614  &lt; 2e-16 ***
-## citeprice      -0.960936   0.189220  -5.078 9.78e-07 ***
-## age             0.373054   0.089361   4.175 4.72e-05 ***
-## chars           0.234618   0.106133   2.211  0.02838 *  
-## I(citeprice^2)  0.016510   0.024135   0.684  0.49484    
-## I(citeprice^3)  0.003667   0.006862   0.534  0.59380    
-## citeprice:age   0.155777   0.055050   2.830  0.00521 ** 
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 0.6906 on 173 degrees of freedom
-## Multiple R-squared:  0.6349, Adjusted R-squared:  0.6223 
-## F-statistic: 50.15 on 6 and 173 DF,  p-value: &lt; 2.2e-16</code></pre>
+summary(fm4) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">3.9478229</td>
+<td align="right">0.3399169</td>
+<td align="right">11.6140812</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">citeprice</td>
+<td align="right">-0.9609365</td>
+<td align="right">0.1892198</td>
+<td align="right">-5.0784127</td>
+<td align="right">0.0000010</td>
+</tr>
+<tr class="odd">
+<td align="left">age</td>
+<td align="right">0.3730539</td>
+<td align="right">0.0893609</td>
+<td align="right">4.1746887</td>
+<td align="right">0.0000472</td>
+</tr>
+<tr class="even">
+<td align="left">chars</td>
+<td align="right">0.2346178</td>
+<td align="right">0.1061335</td>
+<td align="right">2.2105917</td>
+<td align="right">0.0283757</td>
+</tr>
+<tr class="odd">
+<td align="left">I(citeprice^2)</td>
+<td align="right">0.0165099</td>
+<td align="right">0.0241346</td>
+<td align="right">0.6840751</td>
+<td align="right">0.4948430</td>
+</tr>
+<tr class="even">
+<td align="left">I(citeprice^3)</td>
+<td align="right">0.0036666</td>
+<td align="right">0.0068621</td>
+<td align="right">0.5343296</td>
+<td align="right">0.5937995</td>
+</tr>
+<tr class="odd">
+<td align="left">citeprice:age</td>
+<td align="right">0.1557773</td>
+<td align="right">0.0550499</td>
+<td align="right">2.8297485</td>
+<td align="right">0.0052097</td>
+</tr>
+</tbody>
+</table>
 <p>図の軸に表示しない変数は平均値として図示すると以下になる.</p>
 <pre class="r"><code>fn4 &lt;- makeFun(fm4)
 fn4m &lt;- makeFun(fn4(citeprice, age=mage, chars=mchars) ~ citeprice, 
