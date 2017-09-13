@@ -1,0 +1,151 @@
+---
+title: gapminder
+author: Kenji Miyazaki
+date: '2017-09-13'
+slug: gapminder
+categories: []
+tags:
+  - R Markdown
+  - regression
+---
+
+R4DS の以下を `mosaic` を使って再現する.
+
+http://r4ds.had.co.nz/many-models.html#gapminder
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(gapminder)
+library(modelr)
+```
+
+## gapminder
+```{r}
+summary(gapminder)
+```
+
+
+```{r}
+gapminder %>% gf_line(lifeExp~year, group=~country, color=~continent) 
+```
+
+```{r}
+gapminder %>% gf_line(lifeExp~year |continent, group=~country, color=~continent) 
+```
+
+## Japan
+日本について見る.
+```{r}
+jp <- gapminder %>% filter(country == "Japan")
+```
+
+```{r, fig.show='hold'}
+jp %>% gf_line(lifeExp ~year) %>% gf_labs(title="Full data")
+jp_mod <- lm(lifeExp ~ year, data= jp)
+jp %>% add_predictions(jp_mod) %>%
+  gf_line(pred ~year) %>% gf_labs(title="Linear trend")
+jp %>% add_residuals(jp_mod) %>%
+  gf_line(resid ~year) %>% gf_labs(title="Remaining pattern")
+```
+
+## nested dataframe
+```{r}
+by_country <- gapminder %>% nest(-country, -continent)
+head(by_country)
+```
+
+国ごとの回帰モデルの結果を加える.
+```{r}
+by_country <- by_country %>% 
+  dplyr::mutate(model = purrr::map(data, ~ lm(lifeExp ~ year, data = .)))
+```
+
+国ごとの回帰モデルの結果を加える.
+```{r}
+by_country <- by_country %>% 
+  dplyr::mutate(resids = purrr::map2(data, model, modelr::add_residuals))
+```
+
+国ごとの残差を図示する.
+```{r}
+resids <- unnest(by_country, resids)
+resids %>% gf_line(resid~year, group=~country, color=~continent)
+```
+
+大陸ごとに分ける
+```{r}
+resids %>% gf_line(resid~year|continent, group=~country, color=~continent)
+```
+
+
+国ごとの調整済み決定係数を見る.
+```{r}
+by_country <- by_country %>%
+  mutate(glance = map(model, broom::glance))
+glance <- unnest(by_country, glance, .drop = TRUE)
+glance %>% arrange(r.squared)
+```
+
+決定係数が悪いものを表示する.
+```{r}
+bad_fit <- filter(glance, r.squared<0.25)
+gapminder %>% semi_join(bad_fit, by ="country") %>%
+  gf_line(lifeExp ~ year, color =~country)
+```
+
+## おまけ
+係数の結果を表として取り出す.
+```{r}
+coef <- by_country %>% unnest(model %>% purrr::map(broom::tidy))
+```
+
+```{r}
+by_country <- by_country %>% mutate(coef = map(model, broom::tidy))
+coef <- by_country %>% unnest(coef, .drop=TRUE)
+coef
+# coef <- by_country %>% unnest(model %>% purrr::map(broom::tidy))
+```
+
+
+回帰係数の傾きをみる. P値が悪いのは決定係数が悪いのとほぼ同じである.
+```{r}
+coef_year <- filter(coef, term=="year")
+coef_year %>% arrange(desc(p.value)) %>% head()
+```
+
+
+全体の分布をみる.
+```{r}
+coef_year %>% gf_density(~estimate)
+```
+
+大陸ごとの分布をみる.
+```{r}
+coef_year %>% gf_density(~estimate, group=~continent,color=~continent)
+```
+
+パネルごとにみる.
+```{r}
+coef_year %>% gf_density(~estimate|continent,color=~continent)
+```
+
+箱ひげ図でみる.
+```{r}
+coef_year %>% gf_boxplot(estimate~continent,color=~continent)
+```
+
+表にまとめる.
+```{r}
+coef_year %>% group_by(continent) %>%
+  summarize(mean=mean(estimate),
+            sd = sd(estimate))
+```
+
+係数が負の国は以下の3つであるが, どれもP値は高い.
+```{r}
+coef_year %>% filter(estimate<0) %>% 
+  select(country, estimate, p.value)
+```
+
+

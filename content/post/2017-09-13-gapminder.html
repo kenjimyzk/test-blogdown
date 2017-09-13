@@ -1,0 +1,175 @@
+---
+title: gapminder
+author: Kenji Miyazaki
+date: '2017-09-13'
+slug: gapminder
+categories: []
+tags:
+  - R Markdown
+  - regression
+---
+
+
+
+<p>R4DS の以下を <code>mosaic</code> を使って再現する.</p>
+<p><a href="http://r4ds.had.co.nz/many-models.html#gapminder" class="uri">http://r4ds.had.co.nz/many-models.html#gapminder</a></p>
+<pre class="r"><code>library(tidyverse)
+library(mosaic)
+library(gapminder)
+library(modelr)</code></pre>
+<div id="gapminder" class="section level2">
+<h2>gapminder</h2>
+<pre class="r"><code>summary(gapminder)</code></pre>
+<pre><code>##         country        continent        year         lifeExp     
+##  Afghanistan:  12   Africa  :624   Min.   :1952   Min.   :23.60  
+##  Albania    :  12   Americas:300   1st Qu.:1966   1st Qu.:48.20  
+##  Algeria    :  12   Asia    :396   Median :1980   Median :60.71  
+##  Angola     :  12   Europe  :360   Mean   :1980   Mean   :59.47  
+##  Argentina  :  12   Oceania : 24   3rd Qu.:1993   3rd Qu.:70.85  
+##  Australia  :  12                  Max.   :2007   Max.   :82.60  
+##  (Other)    :1632                                                
+##       pop              gdpPercap       
+##  Min.   :6.001e+04   Min.   :   241.2  
+##  1st Qu.:2.794e+06   1st Qu.:  1202.1  
+##  Median :7.024e+06   Median :  3531.8  
+##  Mean   :2.960e+07   Mean   :  7215.3  
+##  3rd Qu.:1.959e+07   3rd Qu.:  9325.5  
+##  Max.   :1.319e+09   Max.   :113523.1  
+## </code></pre>
+<pre class="r"><code>gapminder %&gt;% gf_line(lifeExp~year, group=~country, color=~continent) </code></pre>
+<p><img src="/post/2017-09-13-gapminder_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>gapminder %&gt;% gf_line(lifeExp~year |continent, group=~country, color=~continent) </code></pre>
+<p><img src="/post/2017-09-13-gapminder_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="japan" class="section level2">
+<h2>Japan</h2>
+<p>日本について見る.</p>
+<pre class="r"><code>jp &lt;- gapminder %&gt;% filter(country == &quot;Japan&quot;)</code></pre>
+<pre class="r"><code>jp %&gt;% gf_line(lifeExp ~year) %&gt;% gf_labs(title=&quot;Full data&quot;)
+jp_mod &lt;- lm(lifeExp ~ year, data= jp)
+jp %&gt;% add_predictions(jp_mod) %&gt;%
+  gf_line(pred ~year) %&gt;% gf_labs(title=&quot;Linear trend&quot;)
+jp %&gt;% add_residuals(jp_mod) %&gt;%
+  gf_line(resid ~year) %&gt;% gf_labs(title=&quot;Remaining pattern&quot;)</code></pre>
+<p><img src="/post/2017-09-13-gapminder_files/figure-html/unnamed-chunk-6-1.png" width="672" /><img src="/post/2017-09-13-gapminder_files/figure-html/unnamed-chunk-6-2.png" width="672" /><img src="/post/2017-09-13-gapminder_files/figure-html/unnamed-chunk-6-3.png" width="672" /></p>
+</div>
+<div id="nested-dataframe" class="section level2">
+<h2>nested dataframe</h2>
+<pre class="r"><code>by_country &lt;- gapminder %&gt;% nest(-country, -continent)
+head(by_country)</code></pre>
+<pre><code>## # A tibble: 6 x 3
+##       country continent              data
+##        &lt;fctr&gt;    &lt;fctr&gt;            &lt;list&gt;
+## 1 Afghanistan      Asia &lt;tibble [12 x 4]&gt;
+## 2     Albania    Europe &lt;tibble [12 x 4]&gt;
+## 3     Algeria    Africa &lt;tibble [12 x 4]&gt;
+## 4      Angola    Africa &lt;tibble [12 x 4]&gt;
+## 5   Argentina  Americas &lt;tibble [12 x 4]&gt;
+## 6   Australia   Oceania &lt;tibble [12 x 4]&gt;</code></pre>
+<p>国ごとの回帰モデルの結果を加える.</p>
+<pre class="r"><code>by_country &lt;- by_country %&gt;% 
+  dplyr::mutate(model = purrr::map(data, ~ lm(lifeExp ~ year, data = .)))</code></pre>
+<p>国ごとの回帰モデルの結果を加える.</p>
+<pre class="r"><code>by_country &lt;- by_country %&gt;% 
+  dplyr::mutate(resids = purrr::map2(data, model, modelr::add_residuals))</code></pre>
+<p>国ごとの残差を図示する.</p>
+<pre class="r"><code>resids &lt;- unnest(by_country, resids)
+resids %&gt;% gf_line(resid~year, group=~country, color=~continent)</code></pre>
+<p><img src="/post/2017-09-13-gapminder_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>大陸ごとに分ける</p>
+<pre class="r"><code>resids %&gt;% gf_line(resid~year|continent, group=~country, color=~continent)</code></pre>
+<p><img src="/post/2017-09-13-gapminder_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>国ごとの調整済み決定係数を見る.</p>
+<pre class="r"><code>by_country &lt;- by_country %&gt;%
+  mutate(glance = map(model, broom::glance))
+glance &lt;- unnest(by_country, glance, .drop = TRUE)
+glance %&gt;% arrange(r.squared)</code></pre>
+<pre><code>## # A tibble: 142 x 13
+##             country continent  r.squared adj.r.squared    sigma statistic
+##              &lt;fctr&gt;    &lt;fctr&gt;      &lt;dbl&gt;         &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+##  1           Rwanda    Africa 0.01715964  -0.081124401 6.558269 0.1745923
+##  2         Botswana    Africa 0.03402340  -0.062574259 6.112177 0.3522177
+##  3         Zimbabwe    Africa 0.05623196  -0.038144842 7.205431 0.5958240
+##  4           Zambia    Africa 0.05983644  -0.034179918 4.528713 0.6364471
+##  5        Swaziland    Africa 0.06821087  -0.024968046 6.644091 0.7320419
+##  6          Lesotho    Africa 0.08485635  -0.006658011 5.933934 0.9272463
+##  7    Cote d&#39;Ivoire    Africa 0.28337240   0.211709644 3.925590 3.9542491
+##  8     South Africa    Africa 0.31246865   0.243715518 4.744356 4.5447914
+##  9           Uganda    Africa 0.34215382   0.276369202 3.187668 5.2011219
+## 10 Congo, Dem. Rep.    Africa 0.34820278   0.283023054 2.429489 5.3421948
+## # ... with 132 more rows, and 7 more variables: p.value &lt;dbl&gt;, df &lt;int&gt;,
+## #   logLik &lt;dbl&gt;, AIC &lt;dbl&gt;, BIC &lt;dbl&gt;, deviance &lt;dbl&gt;, df.residual &lt;int&gt;</code></pre>
+<p>決定係数が悪いものを表示する.</p>
+<pre class="r"><code>bad_fit &lt;- filter(glance, r.squared&lt;0.25)
+gapminder %&gt;% semi_join(bad_fit, by =&quot;country&quot;) %&gt;%
+  gf_line(lifeExp ~ year, color =~country)</code></pre>
+<p><img src="/post/2017-09-13-gapminder_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+<div class="section level2">
+<h2>おまけ</h2>
+<p>係数の結果を表として取り出す.</p>
+<pre class="r"><code>coef &lt;- by_country %&gt;% unnest(model %&gt;% purrr::map(broom::tidy))</code></pre>
+<pre class="r"><code>by_country &lt;- by_country %&gt;% mutate(coef = map(model, broom::tidy))
+coef &lt;- by_country %&gt;% unnest(coef, .drop=TRUE)
+coef</code></pre>
+<pre><code>## # A tibble: 284 x 7
+##        country continent        term      estimate    std.error  statistic
+##         &lt;fctr&gt;    &lt;fctr&gt;       &lt;chr&gt;         &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;
+##  1 Afghanistan      Asia (Intercept)  -507.5342716 40.484161954 -12.536613
+##  2 Afghanistan      Asia        year     0.2753287  0.020450934  13.462890
+##  3     Albania    Europe (Intercept)  -594.0725110 65.655359062  -9.048348
+##  4     Albania    Europe        year     0.3346832  0.033166387  10.091036
+##  5     Algeria    Africa (Intercept) -1067.8590396 43.802200843 -24.379118
+##  6     Algeria    Africa        year     0.5692797  0.022127070  25.727749
+##  7      Angola    Africa (Intercept)  -376.5047531 46.583370599  -8.082385
+##  8      Angola    Africa        year     0.2093399  0.023532003   8.895964
+##  9   Argentina  Americas (Intercept)  -389.6063445  9.677729641 -40.258031
+## 10   Argentina  Americas        year     0.2317084  0.004888791  47.395847
+## # ... with 274 more rows, and 1 more variables: p.value &lt;dbl&gt;</code></pre>
+<pre class="r"><code># coef &lt;- by_country %&gt;% unnest(model %&gt;% purrr::map(broom::tidy))</code></pre>
+<p>回帰係数の傾きをみる. P値が悪いのは決定係数が悪いのとほぼ同じである.</p>
+<pre class="r"><code>coef_year &lt;- filter(coef, term==&quot;year&quot;)
+coef_year %&gt;% arrange(desc(p.value)) %&gt;% head()</code></pre>
+<pre><code>## # A tibble: 6 x 7
+##     country continent  term    estimate  std.error  statistic   p.value
+##      &lt;fctr&gt;    &lt;fctr&gt; &lt;chr&gt;       &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;
+## 1    Rwanda    Africa  year -0.04583147 0.10968601 -0.4178424 0.6848927
+## 2  Botswana    Africa  year  0.06066853 0.10222519  0.5934793 0.5660414
+## 3  Zimbabwe    Africa  year -0.09302098 0.12050968 -0.7718963 0.4580290
+## 4    Zambia    Africa  year -0.06042517 0.07574200 -0.7977764 0.4435318
+## 5 Swaziland    Africa  year  0.09507483 0.11112137  0.8555945 0.4122530
+## 6   Lesotho    Africa  year  0.09556573 0.09924409  0.9629363 0.3582864</code></pre>
+<p>全体の分布をみる.</p>
+<pre class="r"><code>coef_year %&gt;% gf_density(~estimate)</code></pre>
+<p><img src="/post/2017-09-13-gapminder_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p>大陸ごとの分布をみる.</p>
+<pre class="r"><code>coef_year %&gt;% gf_density(~estimate, group=~continent,color=~continent)</code></pre>
+<p><img src="/post/2017-09-13-gapminder_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>パネルごとにみる.</p>
+<pre class="r"><code>coef_year %&gt;% gf_density(~estimate|continent,color=~continent)</code></pre>
+<p><img src="/post/2017-09-13-gapminder_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>箱ひげ図でみる.</p>
+<pre class="r"><code>coef_year %&gt;% gf_boxplot(estimate~continent,color=~continent)</code></pre>
+<p><img src="/post/2017-09-13-gapminder_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p>表にまとめる.</p>
+<pre class="r"><code>coef_year %&gt;% group_by(continent) %&gt;%
+  summarize(mean=mean(estimate),
+            sd = sd(estimate))</code></pre>
+<pre><code>## # A tibble: 5 x 3
+##   continent      mean         sd
+##      &lt;fctr&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+## 1    Africa 0.2895293 0.17070326
+## 2  Americas 0.3676509 0.13511006
+## 3      Asia 0.4531224 0.13673199
+## 4    Europe 0.2219321 0.08297783
+## 5   Oceania 0.2102724 0.02468000</code></pre>
+<p>係数が負の国は以下の3つであるが, どれもP値は高い.</p>
+<pre class="r"><code>coef_year %&gt;% filter(estimate&lt;0) %&gt;% 
+  select(country, estimate, p.value)</code></pre>
+<pre><code>## # A tibble: 3 x 3
+##    country    estimate   p.value
+##     &lt;fctr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
+## 1   Rwanda -0.04583147 0.6848927
+## 2   Zambia -0.06042517 0.4435318
+## 3 Zimbabwe -0.09302098 0.4580290</code></pre>
+</div>
