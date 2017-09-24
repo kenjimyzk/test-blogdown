@@ -1,0 +1,75 @@
+---
+title: "ztable"
+author: "Kenji Miyazaki"
+date: '2017-09-24'
+slug: ztable
+tags: R Markdown
+categories: R
+---
+
+ここでは [ztable](https://cran.r-project.org/web/packages/ztable/index.html) というパッケージを紹介する.
+表を latex や html に変換するパッケージとして xtable が有名である.
+ztable はグループ化や色付けが簡単にできるパッケージである.
+
+まずは以下のように準備する.
+```{r}
+mat <- matrix(1:6/sum(1:6),nrow=2)
+mat <- rbind(mat, colSums(mat))
+mat <- cbind(mat, rowSums(mat))
+rownames(mat) <- c("1","2","P(X)")
+colnames(mat) <- c("1","2","3","P(Y)")
+mat
+```
+
+さて, ztableを導入する. データフレイムに変換しておいたほうが扱いやすい.
+```{r, collapse=TRUE}
+library(ztable)
+df <- as.data.frame(mat)
+```
+
+実行結果は以下である.
+```{r, results='asis'}
+tab <- ztable(df)
+print(tab,type="html")
+```
+
+罫線などは以下の様にする.
+
+```{r,results='asis'}
+print(tab,align="|c|ccc|c|",hline=2,type="html")
+```
+
+
+グループ化できる.
+```{r,results='asis'}
+tab1 <- addcgroup(tab, cgroup = c("X",""), n.cgroup=c(3,1))
+tab1 <- addrgroup(tab1, rgroup = c("Y",""), n.rgroup=c(2,1))
+print(tab1,type="html")
+```
+
+色付けが可能である.
+```{r,results='asis'}
+tab2 <- addRowColor(tab1,4,"pink")
+tab2 <- addColColor(tab2,5,"amber")
+tab2 <- addCellColor(tab2,rows=4,cols=5,"orange")
+print(tab2,type="html")
+```
+
+当然, `latex` 形式での出力も可能である. ただ `xtable` と違い, ファイル保存のコマンドがができないので次のように `capture.output` を使う.
+```{r}
+capture.output({
+  print(tab2,type="latex",tabular=TRUE)
+  }, file = "ztab.tex")
+```
+
+ファイルは [ここ](https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/ztab.tex
+) にある.
+
+もし実行させるのが Rmd ファイル でなくRスクリプトファイルなら `sink()` を使ってもよい.
+ただ日本語が含まれている場合, Windows のとき文字コードの変換が必要の場合がある.
+
+
+
+より細かい情報はヘルプにある `Vignettes` を参考にされたい:
+
+https://cran.r-project.org/web/packages/ztable/vignettes/ztable.html

@@ -6,10 +6,19 @@
     <description>Recent content in R on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja-jp</language>
-    <lastBuildDate>Sun, 10 Sep 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 24 Sep 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ztable</title>
+      <link>/2017/09/24/ztable/</link>
+      <pubDate>Sun, 24 Sep 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/09/24/ztable/</guid>
+      <description>ここでは ztable というパッケージを紹介する. 表を latex や html に変換するパッケージとして xtable が有名である. ztable はグループ化や色付けが簡単にできるパッケージであ</description>
+    </item>
     
     <item>
       <title>gf_line</title>
