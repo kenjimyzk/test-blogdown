@@ -53,7 +53,7 @@ coeftest(fm, vcov=hc)</code></pre>
 <pre class="r"><code>fm %&gt;% tidy() %&gt;% xtable() %&gt;% 
   print(include.rownames=FALSE,type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.4.1 by xtable 1.8-2 package -->
-<!-- Sat Aug 19 19:47:37 2017 -->
+<!-- Sun Nov 05 18:36:19 2017 -->
 <table border="1">
 <tr>
 <th>
@@ -111,7 +111,7 @@ speed
 <pre class="r"><code>tab1 &lt;- fm %&gt;% coeftest(vcov=hc) %&gt;% tidy()
 print(xtable(tab1),include.rownames=FALSE,type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.4.1 by xtable 1.8-2 package -->
-<!-- Sat Aug 19 19:47:37 2017 -->
+<!-- Sun Nov 05 18:36:19 2017 -->
 <table border="1">
 <tr>
 <th>
@@ -174,7 +174,7 @@ speed
 <pre class="r"><code>tab1[&quot;term&quot;] &lt;- c(&quot;定数項&quot;,&quot;速度&quot;)
 print(xtable(tab1),include.rownames=FALSE,type=&quot;html&quot;)</code></pre>
 <!-- html table generated in R 3.4.1 by xtable 1.8-2 package -->
-<!-- Sat Aug 19 19:47:37 2017 -->
+<!-- Sun Nov 05 18:36:19 2017 -->
 <table border="1">
 <tr>
 <th>
@@ -247,7 +247,7 @@ tab2 &lt;- capture.output(print(xtable(tab1),include.rownames=FALSE,type=&quot;h
   str_replace(&quot;3.93&quot;,&quot;&lt;b&gt;3.93&lt;/b&gt;&quot;)
 cat(tab2,sep=&quot;\n&quot;)</code></pre>
 <!-- html table generated in R 3.4.1 by xtable 1.8-2 package -->
-<!-- Sat Aug 19 19:47:37 2017 -->
+<!-- Sun Nov 05 18:36:20 2017 -->
 <table border="1">
 <tr>
 <th>

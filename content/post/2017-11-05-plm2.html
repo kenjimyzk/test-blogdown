@@ -1,0 +1,1041 @@
+---
+title: "plm2"
+author: "Kenji Miyazaki"
+date: '2017-11-05'
+slug: plm2
+tags:
+- R Markdown
+- plot
+categories: R
+---
+
+
+
+<div id="library" class="section level2">
+<h2>library</h2>
+<pre class="r"><code>library(tidyverse)
+library(knitr)
+library(broom)
+library(AER)
+library(plm)
+library(texreg)
+library(mosaic)</code></pre>
+</div>
+<div id="data" class="section level2">
+<h2>data</h2>
+<pre class="r"><code>data(&quot;Fatalities&quot;)
+df &lt;- Fatalities %&gt;% 
+  mutate(frate = 10000 * fatal/pop,
+         vmiles = miles/1000,
+         punish= factor(jail == &quot;yes&quot; | service == &quot;yes&quot;, labels = c(&quot;no&quot;, &quot;yes&quot;)),
+         drinkagec=relevel(
+           cut(drinkage, breaks =18:22, include.lowest = TRUE, right = FALSE), ref = 4))
+head(df) %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">state</th>
+<th align="left">year</th>
+<th align="right">spirits</th>
+<th align="right">unemp</th>
+<th align="right">income</th>
+<th align="right">emppop</th>
+<th align="right">beertax</th>
+<th align="right">baptist</th>
+<th align="right">mormon</th>
+<th align="right">drinkage</th>
+<th align="right">dry</th>
+<th align="right">youngdrivers</th>
+<th align="right">miles</th>
+<th align="left">breath</th>
+<th align="left">jail</th>
+<th align="left">service</th>
+<th align="right">fatal</th>
+<th align="right">nfatal</th>
+<th align="right">sfatal</th>
+<th align="right">fatal1517</th>
+<th align="right">nfatal1517</th>
+<th align="right">fatal1820</th>
+<th align="right">nfatal1820</th>
+<th align="right">fatal2124</th>
+<th align="right">nfatal2124</th>
+<th align="right">afatal</th>
+<th align="right">pop</th>
+<th align="right">pop1517</th>
+<th align="right">pop1820</th>
+<th align="right">pop2124</th>
+<th align="right">milestot</th>
+<th align="right">unempus</th>
+<th align="right">emppopus</th>
+<th align="right">gsp</th>
+<th align="right">frate</th>
+<th align="right">vmiles</th>
+<th align="left">punish</th>
+<th align="left">drinkagec</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">al</td>
+<td align="left">1982</td>
+<td align="right">1.37</td>
+<td align="right">14.4</td>
+<td align="right">10544.15</td>
+<td align="right">50.69204</td>
+<td align="right">1.539379</td>
+<td align="right">30.3557</td>
+<td align="right">0.32829</td>
+<td align="right">19.00</td>
+<td align="right">25.0063</td>
+<td align="right">0.211572</td>
+<td align="right">7233.887</td>
+<td align="left">no</td>
+<td align="left">no</td>
+<td align="left">no</td>
+<td align="right">839</td>
+<td align="right">146</td>
+<td align="right">99</td>
+<td align="right">53</td>
+<td align="right">9</td>
+<td align="right">99</td>
+<td align="right">34</td>
+<td align="right">120</td>
+<td align="right">32</td>
+<td align="right">309.438</td>
+<td align="right">3942002</td>
+<td align="right">208999.6</td>
+<td align="right">221553.4</td>
+<td align="right">290000.1</td>
+<td align="right">28516</td>
+<td align="right">9.7</td>
+<td align="right">57.8</td>
+<td align="right">-0.0221248</td>
+<td align="right">2.12836</td>
+<td align="right">7.233887</td>
+<td align="left">no</td>
+<td align="left">[19,20)</td>
+</tr>
+<tr class="even">
+<td align="left">al</td>
+<td align="left">1983</td>
+<td align="right">1.36</td>
+<td align="right">13.7</td>
+<td align="right">10732.80</td>
+<td align="right">52.14703</td>
+<td align="right">1.788991</td>
+<td align="right">30.3336</td>
+<td align="right">0.34341</td>
+<td align="right">19.00</td>
+<td align="right">22.9942</td>
+<td align="right">0.210768</td>
+<td align="right">7836.348</td>
+<td align="left">no</td>
+<td align="left">no</td>
+<td align="left">no</td>
+<td align="right">930</td>
+<td align="right">154</td>
+<td align="right">98</td>
+<td align="right">71</td>
+<td align="right">8</td>
+<td align="right">108</td>
+<td align="right">26</td>
+<td align="right">124</td>
+<td align="right">35</td>
+<td align="right">341.834</td>
+<td align="right">3960008</td>
+<td align="right">202000.1</td>
+<td align="right">219125.5</td>
+<td align="right">290000.2</td>
+<td align="right">31032</td>
+<td align="right">9.6</td>
+<td align="right">57.9</td>
+<td align="right">0.0465583</td>
+<td align="right">2.34848</td>
+<td align="right">7.836348</td>
+<td align="left">no</td>
+<td align="left">[19,20)</td>
+</tr>
+<tr class="odd">
+<td align="left">al</td>
+<td align="left">1984</td>
+<td align="right">1.32</td>
+<td align="right">11.1</td>
+<td align="right">11108.79</td>
+<td align="right">54.16809</td>
+<td align="right">1.714286</td>
+<td align="right">30.3115</td>
+<td align="right">0.35924</td>
+<td align="right">19.00</td>
+<td align="right">24.0426</td>
+<td align="right">0.211484</td>
+<td align="right">8262.990</td>
+<td align="left">no</td>
+<td align="left">no</td>
+<td align="left">no</td>
+<td align="right">932</td>
+<td align="right">165</td>
+<td align="right">94</td>
+<td align="right">49</td>
+<td align="right">7</td>
+<td align="right">103</td>
+<td align="right">25</td>
+<td align="right">118</td>
+<td align="right">34</td>
+<td align="right">304.872</td>
+<td align="right">3988992</td>
+<td align="right">197000.0</td>
+<td align="right">216724.1</td>
+<td align="right">288000.2</td>
+<td align="right">32961</td>
+<td align="right">7.5</td>
+<td align="right">59.5</td>
+<td align="right">0.0627978</td>
+<td align="right">2.33643</td>
+<td align="right">8.262990</td>
+<td align="left">no</td>
+<td align="left">[19,20)</td>
+</tr>
+<tr class="even">
+<td align="left">al</td>
+<td align="left">1985</td>
+<td align="right">1.28</td>
+<td align="right">8.9</td>
+<td align="right">11332.63</td>
+<td align="right">55.27114</td>
+<td align="right">1.652542</td>
+<td align="right">30.2895</td>
+<td align="right">0.37579</td>
+<td align="right">19.67</td>
+<td align="right">23.6339</td>
+<td align="right">0.211140</td>
+<td align="right">8726.917</td>
+<td align="left">no</td>
+<td align="left">no</td>
+<td align="left">no</td>
+<td align="right">882</td>
+<td align="right">146</td>
+<td align="right">98</td>
+<td align="right">66</td>
+<td align="right">9</td>
+<td align="right">100</td>
+<td align="right">23</td>
+<td align="right">114</td>
+<td align="right">45</td>
+<td align="right">276.742</td>
+<td align="right">4021008</td>
+<td align="right">194999.7</td>
+<td align="right">214349.0</td>
+<td align="right">284000.3</td>
+<td align="right">35091</td>
+<td align="right">7.2</td>
+<td align="right">60.1</td>
+<td align="right">0.0274900</td>
+<td align="right">2.19348</td>
+<td align="right">8.726917</td>
+<td align="left">no</td>
+<td align="left">[19,20)</td>
+</tr>
+<tr class="odd">
+<td align="left">al</td>
+<td align="left">1986</td>
+<td align="right">1.23</td>
+<td align="right">9.8</td>
+<td align="right">11661.51</td>
+<td align="right">56.51450</td>
+<td align="right">1.609907</td>
+<td align="right">30.2674</td>
+<td align="right">0.39311</td>
+<td align="right">21.00</td>
+<td align="right">23.4647</td>
+<td align="right">0.213400</td>
+<td align="right">8952.854</td>
+<td align="left">no</td>
+<td align="left">no</td>
+<td align="left">no</td>
+<td align="right">1081</td>
+<td align="right">172</td>
+<td align="right">119</td>
+<td align="right">82</td>
+<td align="right">10</td>
+<td align="right">120</td>
+<td align="right">23</td>
+<td align="right">119</td>
+<td align="right">29</td>
+<td align="right">360.716</td>
+<td align="right">4049994</td>
+<td align="right">203999.9</td>
+<td align="right">212000.0</td>
+<td align="right">263000.3</td>
+<td align="right">36259</td>
+<td align="right">7.0</td>
+<td align="right">60.7</td>
+<td align="right">0.0321429</td>
+<td align="right">2.66914</td>
+<td align="right">8.952853</td>
+<td align="left">no</td>
+<td align="left">[21,22]</td>
+</tr>
+<tr class="even">
+<td align="left">al</td>
+<td align="left">1987</td>
+<td align="right">1.18</td>
+<td align="right">7.8</td>
+<td align="right">11944.00</td>
+<td align="right">57.50988</td>
+<td align="right">1.560000</td>
+<td align="right">30.2453</td>
+<td align="right">0.41123</td>
+<td align="right">21.00</td>
+<td align="right">23.7924</td>
+<td align="right">0.215527</td>
+<td align="right">9166.302</td>
+<td align="left">no</td>
+<td align="left">no</td>
+<td align="left">no</td>
+<td align="right">1110</td>
+<td align="right">181</td>
+<td align="right">114</td>
+<td align="right">94</td>
+<td align="right">11</td>
+<td align="right">127</td>
+<td align="right">31</td>
+<td align="right">138</td>
+<td align="right">30</td>
+<td align="right">368.421</td>
+<td align="right">4082999</td>
+<td align="right">204999.8</td>
+<td align="right">208998.5</td>
+<td align="right">258999.8</td>
+<td align="right">37426</td>
+<td align="right">6.2</td>
+<td align="right">61.5</td>
+<td align="right">0.0489764</td>
+<td align="right">2.71859</td>
+<td align="right">9.166302</td>
+<td align="left">no</td>
+<td align="left">[21,22]</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="for-comparability-with-stata-we-use-hc1-below" class="section level2">
+<h2>for comparability with Stata we use HC1 below</h2>
+<div id="p.351-eq.-10.2" class="section level3">
+<h3>p. 351, Eq. (10.2)</h3>
+<pre class="r"><code>df1982 &lt;- df %&gt;% filter(year==&quot;1982&quot;) 
+fm1982 &lt;- lm(frate ~beertax, data = df1982)
+coeftest(fm1982, vcov = vcovHC(fm1982, type = &quot;HC1&quot;)) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">2.0103813</td>
+<td align="right">0.1495728</td>
+<td align="right">13.440824</td>
+<td align="right">0.000000</td>
+</tr>
+<tr class="even">
+<td align="left">beertax</td>
+<td align="right">0.1484604</td>
+<td align="right">0.1326054</td>
+<td align="right">1.119565</td>
+<td align="right">0.268711</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>plotModel(fm1982)</code></pre>
+<p><img src="/post/2017-11-05-plm2_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="p.351-eq.-10.2-1" class="section level3">
+<h3>p. 351, Eq. (10.2)</h3>
+<pre class="r"><code>df1988 &lt;- df %&gt;% filter(year==&quot;1988&quot;) 
+fm1988 &lt;- lm(frate ~beertax, data = df1988)
+coeftest(fm1988, vcov = vcovHC(fm1988,type = &quot;HC1&quot;)) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">1.8590729</td>
+<td align="right">0.1146124</td>
+<td align="right">16.220528</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">beertax</td>
+<td align="right">0.4387546</td>
+<td align="right">0.1278649</td>
+<td align="right">3.431391</td>
+<td align="right">0.0012791</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>plotModel(fm1988)</code></pre>
+<p><img src="/post/2017-11-05-plm2_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>fn1988 &lt;-makeFun(fm1988)</code></pre>
+</div>
+<div id="pp.355-eq.-10.8" class="section level3">
+<h3>pp. 355, Eq. (10.8)</h3>
+<pre class="r"><code>df1982 &lt;- df %&gt;% filter(year==&quot;1982&quot;) %&gt;% select(frate,beertax,state)
+df1988 &lt;- df %&gt;% filter(year==&quot;1988&quot;) %&gt;% select(frate,beertax,state)
+df8288 &lt;- full_join(df1982,df1988,by=&quot;state&quot;) %&gt;%
+  mutate(dfrate = frate.y-frate.x, dbeertax = beertax.y-beertax.x)
+fm8288 &lt;- lm(dfrate ~ dbeertax, data = df8288)
+fm8288 %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-0.0720371</td>
+<td align="right">0.0606440</td>
+<td align="right">-1.187868</td>
+<td align="right">0.2409827</td>
+</tr>
+<tr class="even">
+<td align="left">dbeertax</td>
+<td align="right">-1.0409727</td>
+<td align="right">0.4172279</td>
+<td align="right">-2.494974</td>
+<td align="right">0.0162485</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>plotModel(fm8288)</code></pre>
+<p><img src="/post/2017-11-05-plm2_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>fm_diff &lt;- df %&gt;% filter(year==&quot;1982&quot;|year==&quot;1988&quot;) %&gt;%
+  plm(frate ~ beertax, data = ., index = c(&quot;state&quot;, &quot;year&quot;),model = &quot;fd&quot;)
+coeftest(fm_diff) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(intercept)</td>
+<td align="right">-0.0720371</td>
+<td align="right">0.0606440</td>
+<td align="right">-1.187868</td>
+<td align="right">0.2409827</td>
+</tr>
+<tr class="even">
+<td align="left">beertax</td>
+<td align="right">-1.0409727</td>
+<td align="right">0.4172279</td>
+<td align="right">-2.494974</td>
+<td align="right">0.0162485</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="p.368-table-10.1-numbers-refer-to-cols." class="section level2">
+<h2>p. 368, Table 10.1, numbers refer to cols.</h2>
+<pre class="r"><code>fm1 &lt;- plm(frate ~ beertax, data = df, index = c(&quot;state&quot;, &quot;year&quot;), model = &quot;pooling&quot;)
+fm2 &lt;- update(fm1, model = &quot;within&quot;)
+fm3 &lt;- update(fm2, effect = &quot;twoways&quot;)
+fm4 &lt;- update(fm3, . ~ . + drinkagec + punish + vmiles + unemp + log(income))
+fm5 &lt;- update(fm4, . ~ . - unemp - log(income))
+fm6 &lt;- update(fm4, . ~ . - drinkagec + drinkage)</code></pre>
+<pre class="r"><code>ll&lt;-list(fm1,fm2,fm3,fm4,fm5,fm6)
+vcovHCC &lt;- function(fm) {
+  G &lt;- length(unique(Fatalities$state))
+  N &lt;- length(Fatalities$state)
+  dfa &lt;-(G/(G - 1)) * (N - 1)/(fm$df.residual+G)
+  return(dfa*vcovHC(fm, cluster=&quot;group&quot;, type=&quot;HC0&quot;))
+}  
+selist &lt;- ll %&gt;% map(~coeftest(.,vcovHCC)[,2])
+pvlist &lt;- ll %&gt;% map(~coeftest(.,vcovHCC)[,4])
+selist[[1]] &lt;- coeftest(fm1)[,2]
+pvlist[[1]] &lt;- coeftest(fm1)[,4]
+htmlreg(ll, override.se=selist,override.pvalues=pvlist,omit.coef = &quot;(Intercept)&quot;,
+        reorder.coef = c(1:4,9,5:8),digits = 3)</code></pre>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<table cellspacing="0" align="center" style="border: none;">
+<caption align="bottom" style="margin-top:0.3em;">
+Statistical models
+</caption>
+<tr>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b></b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 1</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 2</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 3</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 4</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 5</b>
+</th>
+<th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;">
+<b>Model 6</b>
+</th>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+beertax
+</td>
+<td style="padding-right: 12px; border: none;">
+0.365<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.656<sup style="vertical-align: 0px;">*</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.640
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.445
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.690
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.456
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.062)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.291)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.357)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.297)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.352)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.307)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+drinkagec[18,19)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+0.028
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.010
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.070)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.083)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+drinkagec[19,20)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.018
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.076
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.050)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.068)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+drinkagec[20,21)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+0.032
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.100
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.051)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.056)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+drinkage
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.002
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.022)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+punishyes
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+0.038
+</td>
+<td style="padding-right: 12px; border: none;">
+0.085
+</td>
+<td style="padding-right: 12px; border: none;">
+0.039
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.103)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.112)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.103)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+vmiles
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+0.008
+</td>
+<td style="padding-right: 12px; border: none;">
+0.017
+</td>
+<td style="padding-right: 12px; border: none;">
+0.009
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.007)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.011)
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.007)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+unemp
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.063<sup style="vertical-align: 0px;">***</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.063<sup style="vertical-align: 0px;">***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.013)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.013)
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+log(income)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+1.816<sup style="vertical-align: 0px;">**</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+1.786<sup style="vertical-align: 0px;">**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.636)
+</td>
+<td style="padding-right: 12px; border: none;">
+</td>
+<td style="padding-right: 12px; border: none;">
+(0.643)
+</td>
+</tr>
+<tr>
+<td style="border-top: 1px solid black;">
+R<sup style="vertical-align: 0px;">2</sup>
+</td>
+<td style="border-top: 1px solid black;">
+0.093
+</td>
+<td style="border-top: 1px solid black;">
+0.041
+</td>
+<td style="border-top: 1px solid black;">
+0.036
+</td>
+<td style="border-top: 1px solid black;">
+0.360
+</td>
+<td style="border-top: 1px solid black;">
+0.066
+</td>
+<td style="border-top: 1px solid black;">
+0.357
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;">
+Adj. R<sup style="vertical-align: 0px;">2</sup>
+</td>
+<td style="padding-right: 12px; border: none;">
+0.091
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.120
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.149
+</td>
+<td style="padding-right: 12px; border: none;">
+0.217
+</td>
+<td style="padding-right: 12px; border: none;">
+-0.134
+</td>
+<td style="padding-right: 12px; border: none;">
+0.219
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid black;">
+Num. obs.
+</td>
+<td style="border-bottom: 2px solid black;">
+336
+</td>
+<td style="border-bottom: 2px solid black;">
+336
+</td>
+<td style="border-bottom: 2px solid black;">
+336
+</td>
+<td style="border-bottom: 2px solid black;">
+335
+</td>
+<td style="border-bottom: 2px solid black;">
+335
+</td>
+<td style="border-bottom: 2px solid black;">
+335
+</td>
+</tr>
+<tr>
+<td style="padding-right: 12px; border: none;" colspan="8">
+<span style="font-size:0.8em"><sup style="vertical-align: 0px;"><em><strong></sup>p &lt; 0.001, <sup style="vertical-align: 0px;"></strong></sup>p &lt; 0.01, <sup style="vertical-align: 0px;"></em></sup>p &lt; 0.05</span>
+</td>
+</tr>
+</table>
+<pre class="r"><code>fm7 &lt;- df %&gt;% filter(year==1982|year==1988) %&gt;% 
+  lm(frate ~ beertax + drinkagec + punish + vmiles + unemp + log(income) + state + year,.)
+coeftest(fm7, vcovHC(fm7 ,type=&quot;HC1&quot;)) %&gt;% tidy() %&gt;% head(9)</code></pre>
+<pre><code>##               term    estimate  std.error  statistic      p.value
+## 1      (Intercept) -5.24571226 7.00269819 -0.7490987 0.4584099638
+## 2          beertax -0.92560284 0.36055834 -2.5671375 0.0143148699
+## 3 drinkagec[18,19)  0.03744951 0.10773747  0.3475997 0.7300589040
+## 4 drinkagec[19,20) -0.06488482 0.10375259 -0.6253802 0.5354595137
+## 5 drinkagec[20,21) -0.11265975 0.13170612 -0.8553874 0.3976981262
+## 6        punishyes  0.08904197 0.17255222  0.5160292 0.6088238606
+## 7           vmiles  0.12435007 0.05131170  2.4234252 0.0202459114
+## 8            unemp -0.09078230 0.02196733 -4.1326049 0.0001901589
+## 9      log(income)  0.99551324 0.71271907  1.3967821 0.1705839089</code></pre>
+<pre class="r"><code>fm2a &lt;- lm(frate ~ beertax + state, df)
+fm3a &lt;- update(fm2a, . ~ . + year)
+fm4a &lt;- update(fm3a, . ~ . + drinkagec + punish + vmiles + unemp + log(income))
+fm5a &lt;- update(fm4a, . ~ . - unemp - log(income))
+fm6a &lt;- update(fm4a, . ~ . - drinkagec + drinkage)
+fmlist &lt;- list(fm2a, fm3a, fm4a, fm5a, fm6a, fm7)
+fmlist %&gt;% map(summary) %&gt;% map_dbl(&quot;adj.r.squared&quot;)</code></pre>
+<pre><code>## [1] 0.8891286 0.8914250 0.9260149 0.8928436 0.9261851 0.8986838</code></pre>
+<pre class="r"><code>drinkagetest &lt;- function(fm){
+  waldtest(update(fm,.~.-drinkagec),fm,vcov=vcovHCC(fm),test=&quot;F&quot;)
+}
+drinkagetest(fm4)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: frate ~ beertax + punish + vmiles + unemp + log(income)
+## Model 2: frate ~ beertax + drinkagec + punish + vmiles + unemp + log(income)
+##   Res.Df Df      F Pr(&gt;F)
+## 1    276                 
+## 2    273  3 0.3548 0.7857</code></pre>
+<pre class="r"><code>drinkagetest(fm5)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: frate ~ beertax + punish + vmiles
+## Model 2: frate ~ beertax + drinkagec + punish + vmiles
+##   Res.Df Df      F Pr(&gt;F)
+## 1    278                 
+## 2    275  3 1.4062 0.2412</code></pre>
+<pre class="r"><code>unemptest &lt;- function(fm){
+  waldtest(update(fm,.~.-unemp - log(income)),fm,vcov=vcovHCC(fm),test=&quot;F&quot;)
+}
+unemptest(fm4)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: frate ~ beertax + drinkagec + punish + vmiles
+## Model 2: frate ~ beertax + drinkagec + punish + vmiles + unemp + log(income)
+##   Res.Df Df      F    Pr(&gt;F)    
+## 1    275                        
+## 2    273  2 29.627 2.267e-12 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>unemptest(fm6)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: frate ~ beertax + punish + vmiles + drinkage
+## Model 2: frate ~ beertax + punish + vmiles + unemp + log(income) + drinkage
+##   Res.Df Df      F    Pr(&gt;F)    
+## 1    277                        
+## 2    275  2 31.966 3.295e-13 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>timeeffect &lt;- function(fm) {
+  fmb &lt;- update(fm, effect = &quot;individual&quot;)
+  fmc &lt;- update(fmb, .~.+factor(year))
+  waldtest(fmb,fmc,vcov=vcovHCC(fmc),test=&quot;F&quot;)
+}
+
+timeeffect(fm3)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: frate ~ beertax
+## Model 2: frate ~ beertax + factor(year)
+##   Res.Df Df      F    Pr(&gt;F)    
+## 1    287                        
+## 2    281  6 4.2315 0.0004264 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>timeeffect(fm4)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: frate ~ beertax + drinkagec + punish + vmiles + unemp + log(income)
+## Model 2: frate ~ beertax + drinkagec + punish + vmiles + unemp + log(income) + 
+##     factor(year)
+##   Res.Df Df      F  Pr(&gt;F)    
+## 1    279                      
+## 2    273  6 10.118 4.2e-10 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>timeeffect(fm5)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: frate ~ beertax + drinkagec + punish + vmiles
+## Model 2: frate ~ beertax + drinkagec + punish + vmiles + factor(year)
+##   Res.Df Df      F   Pr(&gt;F)   
+## 1    281                      
+## 2    275  6 3.4802 0.002477 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>timeeffect(fm6)</code></pre>
+<pre><code>## Wald test
+## 
+## Model 1: frate ~ beertax + punish + vmiles + unemp + log(income) + drinkage
+## Model 2: frate ~ beertax + punish + vmiles + unemp + log(income) + drinkage + 
+##     factor(year)
+##   Res.Df Df      F    Pr(&gt;F)    
+## 1    281                        
+## 2    275  6 10.277 2.871e-10 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>

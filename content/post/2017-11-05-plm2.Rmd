@@ -1,0 +1,158 @@
+---
+title: "plm2"
+author: "Kenji Miyazaki"
+date: '2017-11-05'
+slug: plm2
+tags:
+- R Markdown
+- plot
+categories: R
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## library
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(knitr)
+library(broom)
+library(AER)
+library(plm)
+library(texreg)
+library(mosaic)
+```
+
+## data
+```{r}
+data("Fatalities")
+df <- Fatalities %>% 
+  mutate(frate = 10000 * fatal/pop,
+         vmiles = miles/1000,
+         punish= factor(jail == "yes" | service == "yes", labels = c("no", "yes")),
+         drinkagec=relevel(
+           cut(drinkage, breaks =18:22, include.lowest = TRUE, right = FALSE), ref = 4))
+head(df) %>% kable()
+```
+
+## for comparability with Stata we use HC1 below
+### p. 351, Eq. (10.2)
+```{r}
+df1982 <- df %>% filter(year=="1982") 
+fm1982 <- lm(frate ~beertax, data = df1982)
+coeftest(fm1982, vcov = vcovHC(fm1982, type = "HC1")) %>% tidy() %>% kable()
+```
+
+```{r}
+plotModel(fm1982)
+```
+
+
+### p. 351, Eq. (10.2)
+```{r}
+df1988 <- df %>% filter(year=="1988") 
+fm1988 <- lm(frate ~beertax, data = df1988)
+coeftest(fm1988, vcov = vcovHC(fm1988,type = "HC1")) %>% tidy() %>% kable()
+```
+
+```{r}
+plotModel(fm1988)
+fn1988 <-makeFun(fm1988)
+```
+
+
+### pp. 355, Eq. (10.8)
+```{r}
+df1982 <- df %>% filter(year=="1982") %>% select(frate,beertax,state)
+df1988 <- df %>% filter(year=="1988") %>% select(frate,beertax,state)
+df8288 <- full_join(df1982,df1988,by="state") %>%
+  mutate(dfrate = frate.y-frate.x, dbeertax = beertax.y-beertax.x)
+fm8288 <- lm(dfrate ~ dbeertax, data = df8288)
+fm8288 %>% tidy() %>% kable()
+```
+
+```{r}
+plotModel(fm8288)
+```
+
+
+```{r}
+fm_diff <- df %>% filter(year=="1982"|year=="1988") %>%
+  plm(frate ~ beertax, data = ., index = c("state", "year"),model = "fd")
+coeftest(fm_diff) %>% tidy() %>% kable()
+```
+
+
+## p. 368, Table 10.1, numbers refer to cols.
+```{r}
+fm1 <- plm(frate ~ beertax, data = df, index = c("state", "year"), model = "pooling")
+fm2 <- update(fm1, model = "within")
+fm3 <- update(fm2, effect = "twoways")
+fm4 <- update(fm3, . ~ . + drinkagec + punish + vmiles + unemp + log(income))
+fm5 <- update(fm4, . ~ . - unemp - log(income))
+fm6 <- update(fm4, . ~ . - drinkagec + drinkage)
+```
+
+```{r results='asis'}
+ll<-list(fm1,fm2,fm3,fm4,fm5,fm6)
+vcovHCC <- function(fm) {
+  G <- length(unique(Fatalities$state))
+  N <- length(Fatalities$state)
+  dfa <-(G/(G - 1)) * (N - 1)/(fm$df.residual+G)
+  return(dfa*vcovHC(fm, cluster="group", type="HC0"))
+}  
+selist <- ll %>% map(~coeftest(.,vcovHCC)[,2])
+pvlist <- ll %>% map(~coeftest(.,vcovHCC)[,4])
+selist[[1]] <- coeftest(fm1)[,2]
+pvlist[[1]] <- coeftest(fm1)[,4]
+htmlreg(ll, override.se=selist,override.pvalues=pvlist,omit.coef = "(Intercept)",
+        reorder.coef = c(1:4,9,5:8),digits = 3)
+```
+
+```{r}
+fm7 <- df %>% filter(year==1982|year==1988) %>% 
+  lm(frate ~ beertax + drinkagec + punish + vmiles + unemp + log(income) + state + year,.)
+coeftest(fm7, vcovHC(fm7 ,type="HC1")) %>% tidy() %>% head(9)
+```
+
+```{r}
+fm2a <- lm(frate ~ beertax + state, df)
+fm3a <- update(fm2a, . ~ . + year)
+fm4a <- update(fm3a, . ~ . + drinkagec + punish + vmiles + unemp + log(income))
+fm5a <- update(fm4a, . ~ . - unemp - log(income))
+fm6a <- update(fm4a, . ~ . - drinkagec + drinkage)
+fmlist <- list(fm2a, fm3a, fm4a, fm5a, fm6a, fm7)
+fmlist %>% map(summary) %>% map_dbl("adj.r.squared")
+```
+
+```{r}
+drinkagetest <- function(fm){
+  waldtest(update(fm,.~.-drinkagec),fm,vcov=vcovHCC(fm),test="F")
+}
+drinkagetest(fm4)
+drinkagetest(fm5)
+```
+
+```{r}
+unemptest <- function(fm){
+  waldtest(update(fm,.~.-unemp - log(income)),fm,vcov=vcovHCC(fm),test="F")
+}
+unemptest(fm4)
+unemptest(fm6)
+```
+
+```{r}
+timeeffect <- function(fm) {
+  fmb <- update(fm, effect = "individual")
+  fmc <- update(fmb, .~.+factor(year))
+  waldtest(fmb,fmc,vcov=vcovHCC(fmc),test="F")
+}
+
+timeeffect(fm3)
+timeeffect(fm4)
+timeeffect(fm5)
+timeeffect(fm6)
+```
+

@@ -6,10 +6,19 @@
     <description>Recent content in R on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja-jp</language>
-    <lastBuildDate>Sun, 24 Sep 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 05 Nov 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>plm2</title>
+      <link>/2017/11/05/plm2/</link>
+      <pubDate>Sun, 05 Nov 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/11/05/plm2/</guid>
+      <description>librarylibrary(tidyverse)library(knitr)library(broom)library(AER)library(plm)library(texreg)library(mosaic)datadata(&amp;quot;Fatalities&amp;quot;)df &amp;lt;- Fatalities %&amp;gt;% mutate(frate = 10000 * fatal/pop,vmiles = miles/1000,punish= factor(jail == &amp;quot;yes&amp;quot; | service == &amp;quot;yes&amp;quot;, labels = c(&amp;quot;no&amp;quot;, &amp;quot;yes&amp;quot;)),drinkagec=relevel(cut(drinkage, breaks =18:22, include.lowest = TRUE, right = FALSE), ref = 4))head(df) %&amp;gt;% kable()stateyearspiritsunempincomeemppopbeertaxbaptistmormondrinkagedryyoungdriversmilesbreathjailservicefatalnfatalsfatalfatal1517nfatal1517fatal1820nfatal1820fatal2124nfatal2124afatalpoppop1517pop1820pop2124milestotunempusemppopusgspfratevmilespunishdrinkagecal19821.</description>
+    </item>
     
     <item>
       <title>ztable</title>
@@ -161,7 +170,7 @@
       <pubDate>Thu, 01 Jun 2017 00:00:00 +0000</pubDate>
       
       <guid>/2017/06/01/rnorm/</guid>
-      <description>ここで例を示す. (x&amp;lt;-rnorm(10)) ## [1] -1.2345044 -0.8173068 0.6888094 1.3621511 1.3997573 -0.6611807 ## [7] -1.4918297 -0.5168402 -0.4478023 -2.6745733 (y&amp;lt;-rnorm(10)) ## [1] -1.1238749 1.0458130 0.6400722 0.1788965 -0.8416527 0.3151544 ## [7] -0.1275523 0.1411757 0.3041461 -0.1065094 作図すると以下になる. plot(x,y)</description>
+      <description>ここで例を示す. (x&amp;lt;-rnorm(10)) ## [1] -0.17422806 -0.28278541 0.74050885 1.24135693 -0.24060728 ## [6] -0.22731567 2.30229004 0.48709020 -0.01152155 1.19819999 (y&amp;lt;-rnorm(10)) ## [1] 0.86600163 0.02958411 -1.05443988 0.80291166 0.11582664 ## [6] 0.06595717 -2.88002246 0.73635879 0.28766829 0.28251751 作図すると以下になる. plot(x,y)</description>
     </item>
     
     <item>

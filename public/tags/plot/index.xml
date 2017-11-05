@@ -6,10 +6,19 @@
     <description>Recent content in Plot on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja-jp</language>
-    <lastBuildDate>Sat, 05 Aug 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 05 Nov 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/plot/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>plm2</title>
+      <link>/2017/11/05/plm2/</link>
+      <pubDate>Sun, 05 Nov 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/11/05/plm2/</guid>
+      <description>librarylibrary(tidyverse)library(knitr)library(broom)library(AER)library(plm)library(texreg)library(mosaic)datadata(&amp;quot;Fatalities&amp;quot;)df &amp;lt;- Fatalities %&amp;gt;% mutate(frate = 10000 * fatal/pop,vmiles = miles/1000,punish= factor(jail == &amp;quot;yes&amp;quot; | service == &amp;quot;yes&amp;quot;, labels = c(&amp;quot;no&amp;quot;, &amp;quot;yes&amp;quot;)),drinkagec=relevel(cut(drinkage, breaks =18:22, include.lowest = TRUE, right = FALSE), ref = 4))head(df) %&amp;gt;% kable()stateyearspiritsunempincomeemppopbeertaxbaptistmormondrinkagedryyoungdriversmilesbreathjailservicefatalnfatalsfatalfatal1517nfatal1517fatal1820nfatal1820fatal2124nfatal2124afatalpoppop1517pop1820pop2124milestotunempusemppopusgspfratevmilespunishdrinkagecal19821.</description>
+    </item>
     
     <item>
       <title>ggformula</title>
