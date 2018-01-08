@@ -1,0 +1,143 @@
+---
+title: texreg again
+author: Kenji Miyazaki
+date: '2018-01-08'
+slug: texreg-again
+categories: []
+tags: []
+---
+
+http://miyazakikenji.netlify.com/2017/08/02/texreg/
+
+を少し修正する.
+
+ライブラリ AER データ を用いる.
+```{r, message=FALSE, warning=FALSE}
+library(AER)
+data("CASchools", package = "AER")
+```
+
+データ加工したうえで幾つか選択する.
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(knitr)
+df <- CASchools %>% 
+  mutate(stratio=students/teachers,score=(math+read)/2) %>%
+  select(score,stratio,english,lunch,calworks)
+df %>% head() %>% kable()
+```
+
+日本語での統計表は次のようにする.
+```{r}
+library(tidyr)
+df %>% gather(key = variables, values) %>%
+  group_by(variables) %>%
+  summarize(`観測数` = n(),
+               `平均` = mean(values),
+               `標準偏差` = sd(values),
+               `最小値` = min(values),
+               `最大値` = max(values)) %>%
+  rename(`変数` = variables) %>% kable()
+```
+
+単回帰モデルは以下のとおりである.
+```{r}
+library(broom)
+fm1 <- lm(score ~ stratio, data = df)
+fm1 %>% tidy() %>% kable()
+```
+
+ロバスト分散は次のようにする.
+```{r}
+fm1 %>% coeftest(.,vcov=vcovHC(.,type="HC1")) %>%
+  tidy() %>% kable()
+```
+
+
+他の回帰分析を実行する.
+```{r}
+fm2 <- update(fm1, . ~ .  + english)
+fm3 <- update(fm2, . ~ .  + lunch)
+fm4 <- update(fm2, . ~ .  + calworks)
+fm5 <- update(fm2, . ~ .  + lunch + calworks)
+```
+
+https://github.com/leifeld/texreg/
+```{r message=FALSE, warning=FALSE}
+library(texreg)
+```
+
+画面は次のようになる.
+```{r results='asis'}
+ll <- list(fm1,fm2,fm3,fm4,fm5)
+htmlreg(ll)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(purrr)
+```
+
+
+ロバスト分散を指定すると次のようになる.
+```{r results='asis'}
+selist <- ll %>% map(~{
+  coeftest(.,vcov=vcovHC(.,type="HC1")) %>% tidy() %>% .$std.error})
+pvlist <- ll %>% map(~{
+  coeftest(.,vcov=vcovHC(.,type="HC1")) %>% tidy() %>% .$p.value})
+
+htmlreg(ll, override.se=selist,override.pvalues=pvlist)
+```
+
+0.1%有意水準を使わないように指定し, 注釈をつける.
+
+```{r results='asis'}
+cn = "係数下の括弧内はロバスト標準誤差を表す. 各係数の統計的な有意性は両側検定にもとづいてテストされる. 個々の係数は, 5%水準 (*), 1%水準 (**) でそれぞれ有意."
+
+htmlreg(ll, stars = c(0.05, 0.01), custom.note = cn,
+        override.se = selist,override.pvalues = pvlist)
+```
+
+係数の順序を変更
+```{r results='asis'}
+htmlreg(ll, reorder.coef = c(2, 3, 4, 5, 1),
+          stars = c(0.05, 0.01), custom.note = cn,
+          override.se = selist,override.pvalues = pvlist)
+```
+
+決定係数を表示しないように指定し, 統計量の順序を変更する.
+```{r results='asis'}
+htmlreg(ll, reorder.coef = c(2, 3, 4, 5, 1),
+          include.rsquared = FALSE, reorder.gof = c(3, 1, 2),
+           stars = c(0.05, 0.01), custom.note = cn,
+           override.se=selist,override.pvalues = pvlist)
+```
+
+名前を変更する.
+```{r results='asis'}
+cnm = c("(1)","(2)","(3)","(4)","(5)")
+cgn = c("調整済み決定係数","観測数","SER")
+ccn = c("切片","教員一人あたり学生数","英語学習者割合","昼食補助者割合","所得支援家計")
+htmlreg(ll, custom.model.names = cnm, 
+        custom.coef.names = ccn, reorder.coef = c(2, 3, 4, 5, 1),
+        include.rsquared = FALSE, 
+        custom.gof.names = cgn, reorder.gof = c(3, 1, 2),
+        stars = c(0.05, 0.01),  custom.note = cn, 
+        override.se = selist,override.pvalues = pvlist)
+```
+
+tex形式で保存する. 脚注のコメントの `%` を `\\%` に変更している.
+```{r}
+cn = "係数下の括弧内はロバスト標準誤差を表す. 各係数の統計的な有意性は両側検定にもとづいてテストされる. 個々の係数は, 5\\%水準 (*), 1\\%水準 (**) でそれぞれ有意."
+p <- texreg(ll, table = FALSE, custom.model.names = cnm, 
+        custom.coef.names = ccn, reorder.coef = c(2, 3, 4, 5, 1),
+        include.rsquared = FALSE, 
+        custom.gof.names = cgn, reorder.gof = c(3, 1, 2),
+        stars = c(0.05, 0.01),  custom.note = cn, 
+        override.se = selist,override.pvalues = pvlist)
+fout <- file("tab4.tex", encoding = "UTF8")
+write(p, file=fout)
+close(fout)
+```
+
+ファイルは [ここ](https://github.com/kenjimyzk/test-blogdown/blob/master/content/post/tab4.tex
+) にある.
