@@ -6,18 +6,18 @@
     <description>Recent content on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja-jp</language>
-    <lastBuildDate>Sun, 05 Nov 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 08 Jan 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>panel2</title>
-      <link>/2017/11/05/panel2/</link>
-      <pubDate>Sun, 05 Nov 2017 00:00:00 +0000</pubDate>
+      <title>texreg again</title>
+      <link>/2018/01/08/texreg-again/</link>
+      <pubDate>Mon, 08 Jan 2018 00:00:00 +0000</pubDate>
       
-      <guid>/2017/11/05/panel2/</guid>
-      <description></description>
+      <guid>/2018/01/08/texreg-again/</guid>
+      <description>http://miyazakikenji.netlify.com/2017/08/02/texreg/ を少し修正する. ライブラリ AER データ を用いる. library(AER) data(&amp;quot;CASchools&amp;quot;, package = &amp;quot;AER&amp;quot;) データ加工したうえで幾つか選択する. library(tidyverse) library(knitr) df &amp;lt;- CASchools %&amp;gt;% mutate(stratio=students/teachers,score=(math+read)/2) %&amp;gt;% select(score,stratio,english,lunch,calworks) df %&amp;gt;% head() %&amp;gt;% kable() score stratio english lunch calworks 690.80 17.88991 0.000000 2.0408 0.5102</description>
     </item>
     
     <item>
@@ -224,7 +224,7 @@
       <pubDate>Thu, 01 Jun 2017 00:00:00 +0000</pubDate>
       
       <guid>/2017/06/01/rnorm/</guid>
-      <description>ここで例を示す. (x&amp;lt;-rnorm(10)) ## [1] -0.17422806 -0.28278541 0.74050885 1.24135693 -0.24060728 ## [6] -0.22731567 2.30229004 0.48709020 -0.01152155 1.19819999 (y&amp;lt;-rnorm(10)) ## [1] 0.86600163 0.02958411 -1.05443988 0.80291166 0.11582664 ## [6] 0.06595717 -2.88002246 0.73635879 0.28766829 0.28251751 作図すると以下になる. plot(x,y)</description>
+      <description>ここで例を示す. (x&amp;lt;-rnorm(10)) ## [1] -0.6686714 -0.4662474 0.2598043 0.2166866 1.9456440 1.0268205 ## [7] -1.1301435 0.5711642 0.2741013 0.5728548 (y&amp;lt;-rnorm(10)) ## [1] -0.650490428 0.659497165 0.132000891 -0.007939512 0.790269970 ## [6] -0.301666107 0.368073030 1.228006602 0.845902507 1.464367774 作図すると以下になる. plot(x,y)</description>
     </item>
     
     <item>
@@ -233,7 +233,7 @@
       <pubDate>Sat, 27 May 2017 00:00:00 +0000</pubDate>
       
       <guid>/2017/05/27/ols/</guid>
-      <description>library(mosaic) ## 要求されたパッケージ dplyr をロード中です ## Warning: パッケージ &amp;#39;dplyr&amp;#39; はバージョン 3.4.2 の R の下で造られました ## ## 次のパッケージを付け加えます: &amp;#39;dplyr&amp;#39; ## 以下のオブ</description>
+      <description>library(mosaic) ## Warning: パッケージ &amp;#39;mosaic&amp;#39; はバージョン 3.4.3 の R の下で造られました ## 要求されたパッケージ dplyr をロード中です ## ## 次のパッケージを付け加えます: &amp;#39;dplyr&amp;#39; ## 以下のオブ</description>
     </item>
     
     <item>
@@ -243,7 +243,7 @@
       
       <guid>/2017/05/27/test/</guid>
       <description>This is a test.
-rnorm(10)## [1] -0.60865459 1.19400910 -1.34013743 1.51236934 1.73843374## [6] -0.04811727 0.59800930 1.20550285 0.25181612 0.04134643</description>
+rnorm(10)## [1] 1.5166319 -0.2440452 1.0729870 0.5259641 -1.8127523 0.6852279## [7] -0.6526763 1.6683641 1.4944270 -1.1124634</description>
     </item>
     
     <item>

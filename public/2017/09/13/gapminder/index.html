@@ -59,7 +59,7 @@
 
   <article class="article">
     
-    <span class="article-duration">2 min read</span>
+    <span class="article-duration">3 min read</span>
     
 
     <h1 class="article-title">gapminder</h1>
@@ -116,14 +116,14 @@ jp %&gt;% add_residuals(jp_mod) %&gt;%
 <pre class="r"><code>by_country &lt;- gapminder %&gt;% nest(-country, -continent)
 head(by_country)</code></pre>
 <pre><code>## # A tibble: 6 x 3
-##       country continent              data
-##        &lt;fctr&gt;    &lt;fctr&gt;            &lt;list&gt;
-## 1 Afghanistan      Asia &lt;tibble [12 x 4]&gt;
-## 2     Albania    Europe &lt;tibble [12 x 4]&gt;
-## 3     Algeria    Africa &lt;tibble [12 x 4]&gt;
-## 4      Angola    Africa &lt;tibble [12 x 4]&gt;
-## 5   Argentina  Americas &lt;tibble [12 x 4]&gt;
-## 6   Australia   Oceania &lt;tibble [12 x 4]&gt;</code></pre>
+##   country     continent data             
+##   &lt;fctr&gt;      &lt;fctr&gt;    &lt;list&gt;           
+## 1 Afghanistan Asia      &lt;tibble [12 x 4]&gt;
+## 2 Albania     Europe    &lt;tibble [12 x 4]&gt;
+## 3 Algeria     Africa    &lt;tibble [12 x 4]&gt;
+## 4 Angola      Africa    &lt;tibble [12 x 4]&gt;
+## 5 Argentina   Americas  &lt;tibble [12 x 4]&gt;
+## 6 Australia   Oceania   &lt;tibble [12 x 4]&gt;</code></pre>
 <p>国ごとの回帰モデルの結果を加える.</p>
 <pre class="r"><code>by_country &lt;- by_country %&gt;% 
   dplyr::mutate(model = purrr::map(data, ~ lm(lifeExp ~ year, data = .)))</code></pre>
@@ -143,20 +143,20 @@ resids %&gt;% gf_line(resid~year, group=~country, color=~continent)</code></pre>
 glance &lt;- unnest(by_country, glance, .drop = TRUE)
 glance %&gt;% arrange(r.squared)</code></pre>
 <pre><code>## # A tibble: 142 x 13
-##             country continent  r.squared adj.r.squared    sigma statistic
-##              &lt;fctr&gt;    &lt;fctr&gt;      &lt;dbl&gt;         &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-##  1           Rwanda    Africa 0.01715964  -0.081124401 6.558269 0.1745923
-##  2         Botswana    Africa 0.03402340  -0.062574259 6.112177 0.3522177
-##  3         Zimbabwe    Africa 0.05623196  -0.038144842 7.205431 0.5958240
-##  4           Zambia    Africa 0.05983644  -0.034179918 4.528713 0.6364471
-##  5        Swaziland    Africa 0.06821087  -0.024968046 6.644091 0.7320419
-##  6          Lesotho    Africa 0.08485635  -0.006658011 5.933934 0.9272463
-##  7    Cote d&#39;Ivoire    Africa 0.28337240   0.211709644 3.925590 3.9542491
-##  8     South Africa    Africa 0.31246865   0.243715518 4.744356 4.5447914
-##  9           Uganda    Africa 0.34215382   0.276369202 3.187668 5.2011219
-## 10 Congo, Dem. Rep.    Africa 0.34820278   0.283023054 2.429489 5.3421948
-## # ... with 132 more rows, and 7 more variables: p.value &lt;dbl&gt;, df &lt;int&gt;,
-## #   logLik &lt;dbl&gt;, AIC &lt;dbl&gt;, BIC &lt;dbl&gt;, deviance &lt;dbl&gt;, df.residual &lt;int&gt;</code></pre>
+##    count~ cont~ r.squ~ adj.r.s~ sigma stat~ p.val~    df logL~   AIC   BIC
+##    &lt;fctr&gt; &lt;fct&gt;  &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 Rwanda Afri~ 0.0172 -0.0811   6.56 0.175 0.685      2 -38.5  83.0  84.5
+##  2 Botsw~ Afri~ 0.0340 -0.0626   6.11 0.352 0.566      2 -37.7  81.3  82.8
+##  3 Zimba~ Afri~ 0.0562 -0.0381   7.21 0.596 0.458      2 -39.6  85.3  86.7
+##  4 Zambia Afri~ 0.0598 -0.0342   4.53 0.636 0.444      2 -34.1  74.1  75.6
+##  5 Swazi~ Afri~ 0.0682 -0.0250   6.64 0.732 0.412      2 -38.7  83.3  84.8
+##  6 Lesot~ Afri~ 0.0849 -0.00666  5.93 0.927 0.358      2 -37.3  80.6  82.1
+##  7 Cote ~ Afri~ 0.283   0.212    3.93 3.95  0.0748     2 -32.3  70.7  72.1
+##  8 South~ Afri~ 0.312   0.244    4.74 4.54  0.0588     2 -34.6  75.2  76.7
+##  9 Uganda Afri~ 0.342   0.276    3.19 5.20  0.0457     2 -29.8  65.7  67.1
+## 10 Congo~ Afri~ 0.348   0.283    2.43 5.34  0.0434     2 -26.6  59.2  60.6
+## # ... with 132 more rows, and 2 more variables: deviance &lt;dbl&gt;,
+## #   df.residual &lt;int&gt;</code></pre>
 <p>決定係数が悪いものを表示する.</p>
 <pre class="r"><code>bad_fit &lt;- filter(glance, r.squared&lt;0.25)
 gapminder %&gt;% semi_join(bad_fit, by =&quot;country&quot;) %&gt;%
@@ -171,32 +171,32 @@ gapminder %&gt;% semi_join(bad_fit, by =&quot;country&quot;) %&gt;%
 coef &lt;- by_country %&gt;% unnest(coef, .drop=TRUE)
 coef</code></pre>
 <pre><code>## # A tibble: 284 x 7
-##        country continent        term      estimate    std.error  statistic
-##         &lt;fctr&gt;    &lt;fctr&gt;       &lt;chr&gt;         &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;
-##  1 Afghanistan      Asia (Intercept)  -507.5342716 40.484161954 -12.536613
-##  2 Afghanistan      Asia        year     0.2753287  0.020450934  13.462890
-##  3     Albania    Europe (Intercept)  -594.0725110 65.655359062  -9.048348
-##  4     Albania    Europe        year     0.3346832  0.033166387  10.091036
-##  5     Algeria    Africa (Intercept) -1067.8590396 43.802200843 -24.379118
-##  6     Algeria    Africa        year     0.5692797  0.022127070  25.727749
-##  7      Angola    Africa (Intercept)  -376.5047531 46.583370599  -8.082385
-##  8      Angola    Africa        year     0.2093399  0.023532003   8.895964
-##  9   Argentina  Americas (Intercept)  -389.6063445  9.677729641 -40.258031
-## 10   Argentina  Americas        year     0.2317084  0.004888791  47.395847
-## # ... with 274 more rows, and 1 more variables: p.value &lt;dbl&gt;</code></pre>
+##    country     continent term         estimate std.error statis~   p.value
+##    &lt;fctr&gt;      &lt;fctr&gt;    &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;
+##  1 Afghanistan Asia      (Intercept) - 508      40.5      -12.5   1.93e- 7
+##  2 Afghanistan Asia      year            0.275   0.0205    13.5   9.84e- 8
+##  3 Albania     Europe    (Intercept) - 594      65.7      - 9.05  3.94e- 6
+##  4 Albania     Europe    year            0.335   0.0332    10.1   1.46e- 6
+##  5 Algeria     Africa    (Intercept) -1068      43.8      -24.4   3.07e-10
+##  6 Algeria     Africa    year            0.569   0.0221    25.7   1.81e-10
+##  7 Angola      Africa    (Intercept) - 377      46.6      - 8.08  1.08e- 5
+##  8 Angola      Africa    year            0.209   0.0235     8.90  4.59e- 6
+##  9 Argentina   Americas  (Intercept) - 390       9.68     -40.3   2.14e-12
+## 10 Argentina   Americas  year            0.232   0.00489   47.4   4.22e-13
+## # ... with 274 more rows</code></pre>
 <pre class="r"><code># coef &lt;- by_country %&gt;% unnest(model %&gt;% purrr::map(broom::tidy))</code></pre>
 <p>回帰係数の傾きをみる. P値が悪いのは決定係数が悪いのとほぼ同じである.</p>
 <pre class="r"><code>coef_year &lt;- filter(coef, term==&quot;year&quot;)
 coef_year %&gt;% arrange(desc(p.value)) %&gt;% head()</code></pre>
 <pre><code>## # A tibble: 6 x 7
-##     country continent  term    estimate  std.error  statistic   p.value
-##      &lt;fctr&gt;    &lt;fctr&gt; &lt;chr&gt;       &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;
-## 1    Rwanda    Africa  year -0.04583147 0.10968601 -0.4178424 0.6848927
-## 2  Botswana    Africa  year  0.06066853 0.10222519  0.5934793 0.5660414
-## 3  Zimbabwe    Africa  year -0.09302098 0.12050968 -0.7718963 0.4580290
-## 4    Zambia    Africa  year -0.06042517 0.07574200 -0.7977764 0.4435318
-## 5 Swaziland    Africa  year  0.09507483 0.11112137  0.8555945 0.4122530
-## 6   Lesotho    Africa  year  0.09556573 0.09924409  0.9629363 0.3582864</code></pre>
+##   country   continent term  estimate std.error statistic p.value
+##   &lt;fctr&gt;    &lt;fctr&gt;    &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 Rwanda    Africa    year   -0.0458    0.110     -0.418   0.685
+## 2 Botswana  Africa    year    0.0607    0.102      0.593   0.566
+## 3 Zimbabwe  Africa    year   -0.0930    0.121     -0.772   0.458
+## 4 Zambia    Africa    year   -0.0604    0.0757    -0.798   0.444
+## 5 Swaziland Africa    year    0.0951    0.111      0.856   0.412
+## 6 Lesotho   Africa    year    0.0956    0.0992     0.963   0.358</code></pre>
 <p>全体の分布をみる.</p>
 <pre class="r"><code>coef_year %&gt;% gf_density(~estimate)</code></pre>
 <p><img src="../../../../post/2017-09-13-gapminder_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
@@ -214,22 +214,22 @@ coef_year %&gt;% arrange(desc(p.value)) %&gt;% head()</code></pre>
   summarize(mean=mean(estimate),
             sd = sd(estimate))</code></pre>
 <pre><code>## # A tibble: 5 x 3
-##   continent      mean         sd
-##      &lt;fctr&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-## 1    Africa 0.2895293 0.17070326
-## 2  Americas 0.3676509 0.13511006
-## 3      Asia 0.4531224 0.13673199
-## 4    Europe 0.2219321 0.08297783
-## 5   Oceania 0.2102724 0.02468000</code></pre>
+##   continent  mean     sd
+##   &lt;fctr&gt;    &lt;dbl&gt;  &lt;dbl&gt;
+## 1 Africa    0.290 0.171 
+## 2 Americas  0.368 0.135 
+## 3 Asia      0.453 0.137 
+## 4 Europe    0.222 0.0830
+## 5 Oceania   0.210 0.0247</code></pre>
 <p>係数が負の国は以下の3つであるが, どれもP値は高い.</p>
 <pre class="r"><code>coef_year %&gt;% filter(estimate&lt;0) %&gt;% 
   select(country, estimate, p.value)</code></pre>
 <pre><code>## # A tibble: 3 x 3
-##    country    estimate   p.value
-##     &lt;fctr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
-## 1   Rwanda -0.04583147 0.6848927
-## 2   Zambia -0.06042517 0.4435318
-## 3 Zimbabwe -0.09302098 0.4580290</code></pre>
+##   country  estimate p.value
+##   &lt;fctr&gt;      &lt;dbl&gt;   &lt;dbl&gt;
+## 1 Rwanda    -0.0458   0.685
+## 2 Zambia    -0.0604   0.444
+## 3 Zimbabwe  -0.0930   0.458</code></pre>
 </div>
 
     </div>
