@@ -52,8 +52,8 @@ coeftest(fm, vcov=hc)</code></pre>
 <p>ロバスト分散でない結果をまとめると以下になる.</p>
 <pre class="r"><code>fm %&gt;% tidy() %&gt;% xtable() %&gt;% 
   print(include.rownames=FALSE,type=&quot;html&quot;)</code></pre>
-<!-- html table generated in R 3.4.2 by xtable 1.8-2 package -->
-<!-- Mon Jan 08 12:55:42 2018 -->
+<!-- html table generated in R 3.4.3 by xtable 1.8-2 package -->
+<!-- Sun Jan 14 22:03:45 2018 -->
 <table border="1">
 <tr>
 <th>
@@ -110,8 +110,8 @@ speed
 <p>ロバスト分散の結果をまとめると以下になる.</p>
 <pre class="r"><code>tab1 &lt;- fm %&gt;% coeftest(vcov=hc) %&gt;% tidy()
 print(xtable(tab1),include.rownames=FALSE,type=&quot;html&quot;)</code></pre>
-<!-- html table generated in R 3.4.2 by xtable 1.8-2 package -->
-<!-- Mon Jan 08 12:55:42 2018 -->
+<!-- html table generated in R 3.4.3 by xtable 1.8-2 package -->
+<!-- Sun Jan 14 22:03:46 2018 -->
 <table border="1">
 <tr>
 <th>
@@ -173,8 +173,8 @@ speed
 <p>データフレーム形式の名前の変換なら次のようにしてもよい. つぎのようにしてもよい.</p>
 <pre class="r"><code>tab1[&quot;term&quot;] &lt;- c(&quot;定数項&quot;,&quot;速度&quot;)
 print(xtable(tab1),include.rownames=FALSE,type=&quot;html&quot;)</code></pre>
-<!-- html table generated in R 3.4.2 by xtable 1.8-2 package -->
-<!-- Mon Jan 08 12:55:42 2018 -->
+<!-- html table generated in R 3.4.3 by xtable 1.8-2 package -->
+<!-- Sun Jan 14 22:03:46 2018 -->
 <table border="1">
 <tr>
 <th>
@@ -246,8 +246,8 @@ p.value
 tab2 &lt;- capture.output(print(xtable(tab1),include.rownames=FALSE,type=&quot;html&quot;)) %&gt;%
   str_replace(&quot;3.93&quot;,&quot;&lt;b&gt;3.93&lt;/b&gt;&quot;)
 cat(tab2,sep=&quot;\n&quot;)</code></pre>
-<!-- html table generated in R 3.4.2 by xtable 1.8-2 package -->
-<!-- Mon Jan 08 12:55:42 2018 -->
+<!-- html table generated in R 3.4.3 by xtable 1.8-2 package -->
+<!-- Sun Jan 14 22:03:46 2018 -->
 <table border="1">
 <tr>
 <th>

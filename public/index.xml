@@ -6,10 +6,20 @@
     <description>Recent content on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja-jp</language>
-    <lastBuildDate>Mon, 08 Jan 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 14 Jan 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Cluster-Robust (by Firm and Time) Standard Errors in R</title>
+      <link>/2018/01/14/cluster-robust-by-firm-and-time-standard-errors-in-r/</link>
+      <pubDate>Sun, 14 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/2018/01/14/cluster-robust-by-firm-and-time-standard-errors-in-r/</guid>
+      <description>http://www.kellogg.northwestern.edu/faculty/petersen/htm/papers/se/test_data.htm
+library(foreign)test &amp;lt;- read.dta(&amp;quot;http://www.kellogg.northwestern.edu/faculty/petersen/htm/papers/se/test_data.dta&amp;quot;)OLS Coefficients and Standard Errorsfpm &amp;lt;- plm(y ~ x, test, model=&amp;#39;pooling&amp;#39;, index=c(&amp;#39;firmid&amp;#39;, &amp;#39;year&amp;#39;))coeftest(fpm) %&amp;gt;% tidy() %&amp;gt;% kable()termestimatestd.errorstatisticp.value(Intercept)0.02967970.02835931.046560.2953533x1.03483340.028583336.204140.0000000OLS Coefficients and Standard Errors Clustered by Firmcoeftest(fpm, vcov=vcovHC(fpm, cluster = &amp;quot;group&amp;quot;, type=&amp;quot;sss&amp;quot;)) %&amp;gt;% tidy() %&amp;gt;% kable()termestimatestd.</description>
+    </item>
     
     <item>
       <title>texreg again</title>
@@ -224,7 +234,7 @@
       <pubDate>Thu, 01 Jun 2017 00:00:00 +0000</pubDate>
       
       <guid>/2017/06/01/rnorm/</guid>
-      <description>ここで例を示す. (x&amp;lt;-rnorm(10)) ## [1] -0.6686714 -0.4662474 0.2598043 0.2166866 1.9456440 1.0268205 ## [7] -1.1301435 0.5711642 0.2741013 0.5728548 (y&amp;lt;-rnorm(10)) ## [1] -0.650490428 0.659497165 0.132000891 -0.007939512 0.790269970 ## [6] -0.301666107 0.368073030 1.228006602 0.845902507 1.464367774 作図すると以下になる. plot(x,y)</description>
+      <description>ここで例を示す. (x&amp;lt;-rnorm(10)) ## [1] -0.9029842 -1.0599877 1.1458056 0.5482772 0.6829092 -1.4690753 ## [7] 0.4973534 -0.4828934 0.7811832 -0.1522141 (y&amp;lt;-rnorm(10)) ## [1] -1.4156733 -1.7858150 -0.4281849 -0.3154072 1.2376214 -0.6202999 ## [7] 0.3327151 1.1602333 0.9124431 -0.2944872 作図すると以下になる. plot(x,y)</description>
     </item>
     
     <item>
@@ -233,7 +243,7 @@
       <pubDate>Sat, 27 May 2017 00:00:00 +0000</pubDate>
       
       <guid>/2017/05/27/ols/</guid>
-      <description>library(mosaic) ## Warning: パッケージ &amp;#39;mosaic&amp;#39; はバージョン 3.4.3 の R の下で造られました ## 要求されたパッケージ dplyr をロード中です ## ## 次のパッケージを付け加えます: &amp;#39;dplyr&amp;#39; ## 以下のオブ</description>
+      <description>library(mosaic) ## 要求されたパッケージ dplyr をロード中です ## ## 次のパッケージを付け加えます: &amp;#39;dplyr&amp;#39; ## 以下のオブジェクトは &amp;#39;package:stats&amp;#39; からマスクされています: ## ## filter, lag ## 以下の</description>
     </item>
     
     <item>
@@ -243,7 +253,7 @@
       
       <guid>/2017/05/27/test/</guid>
       <description>This is a test.
-rnorm(10)## [1] 1.5166319 -0.2440452 1.0729870 0.5259641 -1.8127523 0.6852279## [7] -0.6526763 1.6683641 1.4944270 -1.1124634</description>
+rnorm(10)## [1] -0.2416871 -0.9905345 -1.3147530 0.4153786 1.1528297 0.4254123## [7] 1.0001822 -1.5520914 -1.7714519 0.4539147</description>
     </item>
     
     <item>

@@ -1,0 +1,53 @@
+---
+title: Cluster-Robust (by Firm and Time) Standard Errors in R
+author: Kenji Miyazaki
+date: '2018-01-14'
+slug: cluster-robust-by-firm-and-time-standard-errors-in-r
+categories: []
+tags: []
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(broom)
+library(AER)
+library(plm)
+```
+
+
+http://www.kellogg.northwestern.edu/faculty/petersen/htm/papers/se/test_data.htm
+
+```{r}
+library(foreign)
+test <- read.dta("http://www.kellogg.northwestern.edu/faculty/petersen/htm/papers/se/test_data.dta")
+```
+
+## OLS Coefficients and Standard Errors
+```{r}
+fpm <- plm(y ~ x, test, model='pooling', index=c('firmid', 'year'))
+coeftest(fpm) %>% tidy() %>% kable()
+```
+
+## OLS Coefficients and Standard Errors Clustered by Firm
+```{r}
+coeftest(fpm, vcov=vcovHC(fpm, cluster = "group", type="sss")) %>% tidy() %>% kable()
+```
+
+## OLS Coefficients and Standard Errors Clustered by Year
+```{r}
+coeftest(fpm, vcov=vcovHC(fpm, cluster = "time", type="sss")) %>% tidy() %>% kable()
+```
+
+## OLS Coefficients and Standard Errors Clustered by Firm and Year
+ 
+```{r}
+coeftest(fpm, vcov=vcovDC(fpm, type="sss")) %>% tidy() %>% kable()
+```
+
+## Fama-MacBeth Coefficients and Standard Errors
+```{r}
+fpmg <- pmg(y~x, test, index=c("year","firmid"))
+coeftest(fpmg) %>% tidy() %>% kable()
+```

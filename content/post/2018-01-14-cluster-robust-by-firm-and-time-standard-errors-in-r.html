@@ -1,0 +1,171 @@
+---
+title: Cluster-Robust (by Firm and Time) Standard Errors in R
+author: Kenji Miyazaki
+date: '2018-01-14'
+slug: cluster-robust-by-firm-and-time-standard-errors-in-r
+categories: []
+tags: []
+---
+
+
+
+<p><a href="http://www.kellogg.northwestern.edu/faculty/petersen/htm/papers/se/test_data.htm" class="uri">http://www.kellogg.northwestern.edu/faculty/petersen/htm/papers/se/test_data.htm</a></p>
+<pre class="r"><code>library(foreign)
+test &lt;- read.dta(&quot;http://www.kellogg.northwestern.edu/faculty/petersen/htm/papers/se/test_data.dta&quot;)</code></pre>
+<div id="ols-coefficients-and-standard-errors" class="section level2">
+<h2>OLS Coefficients and Standard Errors</h2>
+<pre class="r"><code>fpm &lt;- plm(y ~ x, test, model=&#39;pooling&#39;, index=c(&#39;firmid&#39;, &#39;year&#39;))
+coeftest(fpm) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.0296797</td>
+<td align="right">0.0283593</td>
+<td align="right">1.04656</td>
+<td align="right">0.2953533</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="right">1.0348334</td>
+<td align="right">0.0285833</td>
+<td align="right">36.20414</td>
+<td align="right">0.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="ols-coefficients-and-standard-errors-clustered-by-firm" class="section level2">
+<h2>OLS Coefficients and Standard Errors Clustered by Firm</h2>
+<pre class="r"><code>coeftest(fpm, vcov=vcovHC(fpm, cluster = &quot;group&quot;, type=&quot;sss&quot;)) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.0296797</td>
+<td align="right">0.0670127</td>
+<td align="right">0.4428969</td>
+<td align="right">0.6578595</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="right">1.0348334</td>
+<td align="right">0.0505957</td>
+<td align="right">20.4529814</td>
+<td align="right">0.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="ols-coefficients-and-standard-errors-clustered-by-year" class="section level2">
+<h2>OLS Coefficients and Standard Errors Clustered by Year</h2>
+<pre class="r"><code>coeftest(fpm, vcov=vcovHC(fpm, cluster = &quot;time&quot;, type=&quot;sss&quot;)) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.0296797</td>
+<td align="right">0.0233867</td>
+<td align="right">1.269084</td>
+<td align="right">0.2044701</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="right">1.0348334</td>
+<td align="right">0.0333889</td>
+<td align="right">30.993325</td>
+<td align="right">0.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="ols-coefficients-and-standard-errors-clustered-by-firm-and-year" class="section level2">
+<h2>OLS Coefficients and Standard Errors Clustered by Firm and Year</h2>
+<pre class="r"><code>coeftest(fpm, vcov=vcovDC(fpm, type=&quot;sss&quot;)) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.0296797</td>
+<td align="right">0.0650639</td>
+<td align="right">0.4561625</td>
+<td align="right">0.6482929</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="right">1.0348334</td>
+<td align="right">0.0535580</td>
+<td align="right">19.3217259</td>
+<td align="right">0.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="fama-macbeth-coefficients-and-standard-errors" class="section level2">
+<h2>Fama-MacBeth Coefficients and Standard Errors</h2>
+<pre class="r"><code>fpmg &lt;- pmg(y~x, test, index=c(&quot;year&quot;,&quot;firmid&quot;))
+coeftest(fpmg) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.031278</td>
+<td align="right">0.0233565</td>
+<td align="right">1.339155</td>
+<td align="right">0.180581</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="right">1.035586</td>
+<td align="right">0.0333416</td>
+<td align="right">31.059889</td>
+<td align="right">0.000000</td>
+</tr>
+</tbody>
+</table>
+</div>

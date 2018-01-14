@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ja-jp">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.21" />
+
+
+<title>Cluster-Robust (by Firm and Time) Standard Errors in R - A Hugo website</title>
+<meta property="og:title" content="Cluster-Robust (by Firm and Time) Standard Errors in R - A Hugo website">
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="../../../../css/fonts.css" media="all">
+<link rel="stylesheet" href="../../../../css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="../../../../" class="nav-logo">
+    <img src="../../../../images/sarah.jpg"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="https://github.com/rstudio/blogdown">GitHub</a></li>
+    
+    <li><a href="../../../../about/">Kenji Miyazaki</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">1 min read</span>
+    
+
+    <h1 class="article-title">Cluster-Robust (by Firm and Time) Standard Errors in R</h1>
+
+    
+    <span class="article-date">2018/01/14</span>
+    
+
+    <div class="article-content">
+      <p><a href="http://www.kellogg.northwestern.edu/faculty/petersen/htm/papers/se/test_data.htm" class="uri">http://www.kellogg.northwestern.edu/faculty/petersen/htm/papers/se/test_data.htm</a></p>
+<pre class="r"><code>library(foreign)
+test &lt;- read.dta(&quot;http://www.kellogg.northwestern.edu/faculty/petersen/htm/papers/se/test_data.dta&quot;)</code></pre>
+<div id="ols-coefficients-and-standard-errors" class="section level2">
+<h2>OLS Coefficients and Standard Errors</h2>
+<pre class="r"><code>fpm &lt;- plm(y ~ x, test, model=&#39;pooling&#39;, index=c(&#39;firmid&#39;, &#39;year&#39;))
+coeftest(fpm) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.0296797</td>
+<td align="right">0.0283593</td>
+<td align="right">1.04656</td>
+<td align="right">0.2953533</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="right">1.0348334</td>
+<td align="right">0.0285833</td>
+<td align="right">36.20414</td>
+<td align="right">0.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="ols-coefficients-and-standard-errors-clustered-by-firm" class="section level2">
+<h2>OLS Coefficients and Standard Errors Clustered by Firm</h2>
+<pre class="r"><code>coeftest(fpm, vcov=vcovHC(fpm, cluster = &quot;group&quot;, type=&quot;sss&quot;)) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.0296797</td>
+<td align="right">0.0670127</td>
+<td align="right">0.4428969</td>
+<td align="right">0.6578595</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="right">1.0348334</td>
+<td align="right">0.0505957</td>
+<td align="right">20.4529814</td>
+<td align="right">0.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="ols-coefficients-and-standard-errors-clustered-by-year" class="section level2">
+<h2>OLS Coefficients and Standard Errors Clustered by Year</h2>
+<pre class="r"><code>coeftest(fpm, vcov=vcovHC(fpm, cluster = &quot;time&quot;, type=&quot;sss&quot;)) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.0296797</td>
+<td align="right">0.0233867</td>
+<td align="right">1.269084</td>
+<td align="right">0.2044701</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="right">1.0348334</td>
+<td align="right">0.0333889</td>
+<td align="right">30.993325</td>
+<td align="right">0.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="ols-coefficients-and-standard-errors-clustered-by-firm-and-year" class="section level2">
+<h2>OLS Coefficients and Standard Errors Clustered by Firm and Year</h2>
+<pre class="r"><code>coeftest(fpm, vcov=vcovDC(fpm, type=&quot;sss&quot;)) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.0296797</td>
+<td align="right">0.0650639</td>
+<td align="right">0.4561625</td>
+<td align="right">0.6482929</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="right">1.0348334</td>
+<td align="right">0.0535580</td>
+<td align="right">19.3217259</td>
+<td align="right">0.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="fama-macbeth-coefficients-and-standard-errors" class="section level2">
+<h2>Fama-MacBeth Coefficients and Standard Errors</h2>
+<pre class="r"><code>fpmg &lt;- pmg(y~x, test, index=c(&quot;year&quot;,&quot;firmid&quot;))
+coeftest(fpmg) %&gt;% tidy() %&gt;% kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.031278</td>
+<td align="right">0.0233565</td>
+<td align="right">1.339155</td>
+<td align="right">0.180581</td>
+</tr>
+<tr class="even">
+<td align="left">x</td>
+<td align="right">1.035586</td>
+<td align="right">0.0333416</td>
+<td align="right">31.059889</td>
+<td align="right">0.000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="../../../../index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+
