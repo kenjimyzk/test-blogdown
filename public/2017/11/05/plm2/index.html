@@ -513,7 +513,8 @@ coeftest(fm_diff) %&gt;% tidy() %&gt;% kable()</code></pre>
 </div>
 <div id="p.368-table-10.1-numbers-refer-to-cols." class="section level2">
 <h2>p. 368, Table 10.1, numbers refer to cols.</h2>
-<pre class="r"><code>fm1 &lt;- plm(frate ~ beertax, data = df, index = c(&quot;state&quot;, &quot;year&quot;), model = &quot;pooling&quot;)
+<pre class="r"><code>formula &lt;- frate ~ beertax
+fm1 &lt;- plm(formula, index = c(&quot;state&quot;, &quot;year&quot;), model = &quot;within&quot;,data =df)
 fm2 &lt;- update(fm1, model = &quot;within&quot;)
 fm3 &lt;- update(fm2, effect = &quot;twoways&quot;)
 fm4 &lt;- update(fm3, . ~ . + drinkagec + punish + vmiles + unemp + log(income))
@@ -565,7 +566,7 @@ Statistical models
 beertax
 </td>
 <td style="padding-right: 12px; border: none;">
-0.365<sup style="vertical-align: 0px;">***</sup>
+-0.656<sup style="vertical-align: 0px;">***</sup>
 </td>
 <td style="padding-right: 12px; border: none;">
 -0.656<sup style="vertical-align: 0px;">*</sup>
@@ -587,7 +588,7 @@ beertax
 <td style="padding-right: 12px; border: none;">
 </td>
 <td style="padding-right: 12px; border: none;">
-(0.062)
+(0.188)
 </td>
 <td style="padding-right: 12px; border: none;">
 (0.291)
@@ -908,7 +909,7 @@ log(income)
 R<sup style="vertical-align: 0px;">2</sup>
 </td>
 <td style="border-top: 1px solid black;">
-0.093
+0.041
 </td>
 <td style="border-top: 1px solid black;">
 0.041
@@ -931,7 +932,7 @@ R<sup style="vertical-align: 0px;">2</sup>
 Adj. R<sup style="vertical-align: 0px;">2</sup>
 </td>
 <td style="padding-right: 12px; border: none;">
-0.091
+-0.120
 </td>
 <td style="padding-right: 12px; border: none;">
 -0.120
@@ -980,7 +981,7 @@ Num. obs.
 </table>
 <pre class="r"><code>fm7 &lt;- df %&gt;% filter(year==1982|year==1988) %&gt;% 
   lm(frate ~ beertax + drinkagec + punish + vmiles + unemp + log(income) + state + year,.)
-coeftest(fm7, vcovHC(fm7 ,type=&quot;HC1&quot;)) %&gt;% tidy() %&gt;% head(9)</code></pre>
+coeftest(fm7, vcovHC(fm7,type=&quot;HC1&quot;)) %&gt;% tidy() %&gt;% head(9)</code></pre>
 <pre><code>##               term    estimate  std.error  statistic      p.value
 ## 1      (Intercept) -5.24571226 7.00269819 -0.7490987 0.4584099638
 ## 2          beertax -0.92560284 0.36055834 -2.5671375 0.0143148699

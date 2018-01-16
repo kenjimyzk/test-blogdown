@@ -88,7 +88,7 @@ coeftest(fm_diff) %>% tidy() %>% kable()
 ## p. 368, Table 10.1, numbers refer to cols.
 ```{r}
 formula <- frate ~ beertax
-fm1 <- plm(formula, index = c("state", "year"), model = "within")
+fm1 <- plm(formula, index = c("state", "year"), model = "within",data =df)
 fm2 <- update(fm1, model = "within")
 fm3 <- update(fm2, effect = "twoways")
 fm4 <- update(fm3, . ~ . + drinkagec + punish + vmiles + unemp + log(income))
