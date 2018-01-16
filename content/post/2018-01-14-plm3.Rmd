@@ -1,0 +1,135 @@
+---
+title: "plm3"
+author: "Kenji Miyazaki"
+date: '2018-01-14'
+slug: plm3
+tags: []
+categories: []
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## library
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(knitr)
+library(broom)
+library(AER)
+library(plm)
+library(texreg)
+library(mosaic)
+options(digits = 3)
+```
+
+## data
+```{r}
+data("Fatalities")
+df <- Fatalities %>% 
+  mutate(frate = 10000 * fatal/pop,
+         vmiles = miles/1000,
+         punish = factor(jail == "yes" | service == "yes", labels = c("no", "yes")),
+         drinkagec = relevel(
+           cut(drinkage, breaks = 18:22, include.lowest = TRUE, right = FALSE), ref = 4))
+```
+
+
+## p. 368, Table 10.1, numbers refer to cols.
+```{r}
+fm1 <- plm(frate ~ beertax, data = df, index = c("state", "year"), model = "pooling")
+fm2 <- update(fm1, model = "within")
+fm3 <- update(fm2, . ~ . + factor(year))
+fm4 <- update(fm3, . ~ . + drinkagec + punish + vmiles + unemp + log(income))
+fm5 <- update(fm4, . ~ . - unemp - log(income))
+fm6 <- update(fm4, . ~ . - drinkagec + drinkage)
+fm7 <- update(fm4, data = subset(df, year == 1982|year == 1988))
+```
+
+
+```{r results='asis'}
+namelist <- paste0("(",1:7,")")
+ll <- list(fm1, fm2,fm3,fm4,fm5,fm6, fm7)
+chc <- function(fm) vcovHC(fm, cluster = "group", type = "sss")
+selist <- ll %>% map(~{
+  coeftest(.,chc(.)) %>% tidy() %>% .$std.error
+  })
+pvlist <- ll %>% map(~{
+  coeftest(.,chc(.)) %>% tidy() %>% .$p.value
+  })
+htmlreg(ll, caption = "",
+        custom.model.names = namelist,
+        override.se = selist,
+        override.pvalues = pvlist, digits = 3)
+```
+
+
+
+
+```{r, results = 'asis'}
+selist[[1]] <- tidy(fm1) %>% .$std.error
+pvlist[[1]] <- tidy(fm1) %>% .$p.value
+htmlreg(ll, caption = "",
+        custom.model.names = namelist,
+        reorder.coef = c(1:4,9,5:8),
+        override.se = selist,
+        override.pvalues = pvlist,
+        omit.coef = "factor|Intercept",
+        digits = 3)
+```
+
+
+
+
+
+```{r}
+timeeffect <- function(fm) {
+  update(fm, .~. - factor(year)) %>% 
+    waldtest(fm, vcov= chc(fm),test = "F") 
+}
+fmlist <- list(fm3,fm4,fm5,fm6,fm7)
+names(fmlist) <- paste0("(",3:7,")")
+fmlist %>% map(timeeffect) %>% 
+  map_dfr("F") %>% slice(2) %>% kable()
+```
+
+```{r}
+drinkagetest <- function(fm){
+  update(fm,.~.-drinkagec) %>%
+    waldtest(fm, vcov = chc(fm),test = "F")
+}
+fmlist <- list(fm4,fm5,fm7)
+names(fmlist) <- paste0("(",c(4,5,7),")")
+fmlist %>% map(drinkagetest) %>% 
+  map_dfr("F") %>% slice(2) %>% kable()
+```
+
+
+```{r}
+unemptest <- function(fm){
+  update(fm,.~.-unemp - log(income)) %>%
+    waldtest(fm, vcov = chc(fm), test = "F")
+}
+fmlist <- list(fm4,fm6,fm7)
+names(fmlist) <- paste0("(",c(4,6,7),")")
+fmlist %>% map(unemptest) %>% 
+  map_dfr("F") %>% slice(2) %>% kable()
+```
+
+
+
+```{r}
+fm1a <- lm(frate ~ beertax, df)
+fm2a <- update(fm1a, . ~ . + state)
+fm3a <- update(fm2a, . ~ . + year)
+fm4a <- update(fm3a, . ~ . + drinkagec + punish + vmiles + unemp + log(income))
+fm5a <- update(fm4a, . ~ . - unemp - log(income))
+fm6a <- update(fm4a, . ~ . - drinkagec + drinkage)
+fm7a <- update(fm4a, . ~ ., data = subset(df, (year == 1982|year == 1988)))
+fmlist <- list(fm1a, fm2a, fm3a, fm4a, fm5a, fm6a, fm7a)
+names(fmlist) <- paste0("(",1:7,")")
+fmlist %>% map(summary) %>% 
+  map_dfr("adj.r.squared") %>% kable()
+```

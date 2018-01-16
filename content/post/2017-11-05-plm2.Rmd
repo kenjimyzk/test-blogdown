@@ -87,7 +87,8 @@ coeftest(fm_diff) %>% tidy() %>% kable()
 
 ## p. 368, Table 10.1, numbers refer to cols.
 ```{r}
-fm1 <- plm(frate ~ beertax, data = df, index = c("state", "year"), model = "pooling")
+formula <- frate ~ beertax
+fm1 <- plm(formula, index = c("state", "year"), model = "within")
 fm2 <- update(fm1, model = "within")
 fm3 <- update(fm2, effect = "twoways")
 fm4 <- update(fm3, . ~ . + drinkagec + punish + vmiles + unemp + log(income))
@@ -114,7 +115,7 @@ htmlreg(ll, override.se=selist,override.pvalues=pvlist,omit.coef = "(Intercept)"
 ```{r}
 fm7 <- df %>% filter(year==1982|year==1988) %>% 
   lm(frate ~ beertax + drinkagec + punish + vmiles + unemp + log(income) + state + year,.)
-coeftest(fm7, vcovHC(fm7 ,type="HC1")) %>% tidy() %>% head(9)
+coeftest(fm7, vcovHC(fm7,type="HC1")) %>% tidy() %>% head(9)
 ```
 
 ```{r}
@@ -155,4 +156,5 @@ timeeffect(fm4)
 timeeffect(fm5)
 timeeffect(fm6)
 ```
+
 
